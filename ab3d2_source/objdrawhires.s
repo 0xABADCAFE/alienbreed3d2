@@ -1,6 +1,8 @@
 
-DRAW_BITMAP_NEAR_PLANE	EQU		25  ; Distances lower than this for bitmaps are considered behind the observer
-DRAW_VECTOR_NEAR_PLANE	EQU		130 ; Distances lower than this for vectors are considered behind the observer
+DRAW_BITMAP_NEAR_PLANE	EQU		25   ; Distances lower than this for bitmaps are considered behind the observer
+DRAW_VECTOR_NEAR_PLANE	EQU		130  ; Distances lower than this for vectors are considered behind the observer
+
+DRAW_VECTOR_MAX_Z		EQU		16383 ; Vector points further than this will be culled
 
 				align 4
 draw_TopY_3D_l:			dc.l	-100*1024
@@ -8,22 +10,23 @@ draw_BottomY_3D_l:		dc.l	1*1024
 
 ********************************************************************************
 
-Draw_Object:
+; Main entry point for object drawing.
+Draw_Objects:
 				move.w	(a0)+,d0
 				cmp.w	#1,d0
-				blt.s	.before_wat
+				blt.s	.before_water
 
-				beq.s	.after_wat
+				beq.s	.after_water
 
 				bgt.s	.full_room
 
-.before_wat:
+.before_water:
 				move.l	Draw_BeforeWaterTop_l,draw_TopY_3D_l
 				move.l	Draw_BeforeWaterBottom_l,draw_BottomY_3D_l
 				move.b	#1,draw_WhichDoing_b
 				bra.s	.done_top_bot
 
-.after_wat:
+.after_water:
 				move.l	Draw_AfterWaterTop_l,draw_TopY_3D_l
 				move.l	Draw_AfterWaterBottom_l,draw_BottomY_3D_l
 				move.b	#0,draw_WhichDoing_b
@@ -36,8 +39,8 @@ Draw_Object:
 
 .done_top_bot:
 				movem.l	d0-d7/a1-a6,-(a7)
-				move.w	rightclip,d0
-				sub.w	leftclip,d0
+				move.w	Draw_RightClip_w,d0
+				sub.w	Draw_LeftClip_w,d0
 				subq	#1,d0
 				ble		.done_all_in_front
 
@@ -113,7 +116,9 @@ Draw_Object:
 ;********************************************************************************
 
 draw_Object:
+				DEV_INC.w	DrawObjectCallCount
 				movem.l	d0-d7/a0-a6,-(a7)
+
 				move.l	Lvl_ObjectDataPtr_l,a0
 				move.l	#ObjRotated_vl,a1
 				asl.w	#6,d0
@@ -122,19 +127,20 @@ draw_Object:
 				move.w	(a0),d0
 				move.w	2(a1,d0.w*8),d1			; z pos
 
-				move.w	leftclip,draw_LeftClipB_w
-				move.w	rightclip,draw_RightClipB_w
+				move.w	Draw_LeftClip_w,draw_LeftClipB_w
+				move.w	Draw_RightClip_w,draw_RightClipB_w
 
 				cmp.b	#$ff,6(a0)
 				bne		draw_Bitmap
 
+				DEV_CHECK	POLYGON_MODELS,.done
 				bsr		draw_PolygonModel
-
+.done:
 				movem.l	(a7)+,d0-d7/a0-a6
 				rts
 
-
 draw_bitmap_glare:
+				DEV_CHECK	GLARE_BITMAPS,object_behind
 				move.w	(a0)+,d0				; Point number
 				move.w	2(a1,d0.w*8),d1			; depth
 				cmp.w	#DRAW_BITMAP_NEAR_PLANE,d1
@@ -354,7 +360,10 @@ draw_bitmap_glare:
 				swap	d2
 				move.l	#0,a1
 
+				DEV_INC.w	VisibleGlareCount
+
 draw_right_side_glare:
+
 				swap	d7
 				move.l	midobj_l,a5
 				lea		(a5,d7.w*4),a5
@@ -390,7 +399,7 @@ draw_right_side_glare:
 				move.b	(a4,d0.w),(a6)
 
 .skip_black_1:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_1
@@ -417,7 +426,7 @@ draw_right_side_glare:
 				move.b	(a4,d0.w),(a6)
 
 .skip_black_2:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_2
@@ -441,7 +450,7 @@ draw_right_side_glare:
 				move.b	(a4,d0.w),(a6)
 
 .skip_black_3:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_3
@@ -528,7 +537,7 @@ draw_Bitmap:
 				move.w	draw_ObjScaleCols_vw(pc,d6.w*2),a4 ; is this the table that scales vertically?
 				bra		pastobjscale
 
-				CNOP 0,4
+				align 4
 draw_ObjScaleCols_vw:
 				dcb.w	1,64*0
 				dcb.w	2,64*1
@@ -790,6 +799,9 @@ pastobjscale:
 				tst.b	draw_Additive_b
 				bne		draw_bitmap_additive
 
+				DEV_CHECK	BITMAPS,object_behind
+				DEV_INC.w	VisibleBitmapCount
+
 draw_right_side:
 				swap	d7
 				move.l	midobj_l,a5
@@ -825,7 +837,7 @@ draw_right_side:
 				move.b	(a4,d0.w*2),(a6)
 
 .skip_black_1:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6					; is d2 the vertical step, fraction|integer?
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_1
@@ -848,7 +860,7 @@ draw_right_side:
 				move.b	(a4,d0.w*2),(a6)
 
 .skip_black_2:
-				adda.w	#SCREENWIDTH,a6			; next line on screen
+				adda.w	#SCREEN_WIDTH,a6			; next line on screen
 				add.l	d2,d6
 				addx.w	d2,d1					; is d2 the vertical step, fraction|integer?
 				dbra	d4,.draw_vertical_strip_2
@@ -869,7 +881,7 @@ draw_right_side:
 				move.b	(a4,d0.w*2),(a6)
 
 .skip_black:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1					; is d2 the vertical dy/dt step, fraction|integer?
 				dbra	d4,.draw_vertical_strip_3
@@ -881,6 +893,8 @@ object_behind:
 				rts
 
 draw_bitmap_additive:
+				DEV_CHECK	ADDITIVE_BITMAPS,object_behind
+				DEV_INC.w	VisibleAdditiveCount
 				move.l	draw_BasePalPtr_l,a4
 
 draw_right_side_additive:
@@ -914,7 +928,7 @@ draw_right_side_additive:
 				lsl.w	#8,d0
 				move.b	(a6),d0
 				move.b	(a4,d0.w),(a6)
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_1
@@ -936,7 +950,7 @@ draw_right_side_additive:
 				lsl.w	#8,d0
 				move.b	(a6),d0
 				move.b	(a4,d0.w),(a6)
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_2
@@ -958,7 +972,7 @@ draw_right_side_additive:
 				move.b	(a4,d0.w),(a6)
 
 .skip_black:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip_3
@@ -968,33 +982,14 @@ draw_right_side_additive:
 				bra		object_behind
 
 draw_bitmap_lighted:
+				DEV_CHECK	LIGHTSOURCED_BITMAPS,object_behind
+				DEV_INC.w	VisibleLightMapCount
 
 ; Make up lighting values
 
 				movem.l	d0-d7/a0-a6,-(a7)
 
-				move.l	#draw_AngleBrights_vl,a2
-				move.l	#$80808080,(a2)
-				move.l	#$80808080,4(a2)
-				move.l	#$80808080,8(a2)
-				move.l	#$80808080,12(a2)
-				move.l	#$80808080,16(a2)
-				move.l	#$80808080,20(a2)
-				move.l	#$80808080,24(a2)
-				move.l	#$80808080,28(a2)
-				move.l	#$80808080,32(a2)
-				move.l	#$80808080,36(a2)
-				move.l	#$80808080,40(a2)
-				move.l	#$80808080,44(a2)
-				move.l	#$80808080,48(a2)
-				move.l	#$80808080,52(a2)
-				move.l	#$80808080,56(a2)
-				move.l	#$80808080,60(a2)
-
-				move.w	Draw_CurrentZone_w,d0
-				bsr		draw_CalcBrightsInZone
-
-				move.l	#draw_AngleBrights_vl+32,a2
+				bsr		draw_ResetAngleBrights
 
 				move.l	#draw_XZAngs_vw,a0
 				move.l	#draw_AngleBrights_vl,a1
@@ -1074,8 +1069,7 @@ foundang:
 				bgt.s	.okpicked
 
 				move.w	d0,d3
-.okpicked
-
+.okpicked:
 				move.w	d0,d2
 				add.w	d1,d2					; total brightness
 
@@ -1203,7 +1197,7 @@ INMIDDLE:
 				move.b	(a4,d0.w),(a6)				; FIXME: causing enforcer hits in Level C, illegal reads
 
 .skip_black:
-				adda.w	#SCREENWIDTH,a6
+				adda.w	#SCREEN_WIDTH,a6
 				add.l	d2,d6
 				addx.w	d2,d1
 				dbra	d4,.draw_vertical_strip
@@ -1246,38 +1240,51 @@ draw_FindRoughAngle:
 				move.w	draw_MapToAng_vw(pc,d7.w*2),d4	; retun angle
 				rts
 
-				CNOP 0,4
+				align 4
 draw_MapToAng_vw:
-				dc.w	3,2,0,1,4,5,7,6
-				dc.w	12,13,15,14,11,10,8,9
+				dc.w	 3, 2, 0, 1, 4, 5, 7, 6
+				dc.w	12,13,15,14,11,10, 8, 9
 
-draw_TempPtr_l:		dc.l	0
+draw_TempPtr_l:
+				dc.l	0
 
 *********************************************
-draw_CalcBrightRings:
+
+; Initialises the angle brightness table
+draw_ResetAngleBrights:
 				move.l	#draw_AngleBrights_vl,a2
-				move.l	#$80808080,(a2)
-				move.l	#$80808080,4(a2)
-				move.l	#$80808080,8(a2)
-				move.l	#$80808080,12(a2)
-				move.l	#$80808080,16(a2)
-				move.l	#$80808080,20(a2)
-				move.l	#$80808080,24(a2)
-				move.l	#$80808080,28(a2)
 
-				move.l	#$80808080,32(a2)
-				move.l	#$80808080,36(a2)
-				move.l	#$80808080,40(a2)
-				move.l	#$80808080,44(a2)
-				move.l	#$80808080,48(a2)
-				move.l	#$80808080,52(a2)
-				move.l	#$80808080,56(a2)
-				move.l	#$80808080,60(a2)
+				move.l	#$80808080,d0
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
 
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+				move.l	d0,(a2)+
+
+				sub.w	#64,a2
 				move.w	Draw_CurrentZone_w,d0
 				bsr		draw_CalcBrightsInZone
 
 				move.l	#draw_AngleBrights_vl+32,a2
+
+				rts
+
+draw_CalcBrightRings:
+				bsr.s	draw_ResetAngleBrights
 
 ; Now do the brightnesses of surrounding
 ; zones:
@@ -1561,6 +1568,8 @@ draw_PolygonModel:
 .okinfront:
 				movem.l	d0-d7/a0-a6,-(a7)
 
+				DEV_INC.w VisibleModelCount
+
 				jsr		draw_CalcBrightRings
 
 				move.l	#draw_AngleBrights_vl,a0
@@ -1769,7 +1778,7 @@ rotate_object:
 				move.l	#boxbrights,a6
 				move.w	2(a0),d2				; object y pos?
 				subq	#1,d7
-				asl.l	#1,d0					;
+				add.l	d0,d0					; * 2
 ; Projection for polygonal objects to screen here?
 				tst.b	Vid_FullScreen_b
 				beq.s	smallscreen_conv
@@ -1778,14 +1787,13 @@ fullscreen_conv:
 				; 0xABADCAFE - this is very weird. If I supply the correct factor of 5/3, vector models break
 				; but if I don't correct for it in billboard rendering, the bitmap depth is incorrect.
 				move.w	d1,d3
-				asl.w	#1,d1
+				add.w	d1,d1
 				add.w	d3,d1					; d1 * 3  because 288 is ~1.5times larger than 196?
 												; if I change this, 3d objects start "swimming" with regard to the world
-
 				ext.l	d2
 				asl.l	#7,d2					; (view_ypos * 128 - yoff) * 2
 				sub.l	yoff,d2
-				asl.l	#1,d2
+				add.l	d2,d2
 
 .convert_to_screen:
 				move.l	(a2),d3					;
@@ -1797,6 +1805,10 @@ fullscreen_conv:
 				move.w	(a2),d5					; z'
 				add.w	d1,d5					; z'' = z' + zpos_of_view
 				ble		.ptbehind
+
+				cmp.w	#DRAW_VECTOR_MAX_Z,d5	; skip object beyond this distance.
+				bgt		nomoreparts
+
 				move.w	d5,(a2)+
 
 				; FIXME: can we factor the 3/2 scaling into Z somewhere else?
@@ -1805,22 +1817,20 @@ fullscreen_conv:
 				; 0xABADCAFE - going to be multiplying by 5/3 here for the 320 fullscreen
 				move.l	#3413,d6
 
-				; todo lower precision, 16 bit multiply?
 				; approximate 3.333 => 3413/1024
-				muls.l	d6,d4
-				asr.l	#8,d4
-				asr.l	#2,d4		; y'' * 3.333
-				divs	d5,d4		; ys = (x*3)/(z*2)
+				asr.l	#2,d4						; Issue #60: Avoid overflow by partially pre-shifting y''
+				muls.l	d6,d4						; before the multiplication step
+				asr.l	#8,d4						; y'' * 3.333
+				divs	d5,d4						; ys = (x*3)/(z*2)
 
-				; todo lower precision, 16 bit multiply?
 				; approximate 3.333 => 3413/1024
-				muls.l	d6,d3
-				asr.l	#8,d3
-				asr.l	#2,d3		; x'' * 3.333
-				divs	d5,d3		; xs = (x*3)/(z*2)
-				add.w	Vid_CentreX_w,d3	; mid_x of screen
+				asr.l	#2,d3						; Issue #60: Avoid overflow by partially pre-shifting x''
+				muls.l	d6,d3						; before the multiplication
+				asr.l	#8,d3						; x'' * 3.333
+				divs	d5,d3						; xs = (x*3)/(z*2)
+				add.w	Vid_CentreX_w,d3			; mid_x of screen
 				add.w	draw_PolygonCentreY_w,d4	; mid_y of screen
-				move.w	d3,(a3)+	; store xs,ys in boxonscr
+				move.w	d3,(a3)+					; store xs,ys in boxonscr
 				move.w	d4,(a3)+
 				dbra	d7,.convert_to_screen
 
@@ -1836,11 +1846,11 @@ fullscreen_conv:
 
 				; Small display
 smallscreen_conv:
-				asl.w	#1,d1					; d1 * 2
+				add.w	d1,d1					; d1 * 2
 				ext.l	d2
 				asl.l	#7,d2
 				sub.l	yoff,d2
-				asl.l	#1,d2					; (d2*128 - yoff) *2
+				add.l	d2,d2					; (d2*128 - yoff) *2
 
 .convert_to_screen:
 				move.l	(a2),d3
@@ -1852,6 +1862,9 @@ smallscreen_conv:
 				move.w	(a2),d5
 				add.w	d1,d5
 				ble		.ptbehind2
+
+				cmp.w	#DRAW_VECTOR_MAX_Z,d5	; skip object beyond this distance.
+				bgt		nomoreparts
 
 				move.w	d5,(a2)+
 				divs	d5,d3
@@ -2108,7 +2121,7 @@ usegour:
 				bsr		draw_PutInLinesGouraud
 
 dontusegour:
-				move.w	#SCREENWIDTH,linedir
+				move.w	#SCREEN_WIDTH,linedir
 				move.l	Vid_FastBufferPtr_l,a6
 				tst.b	drawit(pc)
 				beq		polybehind
@@ -2295,7 +2308,7 @@ drawpol:
 				add.l	a5,d5
 				add.l	d4,d6
 				move.b	(a1,d3.w),(a3)
-				adda.w	#SCREENWIDTH,a3
+				adda.w	#SCREEN_WIDTH,a3
 				dbra	d2,drawpol
 
 pastit:
@@ -2309,7 +2322,7 @@ ontoscr:
 val				SET		0
 				REPT	256
 				dc.l	val
-val				SET		val+SCREENWIDTH
+val				SET		val+SCREEN_WIDTH
 				ENDR
 
 predoglare:
@@ -2402,7 +2415,7 @@ drawpolGL:
 				add.l	a5,d5
 				add.l	d4,d6
 				move.b	(a1,d3.w),(a3)
-				adda.w	#SCREENWIDTH,a3
+				adda.w	#SCREEN_WIDTH,a3
 				dbra	d2,drawpolGL
 
 nodlGL:
@@ -2415,7 +2428,7 @@ itsblack:
 				swap	d5
 				add.l	a5,d5
 				add.l	d4,d6
-				adda.w	#SCREENWIDTH,a3
+				adda.w	#SCREEN_WIDTH,a3
 				dbra	d2,drawpolGL
 
 				adda.w	#16,a4
@@ -2427,7 +2440,7 @@ ontoscrGL:
 val				SET		0
 				REPT	256
 				dc.l	val
-val				SET		val+SCREENWIDTH
+val				SET		val+SCREEN_WIDTH
 				ENDR
 
 tstdca:			dc.l	0
@@ -2537,7 +2550,7 @@ drawpolg:
 				add.w	d2,d7
 				swap	d2
 				move.b	(a1,d3.w),(a3)
-				adda.w	#SCREENWIDTH,a3
+				adda.w	#SCREEN_WIDTH,a3
 				dbra	d2,drawpolg
 
 nodlg:
@@ -2551,7 +2564,7 @@ ontoscrg:
 val				SET		0
 				REPT	256
 				dc.l	val
-val				SET		val+SCREENWIDTH
+val				SET		val+SCREEN_WIDTH
 				ENDR
 
 gotholesin:
@@ -2694,7 +2707,7 @@ drawpolh:
 				move.b	(a1,d3.w),(a3)
 
 .dontplot:
-				adda.w	#SCREENWIDTH,a3
+				adda.w	#SCREEN_WIDTH,a3
 				dbra	d2,drawpolh
 
 pastith:
@@ -2708,7 +2721,7 @@ ontoscrh:
 val				SET		0
 				REPT	256
 				dc.l	val
-val				SET		val+SCREENWIDTH
+val				SET		val+SCREEN_WIDTH
 				ENDR
 
 				EVEN
