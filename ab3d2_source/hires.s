@@ -1767,6 +1767,8 @@ nodrawp2:
 				clr.b	plr2_Teleported_b
 
 .notplr2:
+				jsr		Draw_Crosshair
+
 				jsr		Sys_EvalFPS
 
 				DEV_SAVE	d0/d1/a0/a1
