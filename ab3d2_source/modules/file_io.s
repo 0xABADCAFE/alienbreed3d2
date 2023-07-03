@@ -93,12 +93,12 @@ IO_FlushQueue:
 
 				movem.l	d0-d7/a0-a6,-(a7)
 
-				jsr		mnu_setscreen
+				CALLC	mnu_setscreen
 
 				lea		mnu_askfordisk,a0
 				jsr		mnu_domenu
 
-				jsr		mnu_clearscreen
+				CALLC	mnu_clearscreen
 
 
 				movem.l	(a7)+,d0-d7/a0-a6
@@ -336,10 +336,10 @@ io_HandlePacked:
 .unpacked_start_l:	dc.l	0
 .unpacked_length_l:	dc.l	0
 
-				section bss,bss
+				section .bss,bss
 .unlha_temp_buffer_vl:
 				ds.l	4096		; unLHA wants 16kb
 
-				section code,code
-
+				section .text,code
+_unLHA::
 unLHA:			incbin	"decomp4.raw"

@@ -41,9 +41,10 @@ Game_FinishedLevel_b:
 
 				align	4
 
+
 Game_Start:
 				move.b	#PLR_SINGLE,Plr_MultiplayerType_b
-				jsr		Vid_OpenMainScreen
+				CALLC	Vid_OpenMainScreen
 
 				move.l	#GLF_DatabaseName_vb,a0
 				jsr		IO_LoadFile
@@ -60,7 +61,7 @@ Game_Start:
 
 				jsr		mnu_copycredz
 
-				jsr		mnu_setscreen
+				CALLC	mnu_setscreen
 				move.l	a7,mnu_mainstack	; not sure if this is the right thing or even in use...
 
 				jsr		IO_InitQueue
@@ -102,7 +103,7 @@ Game_Start:
 				bsr		DEFAULTGAME
 
 BACKTOMENU:
-				jsr		Sys_ClearKeyboard
+				CALLC	Sys_ClearKeyboard
 
 				cmp.b	#PLR_SLAVE,Plr_MultiplayerType_b
 				beq.s	BACKTOSLAVE
@@ -118,7 +119,7 @@ BACKTOSLAVE:
 DONEMENU:
 
 
-				jsr		mnu_clearscreen
+				CALLC	mnu_clearscreen
 
 				;	bsr		WAITREL
 
@@ -160,19 +161,7 @@ DONEMENU:
 *************************************
 				jsr		IO_InitQueue
 
-				move.l	#draw_BorderPacked_vb,d0
-				moveq	#0,d1
-				move.l	Vid_Screen1Ptr_l,a0
-				lea		Sys_Workspace_vl,a1
-				lea		$0,a2
-				jsr		unLHA
-
-				move.l	#draw_BorderPacked_vb,d0
-				moveq	#0,d1
-				move.l	Vid_Screen2Ptr_l,a0
-				lea		Sys_Workspace_vl,a1
-				lea		$0,a2
-				jsr		unLHA
+				CALLC	Draw_ResetGameDisplay
 
 *************************************
 
@@ -197,7 +186,7 @@ DONEMENU:
 				ENDR
 
 dontusestats:
-				jsr		mnu_setscreen
+				CALLC	mnu_setscreen
 
 
 				bra		BACKTOMENU
@@ -205,6 +194,8 @@ dontusestats:
 QUITTT:
 				move.l	Lvl_DataPtr_l,a1
 				CALLEXEC FreeVec
+
+				IFND BUILD_WITH_C
 
 				move.l	Vid_FastBufferAllocPtr_l,a1
 				CALLEXEC FreeVec
@@ -219,18 +210,18 @@ QUITTT:
 				move.w	#SCREEN_HEIGHT*8+1,d1
 				CALLGRAF FreeRaster
 
+				ELSE
+
+				CALLC Vid_CloseMainScreen
+
+				ENDIF
+
 ; jsr Res_FreeWallTextures
 				jsr		Res_FreeSoundFx
 				jsr		Res_FreeFloorTextures
 				jsr		Res_FreeObjects
 
-				lea		VBLANKInt,a1
-				moveq	#INTB_VERTB,d0
-				CALLEXEC RemIntServer
-
-				lea		KEYInt,a1
-				moveq	#INTB_PORTS,d0
-				CALLEXEC RemIntServer
+				CALLC	Sys_Done
 
 				move.l	#0,d0
 
@@ -328,19 +319,6 @@ ASKFORDISK:
 ; PRSDD
 				move.w	#10,OptScrn
 				bsr		DRAWOPTSCRN
-
-ProtChkNLev1:
-.wtrel:
-				btst	#7,$bfe001
-				beq.s	.wtrel
-
-wtclick:
-				add.w	#$235,-300(a0)
-				add.w	#$4533,-900(a0)
-				btst	#6,$bfe001
-				bne.s	wtclick
-
-				rts
 
 ********************************************************
 
@@ -798,11 +776,11 @@ TWOPLAYER:
 
 				move.w	#0,OldEnergy
 				move.w	#127,Energy
-				jsr		Draw_BorderEnergyBar
+				CALLC	Draw_BorderEnergyBar
 
 				move.w	#63,OldAmmo
 				move.w	#0,Ammo
-				jsr		Draw_BorderAmmoBar
+				CALLC	Draw_BorderAmmoBar
 				move.w	#0,OldAmmo
 
 				move.b	#0,Plr1_GunSelected_b
@@ -849,52 +827,6 @@ DEFAULTGAME:
 
 				rts
 
-CHKPROT:		dc.w	0
-
-GETPARITY:
-				move.w	#6,d3
-.calcparity:
-				btst	d3,d0
-				beq.s	.nochange
-				bchg	#7,d0
-.nochange:
-				dbra	d3,.calcparity
-				rts
-
-CHECKPARITY:
-				move.w	#6,d3
-				move.b	#$0,d2
-.calcparity:
-				btst	d3,d0
-				beq.s	.nochange
-				bchg	#7,d2
-.nochange:
-				dbra	d3,.calcparity
-				move.b	d0,d1
-				and.b	#$80,d1
-				eor.b	d1,d2
-				sne		d5
-				rts
-
-CALCPASSWORD:
-				rts
-
-PASSLINETOGAME:
-				rts
-
-illega:
-
-				move.w	#-1,d0
-
-				rts
-
-PASSBUFFER:
-				ds.b	8
-
-CHECKBUFFER:	ds.b	8
-
-PASS:
-				ds.b	16
 
 **************************************************
 

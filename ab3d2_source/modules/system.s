@@ -13,6 +13,39 @@
 
 ;******************************************************************************
 ;*
+;* Copy using move16. Don't call this if you don't have an 040, 060 or the
+;* amount of data to transfer is less than 64 bytes or greater than 4MiB as
+;* there's no handling for that.
+;*
+;******************************************************************************
+_Sys_CopyMemMove16:
+Sys_CopyMemMove16:
+				; round the source. Is this actually needed?
+				exg			a0,d0
+				add.l		#15,d0
+				and.l		#$FFFFFFF0,d0
+				exg			d0,a0
+
+				; round the destination. Is this actually needed?
+				exg			a1,d0
+				add.l		#15,d0
+				and.l		#$FFFFFFF0,d0
+				exg			d0,a1
+
+				lsr.l		#6,d0	; 4 cache lines of 16 bytes per loop
+				subq.l		#1,d0
+
+.copy_loop:
+				move16		(a0)+,(a1)+
+				move16		(a0)+,(a1)+
+				move16		(a0)+,(a1)+
+				move16		(a0)+,(a1)+
+				dbra		d0,.copy_loop ; assume have less than 4MB
+				rts
+
+				IFND BUILD_WITH_C
+;******************************************************************************
+;*
 ;* Initialise system dependencies
 ;*
 ;* return bool[d0]
@@ -49,7 +82,17 @@ Sys_Init:
 ;*
 ;******************************************************************************
 Sys_Done:
-				jsr			sys_CloseLibs
+				lea		VBLANKInt,a1
+				moveq	#INTB_VERTB,d0
+				CALLEXEC RemIntServer
+
+				IFEQ	CD32VER
+				lea		KEYInt,a1
+				moveq	#INTB_PORTS,d0
+				CALLEXEC RemIntServer
+				ENDC
+
+				jsr		sys_CloseLibs
 				rts
 
 ;******************************************************************************
@@ -209,6 +252,12 @@ Sys_ClearKeyboard:
 				dbra	d1,.loop
 				rts
 
+				ENDIF
+
+
+; 0xABADCAFE - Reinstated until there is a viable fix for the C version. We
+;              just include this function regardless of the build for now.
+
 ;******************************************************************************
 ;*
 ;* Read Mouse State
@@ -242,11 +291,9 @@ Sys_ReadMouse:
 
 .not_negative_y2:
 				add.b	d0,d2
-				add.w	d0,.oldMouseY2
 				move.w	d2,.oldMouseY
-				move.w	d2,d0
-				move.w	.oldMouseY2,d0
-				move.w	d0,Sys_MouseY
+				add.w	d0,Sys_MouseY
+
 				clr.l	d0
 				clr.l	d1
 				move.w	$a(a6),d0
@@ -297,6 +344,9 @@ Sys_ReadMouse:
 .oldMouseY:		dc.w	0
 .oldMouseY2:	dc.w	0
 .prevX:			dc.w	0
+
+
+				IFND BUILD_WITH_C
 
 ;******************************************************************************
 ;*
@@ -475,3 +525,5 @@ KEYInt:
 				dc.l	AppName					;is_Node ln_Name
 				dc.l	0						;is_Data
 				dc.l	key_interrupt			;is_Code
+
+				ENDIF

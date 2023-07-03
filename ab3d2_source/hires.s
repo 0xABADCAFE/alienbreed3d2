@@ -7,6 +7,7 @@
 
 				xref	_custom
 				xref	_ciaa
+				xref	_Vid_Present
 
 ;*************************************************
 ;* Stuff to do to get a C2P version:
@@ -79,13 +80,16 @@ PLR_SINGLE				equ 'n' ; Single player
 				include "data/tables_data.s"
 				include "data/text_data.s"
 
-				section code,code
+				section .text,code
+
+				xref _Vid_isRTG
+				xdef _startup
 ; Startup Code
-_start:
+_startup:
 				; entry point
 				movem.l	d1-a6,-(sp)
 
-				jsr		Sys_Init
+				CALLC	Sys_Init
 				tst.l	d0
 				beq		.startup_fail
 
@@ -131,6 +135,7 @@ _start:
 				clr.b	Plr2_Joystick_b
 				ENDC
 
+				IFND	BUILD_WITH_C
 				; allocate chunky render buffer in fastmem
 				move.l	#MEMF_ANY|MEMF_CLEAR,d1
 				move.l	#VID_FAST_BUFFER_SIZE,d0
@@ -142,6 +147,7 @@ _start:
 				moveq	#-16,d1					; $F0
 				and.l	d1,d0
 				move.l	d0,Vid_FastBufferPtr_l
+				ENDIF
 
 				; Setup constant table
 				move.l	#ConstantTable_vl,a0
@@ -168,12 +174,18 @@ _start:
 				jsr		Game_Start
 
 .startup_fail:
-				jsr		Sys_Done
+				CALLC	Sys_Done
 
 				movem.l	(sp)+,d1-a6
 				rts
 
+
+				IFND BUILD_WITH_C
 				include		"modules/system.s"
+				ELSE IFND FIXED_C_MOUSE
+				; Only the Sys_ReadMouse will be incorporated here
+				include		"modules/system.s"
+				ENDIF
 
 ;*******************************************************************************
 ; Global data
@@ -209,7 +221,7 @@ Game_ShowIntroText:
 
 .next_line_loop:
 				move.l	Vid_TextScreenPtr_l,a1
-				jsr		Draw_LineOfText
+				CALLC	Draw_LineOfText
 
 				addq	#1,d0
 				add.w	#82,a0
@@ -392,7 +404,7 @@ noload:
 				move.l	Lvl_ClipsPtr_l,a2
 				moveq	#0,d0
 				move.w	10+6(a1),d7				;numzones
-				move.w	d7,NUMZONES
+				move.w	d7,Zone_Count_w
 
 assignclips:
 				move.l	(a0)+,a3
@@ -458,6 +470,11 @@ noclips:
 				; FIXME: reimplement level blurb
 ; move.l #Blurbfield,$dff080
 
+				IFD BUILD_WITH_C
+				tst.w	_Vid_isRTG
+				bne.s	.skipChangeScreen
+				ENDIF
+
 				IFNE	DISPLAYMSGPORT_HACK
 				;empty Vid_DisplayMsgPort_l and set Vid_ScreenBufferIndex_w to 0
 				;so the starting point is the same every time
@@ -479,6 +496,7 @@ noclips:
 
 				clr.b	Vid_WaitForDisplayMsg_b
 
+.skipChangeScreen:
 ****************************
 				jsr		Plr_Initialise
 ; bsr initobjpos
@@ -566,7 +584,7 @@ scaledownlop:
 				move.l	#PLR_STAND_HEIGHT,Plr2_SnapTargHeight_l
 				move.l	#PLR_STAND_HEIGHT,Plr2_SnapHeight_l
 
-				jsr		Sys_ClearKeyboard
+				CALLC	Sys_ClearKeyboard
 
 				clr.b	Game_MasterQuit_b
 
@@ -666,11 +684,7 @@ NOALLWALLS:
 				move.w	#SMALL_HEIGHT,Vid_BottomY_w
 				move.w	#SMALL_HEIGHT/2,TOTHEMIDDLE
 				clr.b	Vid_FullScreen_b
-				move.l	Vid_Screen1Ptr_l,a0
-				jsr		Draw_ResetGameDisplay
-
-				move.l	Vid_Screen2Ptr_l,a0
-				jsr		Draw_ResetGameDisplay
+				CALLC	Draw_ResetGameDisplay
 
 				st		Plr1_Weapons_vb+1
 				st		Plr2_Weapons_vb+1
@@ -709,7 +723,7 @@ clrmessbuff:
 				; Initialise FPS
 				clr.l	Sys_FrameNumber_l
 				lea		Sys_PrevFrameTimeECV_q,a0
-				bsr 	Sys_MarkTime
+				CALLC 	Sys_MarkTime
 
 				clr.b	Plr2_Fire_b
 				clr.b	Plr2_TmpFire_b
@@ -957,6 +971,10 @@ waitmaster:
 
 *****************************************************************
 
+				IFD BUILD_WITH_C
+				tst.w	_Vid_isRTG
+				bne		.screenSwapDone
+				ENDIF
 				; Flip screens
 
 				; Wait on prior frame to be displayed.
@@ -996,12 +1014,12 @@ waitmaster:
 				clr.b	Vid_WaitForDisplayMsg_b		; last attempt failed, so don't wait for next message
 
 .screenSwapDone:
-				jsr		Sys_FrameLap
+				CALLC	Sys_FrameLap
 				CALLDEV	PrintStats
 				CALLDEV	MarkFrameBegin
 
 				IFND	DEV
-				jsr		Sys_ShowFPS
+				CALLC	Sys_ShowFPS
 				ENDC
 
 				move.l	#SMIDDLEY,a0
@@ -1078,7 +1096,7 @@ okwat:
 ;				sub.w	#1,CHEATNUM
 ;				move.l	#CHEATFRAME,a4
 ;				move.w	#127,Plr1_Energy_w
-;				jsr		Draw_BorderEnergyBar
+;				CALLC	Draw_BorderEnergyBar
 ;.nocheat
 ;
 ;				sub.l	#200000,a4
@@ -1635,8 +1653,8 @@ IWasPlayer1:
 
 				jsr		OrderZones
 				jsr		objmoveanim
-				jsr		Draw_BorderEnergyBar
-				jsr		Draw_BorderAmmoBar
+				CALLC	Draw_BorderEnergyBar
+				CALLC	Draw_BorderAmmoBar
 
 
 ;********************************************
@@ -1736,8 +1754,8 @@ drawplayer2:
 .nolookback:
 				jsr		OrderZones
 				jsr		objmoveanim
-				jsr		Draw_BorderEnergyBar
-				jsr		Draw_BorderAmmoBar
+				CALLC	Draw_BorderEnergyBar
+				CALLC	Draw_BorderAmmoBar
 
 				move.w	Vid_LetterBoxMarginHeight_w,d0
 				move.w	#0,Draw_LeftClip_w
@@ -1767,13 +1785,18 @@ nodrawp2:
 				clr.b	plr2_Teleported_b
 
 .notplr2:
-				jsr		Sys_EvalFPS
+				CALLC		Sys_EvalFPS
 
 				DEV_SAVE	d0/d1/a0/a1
 				CALLDEV		MarkDrawDone
 				CALLDEV		DrawGraph
 				DEV_RESTORE	d0/d1/a0/a1
-				jsr			Vid_ConvertC2P
+
+				IFD BUILD_WITH_C
+				CALLC Vid_Present
+				ELSE
+				jsr Vid_ConvertC2P
+				ENDIF
 
 				;CALLDEV	MarkChunkyDone
 
@@ -1792,11 +1815,7 @@ nodrawp2:
 				blt.s	.clamped
 
 				add.w	#2,Vid_LetterBoxMarginHeight_w
-				move.l	Vid_DrawScreenPtr_l,a0
-				jsr		Draw_ResetGameDisplay
-
-				move.l	Vid_DisplayScreen_Ptr_l,a0
-				jsr		Draw_ResetGameDisplay
+				CALLC	Draw_ResetGameDisplay
 
 .clamped:
 .nosmallscr:
@@ -1847,7 +1866,8 @@ nodrawp2:
 
 				; Check renderbuffer setup variables and clear screen
 				bsr		SetupRenderbufferSize
-				jsr		vid_SetupDoubleheightCopperlist
+
+				CALLC	vid_SetupDoubleheightCopperlist
 
 				bra.s	.not_double_height
 
@@ -2042,12 +2062,10 @@ SetupRenderbufferSize:
 				move.w	#SMALL_HEIGHT/2,TOTHEMIDDLE
 
 .wipeScreen:
-				move.l	Vid_DisplayScreen_Ptr_l,a0
-				jsr		Draw_ResetGameDisplay
-				move.l	Vid_DrawScreenPtr_l,a0
-				jsr		Draw_ResetGameDisplay
+				CALLC	Draw_ResetGameDisplay
 				rts
 
+				IFND BUILD_WITH_C
 LoadMainPalette:
 				sub.l	#256*4*3+2+2+4+4,a7		; reserve stack for 256 color entries + numColors + firstColor
 				move.l	a7,a1
@@ -2072,6 +2090,8 @@ LoadMainPalette:
 
 				add.l	#256*4*3+2+2+4+4,a7		;restore stack
 				rts
+
+				ENDIF
 
 CLRTWOLINES:
 				move.l	d2,-(a7)
@@ -3586,10 +3606,7 @@ notintop:
 				cmp.b	#PLR_SLAVE,Plr_MultiplayerType_b
 				beq.s	nobackgraphics
 
-				move.l	a0,-(a7)
-				jsr		putinbackdrop
-
-				move.l	(a7)+,a0
+				jsr		Draw_SkyBackdrop
 
 nobackgraphics:
 				move.b	(a0)+,Plr1_Echo_b
@@ -3799,9 +3816,9 @@ Plr2_Control:
 				beq.s	.nobackgraphics
 				cmp.b	#PLR_SLAVE,Plr_MultiplayerType_b
 				bne.s	.nobackgraphics
-				move.l	a0,-(a7)
-				jsr		putinbackdrop
-				move.l	(a7)+,a0
+
+				jsr		Draw_SkyBackdrop
+
 .nobackgraphics:
 
 				move.b	(a0)+,Plr2_Echo_b
@@ -4240,7 +4257,7 @@ itsaseewall:
 				bra		polyloop
 
 itsbackdrop:
-				jsr		putinbackdrop
+				jsr		Draw_SkyBackdrop
 				bra		polyloop
 
 itswater:
@@ -4368,10 +4385,12 @@ noturn:
 
 lrs:			dc.w	0
 
+_angpos::
 angpos:			dc.w	0 ; Yaw
 mang:			dc.w	0
 Sys_OldMouseY:	dc.w	0
 xmouse:			dc.w	0
+_Sys_MouseY::
 Sys_MouseY:		dc.w	0 ; Pitch?
 
 MAPON:			dc.w	$0
@@ -4999,7 +5018,7 @@ endlevel:
 				tst.w	Energy
 				bgt.s	wevewon
 				move.w	#0,Energy
-				bsr		Draw_BorderEnergyBar
+				CALLC	Draw_BorderEnergyBar
 
 				move.l	#gameover,mt_data
 				st		UseAllChannels
@@ -5020,7 +5039,7 @@ wevewon:
 				; Disable audio DMA
 				move.w	#$f,$dff000+dmacon
 
-				bsr		Draw_BorderEnergyBar
+				CALLC	Draw_BorderEnergyBar
 
 				cmp.b	#PLR_SINGLE,Plr_MultiplayerType_b
 				bne.s	.nonextlev
@@ -7875,6 +7894,7 @@ key_readkey:
 				move.b	#0,lastpressed
 				rts
 
+_key_interrupt::
 key_interrupt:
 ;		movem.l	d0-d7/a0-a6,-(sp)
 
@@ -8040,6 +8060,7 @@ OtherInter:
 				align	4
 
 ; Main VBlank interrupt
+_VBlankInterrupt::
 VBlankInterrupt:
 				addq.l	#1,counter
 				addq.l	#1,main_counter
@@ -10289,7 +10310,7 @@ endtestscroll:
 Vid_TextScreenPtr_l:		dc.l	0
 
 
-				SECTION	bss_c,bss_c
+				SECTION	.bsschip,bss_c
 				align 8
 
 ; Audio
@@ -10305,7 +10326,7 @@ SCROLLSCRN:		ds.l	20*16
 * Stuff you don't have to worry about yet. *
 ********************************************
 
-				section	code,code
+				section	.text,code
 
 				; FIMXE: this is not what I was thinking it is.
 				; This does not exit the whole game, but just playing
@@ -10434,7 +10455,7 @@ UseAllChannels:		dc.w	0
 ;CHEATNUM:			dc.l	0
 Lvl_MusicPtr_l:		dc.l	0
 
-				section	data_c,data_c
+				section	.datachip,data_c
 ; not sure what this is; it seems to be used as timing
 ; device. I.e. by accessing chipmap, we throttle the CPU
 tstchip:		dc.l	0
@@ -10445,7 +10466,7 @@ gameover:
 welldone:
 				incbin	"includes/quietwelldone"
 
-				section code,code
+				section .text,code
 				cnop	0,4
 				include	"serial_nightmare.s"
 

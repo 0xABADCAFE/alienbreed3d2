@@ -1,5 +1,5 @@
 
-			section bss,bss
+			section .bss,bss
 
 ; BSS data - to be included in BSS section
 			align 4
@@ -41,4 +41,5 @@ anim_DoorHeightTable_vw:	ds.w	40 ; newanims.s
 
 Obj_RoomPath_vw:			ds.w	100 ; objmove.s
 
+_KeyMap_vb::
 KeyMap_vb:				ds.b	256
