@@ -74,8 +74,6 @@ plr_MouseControl:
 
 				IFND BUILD_WITH_C
 				bsr		Sys_ReadMouse
-				ELSE IFND FIXED_C_MOUSE
-				bsr		Sys_ReadMouse
 				ELSE
 				CALLC	Sys_ReadMouse
 				ENDIF
@@ -365,7 +363,7 @@ plr_KeyboardControl:
 
 .clear_zone_data:
 				tst.b			RAWKEY_Z(a5)
-				beq.s			.dev_toggles
+				beq.s			.toggle_060
 
 				clr.b			RAWKEY_Z(a5)
 
@@ -378,6 +376,13 @@ plr_KeyboardControl:
 				clr.l			(a1)+
 				clr.l			(a1)+
 				dbra			d0,.clear_loop
+
+.toggle_060:
+				tst.b			RAWKEY_H(a5)
+				beq.s			.dev_toggles
+
+				clr.b			RAWKEY_H(a5)
+				not.b			Sys_CPU_68060_b
 
 .dev_toggles:
 				; Developer toggles

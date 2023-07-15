@@ -38,6 +38,8 @@ extern UWORD Sys_FPSFracAvg_w;
 
 extern UBYTE Sys_Move16_b;
 extern UBYTE Vid_FullScreenTemp_b;
+extern UBYTE Sys_CPU_68060_b;
+
 extern struct EClockVal _Sys_FrameTimeECV_q[2];
 
 extern UWORD angpos;
@@ -187,10 +189,11 @@ void Sys_CloseLibs(void)
 BOOL sys_InitHardware()
 {
     LOCAL_SYSBASE();
-    if (SysBase->AttnFlags & AFF_68040) {
-        Sys_Move16_b = ~Sys_Move16_b;
-        Vid_FullScreenTemp_b = ~Vid_FullScreenTemp_b;
-    }
+
+    Vid_FullScreenTemp_b =
+    Sys_Move16_b    = (SysBase->AttnFlags & (AFF_68040|AFF_68060)) ? 0xFF : 0;
+    Sys_CPU_68060_b = (SysBase->AttnFlags & AFF_68060) ? 0xFF : 0;
+
 
     if (AllocMiscResource(MR_SERIALPORT, AppName)) {
         goto fail;
@@ -348,7 +351,8 @@ void Sys_EvalFPS()
     if (!avg) {
         return;
     }
-    Sys_FPSFracAvg_w = (UWORD)1000 % (UWORD)avg;
+
+    Sys_FPSFracAvg_w = ((UWORD)1000 % (UWORD)avg)/10;
     Sys_FPSIntAvg_w = (UWORD)1000 / (UWORD)avg;
 }
 
@@ -369,28 +373,18 @@ void Sys_ShowFPS()
     Text(&Vid_MainScreen_l->RastPort, text, outPtr - text - 1);
 }
 
-#ifdef FIXED_C_MOUSE
-
-/**
- * 0xABADCAFE - Disabled until there is a viable fix for the vertical mouse movement
- */
 void Sys_ReadMouse()
 {
-    static UBYTE oldCounterY = 0;
-    static UWORD oldMouseY2 = 0;
-
-    UWORD counterY = joy0dat >> 8;
-    WORD diffY = counterY - oldCounterY;
-    if (diffY >= 127) {
+    static WORD oldMouseY;
+    WORD diffY = joy0dat >> 8;
+    diffY -= oldMouseY;
+    if (diffY >= 127)
         diffY -= 255;
-    }else if (diffY < -127) {
+    else if (diffY < -127)
         diffY += 255;
-    }
-
-    WORD newMouseY = diffY + oldCounterY;
-    oldCounterY = newMouseY;
-
-    Sys_MouseY = newMouseY ; // oldCounterY;
+    // Emulate weird add.b stuff in original code
+    oldMouseY = (oldMouseY & 0xff00) | ((diffY+oldMouseY) & 0xff);
+    Sys_MouseY += diffY;
 
     static UBYTE oldCounterX = 0;
     static UWORD oldMouseX2 = 0;
@@ -415,8 +409,6 @@ void Sys_ReadMouse()
     // FIXME: should use WritePotgo here... what does this even reset?
     // potgo = 0;
 }
-
-#endif
 
 void Sys_ClearKeyboard()
 {
