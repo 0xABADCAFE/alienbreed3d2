@@ -278,7 +278,7 @@ ai_DoDefault:
 				rts
 
 ai_DoResponse:
-				DEV_CHECK	SKIP_AI_ATTACK,ai_DoDefault
+				DEV_CHECK_SET	SKIP_AI_ATTACK,ai_DoDefault
 				cmp.w	#1,AI_ResponseMode_w
 				blt		ai_Charge
 				beq		ai_ChargeToSide

@@ -1,4 +1,13 @@
 Draw_Zone_Graph:
+
+				IFD	ZONE_DEBUG
+				DEV_CHECK_CLR	ZONE_TRACE,.no_trace
+				DEV_SAVE d0-d7/a0-a6
+				CALLC ZDbg_Init
+				DEV_RESTORE d0-d7/a0-a6
+.no_trace:
+				ENDIF
+
 				move.l	Zone_EndOfListPtr_l,a0
 ; move.w #-1,(a0)
 
@@ -203,9 +212,26 @@ Draw_Zone_Graph:
 				bra		.subroomloop
 
 .done_all_zones:
+				IFD	ZONE_DEBUG
+				DEV_CHECK_CLR ZONE_TRACE,.done_zone_debug
+				DEV_DISABLE ZONE_TRACE
+				DEV_SAVE d0-d7/a0-a6
+				CALLC ZDbg_Done
+				DEV_RESTORE d0-d7/a0-a6
+.done_zone_debug:
+				ENDIF
+
 				rts
 
 draw_RenderCurrentZone:
+				IFD	ZONE_DEBUG
+				DEV_CHECK_CLR ZONE_TRACE,.done_zone_debug
+				DEV_SAVE d0-d7/a0-a6
+				CALLC ZDbg_Dump
+				DEV_RESTORE d0-d7/a0-a6
+.done_zone_debug:
+				ENDIF
+
 				move.w	(a0)+,d0
 				move.w	d0,Draw_CurrentZone_w
 				move.w	d0,d1

@@ -2664,7 +2664,7 @@ sky_early_exit:
 ; Fills in the sky. Preserves a0
 ;
 Draw_SkyBackdrop:
-				DEV_CHECK SKIP_SKYFILL,sky_early_exit
+				DEV_CHECK_SET SKIP_SKYFILL,sky_early_exit
 
 				; bail if the zone is tagged as having no sky
 				lea		Zone_BackdropDisable_vb,a5

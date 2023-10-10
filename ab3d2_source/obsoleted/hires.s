@@ -5492,7 +5492,7 @@ cornerprocessloop: ;	figure					out if any left/right clipping is necessary
 				bne		dontdrawreturn
 
 somefloortodraw:
-				DEV_CHECK	SKIP_FLATS,dontdrawreturn
+				DEV_CHECK_SET	SKIP_FLATS,dontdrawreturn
 				DEV_INC.w	VisibleFlats
 				tst.b	draw_UseGouraudFlats_b
 				bne		goursides

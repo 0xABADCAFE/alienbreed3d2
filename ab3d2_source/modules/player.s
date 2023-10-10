@@ -444,6 +444,7 @@ plr_KeyboardControl:
 				DEV_CHECK_KEY	RAWKEY_N,SKIP_AI_ATTACK
 				DEV_CHECK_KEY	RAWKEY_B,SKIP_LIGHTING
 				DEV_CHECK_KEY	RAWKEY_V,SKIP_SKYFILL
+				DEV_CHECK_KEY	RAWKEY_Z,ZONE_TRACE
 
 				; change the default floor gouraud state based on the lighting toggle
 				; todo - fix floor rendering when goraud is disabled, it's seriously glitched

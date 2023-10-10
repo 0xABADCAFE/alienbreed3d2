@@ -2516,7 +2516,7 @@ cant_tell:
 .choose_renderer:
 				; Now determine which renderer to use. First check for simplified lighting.
 
-				DEV_CHECK	SKIP_LIGHTING,.dev_draw_fullbright
+				DEV_CHECK_SET	SKIP_LIGHTING,.dev_draw_fullbright
 
 				tst.b	Draw_ForceSimpleWalls_b
 				beq.s	.check_corners
@@ -2593,12 +2593,12 @@ cant_tell:
 				bgt.s	.do_gouraud_shaded
 
 .do_simple_shaded:
-				DEV_CHECK	SKIP_SIMPLE_WALLS,.function_done
+				DEV_CHECK_SET	SKIP_SIMPLE_WALLS,.function_done
 				bsr			draw_WallSimpleShaded
 				bra.s		.function_done
 
 .do_gouraud_shaded:
-				DEV_CHECK	SKIP_SHADED_WALLS,.function_done
+				DEV_CHECK_SET	SKIP_SHADED_WALLS,.function_done
 				bsr			draw_WallGouraudShaded
 
 .function_done:

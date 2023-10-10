@@ -38,7 +38,7 @@ OBJS = c/main.o \
 	   c/zone_debug.o \
 	   c/hires.o
 
-hiresC: AFLAGS+=-DBUILD_WITH_C
+hiresC: AFLAGS+=-DBUILD_WITH_C -DZONE_DEBUG
 hiresC: ${OBJS}
 		$(LINK) $(LFLAGS) $^ -ldebug -o $@
 

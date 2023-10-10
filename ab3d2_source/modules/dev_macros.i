@@ -22,6 +22,7 @@ DEV_SKIP_AI_ATTACK				EQU 9
 DEV_SKIP_TIMEGRAPH				EQU 10
 DEV_SKIP_LIGHTING				EQU 11
 DEV_SKIP_SKYFILL				EQU 12
+DEV_ZONE_TRACE					EQU 13
 
 ; When any of the level geometry is skipped, we need to make sure the fast buffer gets cleared
 DEV_CLEAR_FASTBUFFER_MASK		EQU (1<<DEV_SKIP_FLATS)|(1<<DEV_SKIP_SIMPLE_WALLS)|(1<<DEV_SKIP_SHADED_WALLS)
@@ -69,9 +70,14 @@ DEV_RESTORE		MACRO
 
 ; Macro for conditionally skipping code based on a devmode flag. Unfortunately there's no btst.l #<im>,<ea> for
 ; non data-register ea modes. So we calculate a byte offset as well as the bit position in that byte.
-DEV_CHECK		MACRO
+DEV_CHECK_SET		MACRO
 				btst.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				bne		\2
+				ENDM
+
+DEV_CHECK_CLR	MACRO
+				btst.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
+				beq		\2
 				ENDM
 
 DEV_ENABLE		MACRO
@@ -143,7 +149,10 @@ DEV_SAVE		MACRO
 DEV_RESTORE		MACRO
 				ENDM
 
-DEV_CHECK		MACRO
+DEV_CHECK_SET	MACRO
+				ENDM
+
+DEV_CHECK_CLR	MACRO
 				ENDM
 
 DEV_ENABLE		MACRO
