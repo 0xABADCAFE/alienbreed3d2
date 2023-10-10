@@ -2,11 +2,15 @@
 				align 4
 
 ; Beware - these are unions of word|long. Do not separate!
+_Draw_LeftClip_l::
 Draw_LeftClip_l:		dc.w	0 ; long
+_Draw_LeftClip_w::
 Draw_LeftClip_w:		dc.w	0 ; lsw
 
 ; Beware - these are unions of word|long. Do not separate!
+_Draw_RightClip_l::
 Draw_RightClip_l:		dc.w	0 ; long
+_Draw_RightClip_w::
 Draw_RightClip_w:		dc.w	0 ; lsw
 
 ;Draw_DefTopClip_w:		dc.w	0 ; written, never read
