@@ -18,6 +18,10 @@ Draw_Zone_Graph:
 				move.w	-(a0),d7
 				blt		.done_all_zones
 
+				IFD	ZONE_DEBUG
+				move.w	d7,Draw_CurrentZone_w
+				ENDIF
+
 				move.l	a0,-(a7)
 
 				move.l	Lvl_ZoneAddsPtr_l,a0
@@ -152,7 +156,7 @@ Draw_Zone_Graph:
 .lzo_below_water_first:
 				bsr		draw_RenderCurrentZone
 
-				bra		.skip_not_visible
+				bra		.ready_next
 
 .lower_zone_first:
 				move.l	ThisRoomToDraw,a0
@@ -192,11 +196,22 @@ Draw_Zone_Graph:
 
 				st		Draw_DoUpper_b
 				bsr		draw_RenderCurrentZone
+
 .noupperroom2:
+				IFD	ZONE_DEBUG
+				bra		.ready_next
+				ENDIF
 
 .skip_not_visible:
-;pastemp:
+				IFD	ZONE_DEBUG
+				DEV_CHECK_CLR ZONE_TRACE,.done_zone_not_visible
+				DEV_SAVE d0-d7/a0-a6
+				CALLC ZDbg_Skip
+				DEV_RESTORE d0-d7/a0-a6
+.done_zone_not_visible:
+				ENDIF
 
+.ready_next:
 				move.l	(a7)+,a1
 				move.l	ThisRoomToDraw,a0
 				move.w	(a0),d7
@@ -223,16 +238,17 @@ Draw_Zone_Graph:
 				rts
 
 draw_RenderCurrentZone:
+				move.w	(a0)+,d0
+				move.w	d0,Draw_CurrentZone_w
+
 				IFD	ZONE_DEBUG
 				DEV_CHECK_CLR ZONE_TRACE,.done_zone_debug
 				DEV_SAVE d0-d7/a0-a6
-				CALLC ZDbg_Dump
+				CALLC ZDbg_Enter
 				DEV_RESTORE d0-d7/a0-a6
 .done_zone_debug:
 				ENDIF
 
-				move.w	(a0)+,d0
-				move.w	d0,Draw_CurrentZone_w
 				move.w	d0,d1
 				muls	#40,d1
 				add.l	#Lvl_BigMap_vl,d1
