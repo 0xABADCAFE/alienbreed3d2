@@ -29,12 +29,13 @@ dev:	AFLAGS += -DDEV=1
 dev:	hires hiresC
 
 OBJS = c/main.o \
-	   c/screen.o \
+	c/screen.o \
 	   c/system.o \
 	   c/menu.o \
 	   c/draw.o \
 	   c/message.o \
 	   c/game_properties.o \
+	   c/zone_debug.o \
 	   c/hires.o
 
 hiresC: AFLAGS+=-DBUILD_WITH_C
