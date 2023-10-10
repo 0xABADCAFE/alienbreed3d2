@@ -199,14 +199,14 @@ draw_Object:
 				cmp.b	#$ff,6(a0)
 				bne		draw_Bitmap
 
-				DEV_CHECK	POLYGON_MODELS,.done
+				DEV_CHECK	SKIP_POLYGON_MODELS,.done
 				bsr		draw_PolygonModel
 .done:
 				movem.l	(a7)+,d0-d7/a0-a6
 				rts
 
 draw_bitmap_glare:
-				DEV_CHECK	GLARE_BITMAPS,object_behind
+				DEV_CHECK	SKIP_GLARE_BITMAPS,object_behind
 				move.w	(a0)+,d0				; Point number
 				move.w	2(a1,d0.w*8),d1			; depth
 				cmp.w	#DRAW_BITMAP_NEAR_PLANE,d1
@@ -915,7 +915,7 @@ pastobjscale:
 				tst.b	draw_Additive_b
 				bne		draw_bitmap_additive
 
-				DEV_CHECK	BITMAPS,object_behind
+				DEV_CHECK	SKIP_BITMAPS,object_behind
 				DEV_INC.w	VisibleBitmapCount
 
 draw_right_side:
@@ -1009,7 +1009,7 @@ object_behind:
 				rts
 
 draw_bitmap_additive:
-				DEV_CHECK	ADDITIVE_BITMAPS,object_behind
+				DEV_CHECK	SKIP_ADDITIVE_BITMAPS,object_behind
 				DEV_INC.w	VisibleAdditiveCount
 				move.l	draw_BasePalPtr_l,a4
 
@@ -1098,7 +1098,7 @@ draw_right_side_additive:
 				bra		object_behind
 
 draw_bitmap_lighted:
-				DEV_CHECK	LIGHTSOURCED_BITMAPS,object_behind
+				DEV_CHECK	SKIP_LIGHTSOURCED_BITMAPS,object_behind
 				DEV_INC.w	VisibleLightMapCount
 
 ; Make up lighting values

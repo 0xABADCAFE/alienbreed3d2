@@ -70,38 +70,38 @@ DEV_RESTORE		MACRO
 ; Macro for conditionally skipping code based on a devmode flag. Unfortunately there's no btst.l #<im>,<ea> for
 ; non data-register ea modes. So we calculate a byte offset as well as the bit position in that byte.
 DEV_CHECK		MACRO
-				btst.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				btst.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				bne		\2
 				ENDM
 
 DEV_ENABLE		MACRO
-				bset.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				bset.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				ENDM
 
 DEV_DISABLE		MACRO
-				bclr.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				bclr.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				ENDM
 
 DEV_TOGGLE		MACRO
-				bchg.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				bchg.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				ENDM
 
 ; Macro for checking if a specific key should toggle a feature
 DEV_CHECK_KEY	MACRO
 				tst.b		\1(a5)
-				beq.s		.dev_skip_\2\@
+				beq.s		.dev_\2\@
 				clr.b		\1(a5)
 				DEV_TOGGLE	\2
-.dev_skip_\2\@:
+.dev_\2\@:
 				ENDM
 
 DEV_SNE			MACRO
-				btst.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				btst.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				sne.b	\2
 				ENDM
 
 DEV_SEQ			MACRO
-				btst.b	#(DEV_SKIP_\1)&7,dev_SkipFlags_l+3-(DEV_SKIP_\1>>3)
+				btst.b	#(DEV_\1)&7,dev_SkipFlags_l+3-(DEV_\1>>3)
 				seq.b	\2
 				ENDM
 

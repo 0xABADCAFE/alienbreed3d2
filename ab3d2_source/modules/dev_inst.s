@@ -138,7 +138,7 @@ Dev_MarkFrameBegin:
 
 				; Check if the current skip flags require the fast buffer to be cleared
 
-				DEV_CHECK	FASTBUFFER_CLEAR,.no_clear
+				DEV_CHECK	SKIP_FASTBUFFER_CLEAR,.no_clear
 				move.l		dev_SkipFlags_l,d0
 				and.l		#DEV_CLEAR_FASTBUFFER_MASK,d0
 				beq.s		.no_clear
