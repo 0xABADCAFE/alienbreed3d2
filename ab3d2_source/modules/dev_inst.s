@@ -9,17 +9,23 @@
 
 ; DEVMODE INSTRUMENTATION
 
+				align 4
+_Dev_RegStatePtr::
+Dev_RegStatePtr_l:			dc.l	0
+_Dev_DebugFlags::
+Dev_DebugFlags_l:			dc.l	0
+
 				IFD	DEV
 
 				section .bss,bss
 				align 4
+
 dev_GraphBuffer_vb:			ds.b	DEV_GRAPH_BUFFER_SIZE*2 ; array of times
 
 ; EClockVal stamps
 dev_ECVDrawDone_q:			ds.l	2	; timestamp at the end of drawing
 dev_ECVChunkyDone_q:		ds.l	2	; timestamp at the end of chunky to planar
 
-dev_SkipFlags_l:			ds.l	1	; Mask of disabled flags (i.e. set when something is skipped)
 
 ; Counters
 dev_Counters_vw:
@@ -139,7 +145,7 @@ Dev_MarkFrameBegin:
 				; Check if the current skip flags require the fast buffer to be cleared
 
 				DEV_CHECK_SET	SKIP_FASTBUFFER_CLEAR,.no_clear
-				move.l		dev_SkipFlags_l,d0
+				move.l		Dev_DebugFlags_l,d0
 				and.l		#DEV_CLEAR_FASTBUFFER_MASK,d0
 				beq.s		.no_clear
 

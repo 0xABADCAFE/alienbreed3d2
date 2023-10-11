@@ -1,11 +1,6 @@
+
 Draw_Zone_Graph:
-				IFD	ZONE_DEBUG
-				DEV_CHECK_CLR	ZONE_TRACE,.no_trace
-				DEV_SAVE d0-d7/a0-a6
-				CALLC ZDbg_Init
-				DEV_RESTORE d0-d7/a0-a6
-.no_trace:
-				ENDIF
+				DEV_ZDBG ZDbg_Init
 
 				move.l	Zone_EndOfListPtr_l,a0
 ; move.w #-1,(a0)
@@ -21,6 +16,8 @@ Draw_Zone_Graph:
 				IFD	ZONE_DEBUG
 				move.w	d7,Draw_CurrentZone_w
 				ENDIF
+
+				DEV_ZDBG ZDbg_First
 
 				move.l	a0,-(a7)
 
@@ -203,13 +200,7 @@ Draw_Zone_Graph:
 				ENDIF
 
 .skip_not_visible:
-				IFD	ZONE_DEBUG
-				DEV_CHECK_CLR ZONE_TRACE,.done_zone_not_visible
-				DEV_SAVE d0-d7/a0-a6
-				CALLC ZDbg_Skip
-				DEV_RESTORE d0-d7/a0-a6
-.done_zone_not_visible:
-				ENDIF
+				DEV_ZDBG ZDbg_Skip
 
 .ready_next:
 				move.l	(a7)+,a1
@@ -226,14 +217,8 @@ Draw_Zone_Graph:
 				bra		.subroomloop
 
 .done_all_zones:
-				IFD	ZONE_DEBUG
-				DEV_CHECK_CLR ZONE_TRACE,.done_zone_debug
+				DEV_ZDBG ZDbg_Done
 				DEV_DISABLE ZONE_TRACE
-				DEV_SAVE d0-d7/a0-a6
-				CALLC ZDbg_Done
-				DEV_RESTORE d0-d7/a0-a6
-.done_zone_debug:
-				ENDIF
 
 				rts
 
@@ -241,13 +226,7 @@ draw_RenderCurrentZone:
 				move.w	(a0)+,d0
 				move.w	d0,Draw_CurrentZone_w
 
-				IFD	ZONE_DEBUG
-				DEV_CHECK_CLR ZONE_TRACE,.done_zone_debug
-				DEV_SAVE d0-d7/a0-a6
-				CALLC ZDbg_Enter
-				DEV_RESTORE d0-d7/a0-a6
-.done_zone_debug:
-				ENDIF
+				DEV_ZDBG ZDbg_Enter
 
 				move.w	d0,d1
 				muls	#40,d1
