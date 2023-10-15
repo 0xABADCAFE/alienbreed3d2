@@ -402,6 +402,11 @@ noload:
 
 ; bra noclips
 
+				; TODO - What are we doing here, exactly?
+				; a4 => Lvl_DataPtr_l (twolev.bin)
+				; a2 => Lvl_ClipsPtr_l (twolev.clips)
+				; a1 => Lvl_DataPtr_l + 1600 (twolev.bin, after message strings)
+				; a0 => Lvl_ZoneAddsPtr_l (from twolev.graph.bin)
 				move.l	Lvl_ClipsPtr_l,a2
 				moveq	#0,d0
 				move.w	TLBT_NumZones_w(a1),d7
@@ -410,11 +415,12 @@ noload:
 assignclips:
 				move.l	(a0)+,a3
 				add.l	a4,a3					; pointer to a zone
-				adda.w	#ZoneT_ListOfGraph_w,a3		; pointer to zonelist
+				adda.w	#ZoneT_ListOfGraph_w,a3	; pointer to zonelist
 
 dowholezone:
 				tst.w	(a3)
 				blt.s	nomorethiszone
+
 				tst.w	2(a3)
 				blt.s	thisonenull
 
@@ -425,6 +431,7 @@ dowholezone:
 findnextclip:
 				cmp.w	#-2,(a2,d0.l)
 				beq.s	foundnextclip
+
 				addq.l	#2,d0
 				bra.s	findnextclip
 foundnextclip:
@@ -433,6 +440,7 @@ foundnextclip:
 thisonenull:
 				addq	#8,a3
 				bra.s	dowholezone
+
 nomorethiszone:
 				dbra	d7,assignclips
 
