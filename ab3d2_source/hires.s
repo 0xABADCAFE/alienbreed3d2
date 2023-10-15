@@ -338,58 +338,66 @@ noload:
 				; The first 1600 bytes are the fixed length message strings
 				lea		LVLT_MESSAGE_LENGTH*LVLT_NUM_MESSAGES(a4),a1
 
-				; What is this offset?
-				lea		54(a1),a2
+				lea		TLBT_SizeOf_l(a1),a2
 				move.l	a2,Lvl_ControlPointCoordsPtr_l
 				move.w	TLBT_NumControlPoints_w(a1),Lvl_NumControlPoints_w
 				move.w	TLBT_NumPoints_w(a1),Lvl_NumPoints_w
 
-				move.l	22(a1),a2
+				move.l	TLBT_PointsOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_PointsPtr_l
+
 				move.w	TLBT_NumPoints_w(a1),d0
 				lea		4(a2,d0.w*4),a2
 				move.l	a2,PointBrightsPtr_l
+
 				move.w	TLBT_NumZones_w(a1),d0
 				addq	#1,d0
 				muls	#80,d0 ; zone size is 80?
 				add.l	d0,a2
 				move.l	a2,Lvl_ZoneBorderPointsPtr_l
 
-				move.l	26(a1),a2
+				move.l	TLBT_FloorLineOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_FloorLinesPtr_l
+
 				move.w	-2(a2),ENDZONE
-				move.l	30(a1),a2
+				move.l	TLBT_ObjectDataOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_ObjectDataPtr_l
-*****************************************
-* Just for charles
+
+;*****************************************
+;* Just for charles
 
 ; move.w #$6060,6(a2)
 ; move.l #$d0000,8(a2)
 ; sub.w #40,4(a2)
 ; move.w #45*256+45,14(a2)
-****************************************
-				move.l	34(a1),a2
+;****************************************
+
+				move.l	TLBT_ShotDataOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr_ShotDataPtr_l
-				move.l	38(a1),a2
+
+				move.l	TLBT_AlienShotDataOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,AI_AlienShotDataPtr_l
 
 				add.l	#64*20,a2
 				move.l	a2,AI_OtherAlienDataPtrs_vl
 
-				move.l	42(a1),a2
+				move.l	TLBT_ObjectPointsOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_ObjectPointsPtr_l
-				move.l	46(a1),a2
+
+				move.l	TLBT_Plr1ObjectOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr1_ObjectPtr_l
-				move.l	50(a1),a2
+
+				move.l	TLBT_Plr2ObjectOffset_l(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr2_ObjectPtr_l
+
 				move.w	TLBT_NumObjects_w(a1),Lvl_NumObjectPoints_w
 
 ; bra noclips
