@@ -429,6 +429,32 @@ DL_Never		EQU		1
 ; TODO - Level Structure
 
 LVLT_MESSAGE_LENGTH EQU 160
+LVLT_NUM_MESSAGES	EQU 10
+
+		; twolev.bin data header, after the text messages
+		STRUCTURE TLBT,12
+			UWORD TLBT_NumControlPoints_w	; 12
+			UWORD TLBT_NumPoints_w			; 14
+			UWORD TLBT_NumZones_w			; 16
+			UWORD TLBT_Unk1_w				; 18
+			UWORD TLBT_NumObjects_w			; 20
+
+
+		LABEL TLBT_SizeOf_l
+
+
+		; twolev.graph.bin data header
+		STRUCTURE TLGT,0
+			; Offset values
+
+			ULONG TLGT_DoorDataOffset_l			; 0
+			ULONG TLGT_LiftDataOffset_l			; 4
+			ULONG TLGT_SwitchDataOffset_l		; 8
+			ULONG TLGT_ZoneGraphAddsOffset_l	; 12
+			ULONG TLGT_ZoneAddsOffset_l			; 16
+
+		LABEL TLGT_SizeOf_l
+
 
 ; For two player victory messages
 GAME_DM_VICTORY_MESSAGE_LENGTH EQU 80

@@ -307,47 +307,60 @@ noload:
 ;* Poke all clip offsets into
 ;* correct bit of level data.
 ;****************************
+
+				; this is the loaded location of twolev.graph.bin
 				move.l	Lvl_GraphicsPtr_l,a0
-				move.l	12(a0),a1
-				add.l	a0,a1
-				move.l	a1,Lvl_ZoneGraphAddsPtr_l
-				move.l	(a0),a1
+
+				; Add the offsets to the base address to calculate pointers for
+				; various important level data.
+				move.l	TLGT_DoorDataOffset_l(a0),a1
 				add.l	a0,a1
 				move.l	a1,Lvl_DoorDataPtr_l
-				move.l	4(a0),a1
+
+				move.l	TLGT_LiftDataOffset_l(a0),a1
 				add.l	a0,a1
 				move.l	a1,Lvl_LiftDataPtr_l
-				move.l	8(a0),a1
+
+				move.l	TLGT_SwitchDataOffset_l(a0),a1
 				add.l	a0,a1
 				move.l	a1,Lvl_SwitchDataPtr_l
-				adda.w	#16,a0
+
+				move.l	TLGT_ZoneGraphAddsOffset_l(a0),a1
+				add.l	a0,a1
+				move.l	a1,Lvl_ZoneGraphAddsPtr_l
+
+				adda.w	#TLGT_ZoneAddsOffset_l,a0
 				move.l	a0,Lvl_ZoneAddsPtr_l
 
+				; This is the loaded location of twolev.bin
 				move.l	Lvl_DataPtr_l,a4
-				lea		160*10(a4),a1
 
+				; The first 1600 bytes are the fixed length message strings
+				lea		LVLT_MESSAGE_LENGTH*LVLT_NUM_MESSAGES(a4),a1
+
+				; What is this offset?
 				lea		54(a1),a2
 				move.l	a2,Lvl_ControlPointCoordsPtr_l
-				move.w	12(a1),Lvl_NumControlPoints_w
-				move.w	14(a1),Lvl_NumPoints_w
+				move.w	TLBT_NumControlPoints_w(a1),Lvl_NumControlPoints_w
+				move.w	TLBT_NumPoints_w(a1),Lvl_NumPoints_w
 
-				move.l	16+6(a1),a2
+				move.l	22(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_PointsPtr_l
-				move.w	8+6(a1),d0
+				move.w	TLBT_NumPoints_w(a1),d0
 				lea		4(a2,d0.w*4),a2
 				move.l	a2,PointBrightsPtr_l
-				move.w	16(a1),d0
+				move.w	TLBT_NumZones_w(a1),d0
 				addq	#1,d0
-				muls	#80,d0
+				muls	#80,d0 ; zone size is 80?
 				add.l	d0,a2
 				move.l	a2,Lvl_ZoneBorderPointsPtr_l
 
-				move.l	20+6(a1),a2
+				move.l	26(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_FloorLinesPtr_l
 				move.w	-2(a2),ENDZONE
-				move.l	24+6(a1),a2
+				move.l	30(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_ObjectDataPtr_l
 *****************************************
@@ -358,32 +371,32 @@ noload:
 ; sub.w #40,4(a2)
 ; move.w #45*256+45,14(a2)
 ****************************************
-				move.l	28+6(a1),a2
+				move.l	34(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr_ShotDataPtr_l
-				move.l	32+6(a1),a2
+				move.l	38(a1),a2
 				add.l	a4,a2
 				move.l	a2,AI_AlienShotDataPtr_l
 
 				add.l	#64*20,a2
 				move.l	a2,AI_OtherAlienDataPtrs_vl
 
-				move.l	36+6(a1),a2
+				move.l	42(a1),a2
 				add.l	a4,a2
 				move.l	a2,Lvl_ObjectPointsPtr_l
-				move.l	40+6(a1),a2
+				move.l	46(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr1_ObjectPtr_l
-				move.l	44+6(a1),a2
+				move.l	50(a1),a2
 				add.l	a4,a2
 				move.l	a2,Plr2_ObjectPtr_l
-				move.w	14+6(a1),Lvl_NumObjectPoints_w
+				move.w	TLBT_NumObjects_w(a1),Lvl_NumObjectPoints_w
 
 ; bra noclips
 
 				move.l	Lvl_ClipsPtr_l,a2
 				moveq	#0,d0
-				move.w	10+6(a1),d7				;numzones
+				move.w	TLBT_NumZones_w(a1),d7
 				move.w	d7,Zone_Count_w
 
 assignclips:
