@@ -426,39 +426,41 @@ DR_Never		EQU		5
 DL_Timeout		EQU		0
 DL_Never		EQU		1
 
-; TODO - Level Structure
-
 LVLT_MESSAGE_LENGTH EQU 160
 LVLT_NUM_MESSAGES	EQU 10
 
-		; twolev.bin data header, after the text messages
-		STRUCTURE TLBT,12
-			UWORD TLBT_NumControlPoints_w		; 12
-			UWORD TLBT_NumPoints_w				; 14
-			UWORD TLBT_NumZones_w				; 16
-			UWORD TLBT_Unk1_w					; 18
-			UWORD TLBT_NumObjects_w				; 20
-			ULONG TLBT_PointsOffset_l			; 22
-			ULONG TLBT_FloorLineOffset_l		; 26
-			ULONG TLBT_ObjectDataOffset_l		; 30
-			ULONG TLBT_ShotDataOffset_l			; 34 - in twolev.bin ?
-			ULONG TLBT_AlienShotDataOffset_l	; 38
-			ULONG TLBT_ObjectPointsOffset_l		; 42
-			ULONG TLBT_Plr1ObjectOffset_l		; 46
-			ULONG TLBT_Plr2ObjectOffset_l		; 50
-		LABEL TLBT_SizeOf_l						; This is the end of the header
+;
+; LEVEL DATA FILES
+;
+	; twolev.bin data header, after the text messages (first: LVLT_MESSAGE_LENGTH * LVLT_NUM_MESSAGES)
+	STRUCTURE TLBT,12
+		; todo - what are the first 12 bytes?
+		UWORD TLBT_NumControlPoints_w		; 12
+		UWORD TLBT_NumPoints_w				; 14
+		UWORD TLBT_NumZones_w				; 16
+		UWORD TLBT_Unk1_w					; 18
+		UWORD TLBT_NumObjects_w				; 20
+		ULONG TLBT_PointsOffset_l			; 22
+		ULONG TLBT_FloorLineOffset_l		; 26
+		ULONG TLBT_ObjectDataOffset_l		; 30
+		ULONG TLBT_ShotDataOffset_l			; 34 - this in twolev.bin ?
+		ULONG TLBT_AlienShotDataOffset_l	; 38 - this in twolev.bin ?
+		ULONG TLBT_ObjectPointsOffset_l		; 42
+		ULONG TLBT_Plr1ObjectOffset_l		; 46
+		ULONG TLBT_Plr2ObjectOffset_l		; 50
+	LABEL TLBT_SizeOf_l						; This is the end of the header
 
 
-		; twolev.graph.bin data header
-		STRUCTURE TLGT,0
-			; Offset values
+	; twolev.graph.bin data header
+	STRUCTURE TLGT,0
+		; Offset values
 
-			ULONG TLGT_DoorDataOffset_l			; 0
-			ULONG TLGT_LiftDataOffset_l			; 4
-			ULONG TLGT_SwitchDataOffset_l		; 8
-			ULONG TLGT_ZoneGraphAddsOffset_l	; 12
-			ULONG TLGT_ZoneAddsOffset_l			; 16
-		LABEL TLGT_SizeOf_l
+		ULONG TLGT_DoorDataOffset_l			; 0
+		ULONG TLGT_LiftDataOffset_l			; 4
+		ULONG TLGT_SwitchDataOffset_l		; 8
+		ULONG TLGT_ZoneGraphAddsOffset_l	; 12
+		ULONG TLGT_ZoneAddsOffset_l			; 16
+	LABEL TLGT_SizeOf_l
 
 
 ; For two player victory messages
