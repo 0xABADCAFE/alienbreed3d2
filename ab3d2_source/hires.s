@@ -420,6 +420,7 @@ noload:
 				; a3 = (UWORD*)(((UBYTE*)&Lvl_DataPtr_l[*Lvl_ZoneAddsPtr_l++]) + ZoneT_ListOfGraph_w)
 
 .do_whole_zone:
+				; a3 is pointing to a negative value terminated list of words (zone id?)
 				tst.w	(a3)
 				blt.s	.no_more_this_zone
 
@@ -428,7 +429,7 @@ noload:
 
 				move.l	d0,d1
 				asr.l	#1,d1
-				move.w	d1,2(a3)
+				move.w	d1,2(a3) ; value poked back in
 
 .find_next_clip:
 				cmp.w	#-2,(a2,d0.l)
@@ -441,7 +442,7 @@ noload:
 				addq.l	#2,d0
 
 .this_one_null:
-				addq	#8,a3
+				addq	#8,a3 				; why 8 ?
 				bra.s	.do_whole_zone
 
 .no_more_this_zone:
