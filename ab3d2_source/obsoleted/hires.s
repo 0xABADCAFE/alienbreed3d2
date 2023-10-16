@@ -425,11 +425,11 @@ assignclips:
 				add.l	a4,a3					; pointer to a zone
 				adda.w	#ZoneT_ListOfGraph_w,a3		; pointer to zonelist
 
-dowholezone:
+.do_whole_zone:
 				tst.w	(a3)
 				blt.s	nomorethiszone
 				tst.w	2(a3)
-				blt.s	thisonenull
+				blt.s	.this_one_null
 
 				move.l	d0,d1
 				asr.l	#1,d1
@@ -443,9 +443,9 @@ findnextclip:
 foundnextclip:
 				addq.l	#2,d0
 
-thisonenull:
+.this_one_null:
 				addq	#8,a3
-				bra.s	dowholezone
+				bra.s	.do_whole_zone
 nomorethiszone:
 				dbra	d7,assignclips
 

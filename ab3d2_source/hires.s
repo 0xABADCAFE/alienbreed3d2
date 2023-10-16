@@ -400,7 +400,7 @@ noload:
 
 				move.w	TLBT_NumObjects_w(a1),Lvl_NumObjectPoints_w
 
-; bra noclips
+; bra .noclips
 
 				; TODO - What are we doing here, exactly?
 				; a4 => Lvl_DataPtr_l (twolev.bin)
@@ -412,42 +412,45 @@ noload:
 				move.w	TLBT_NumZones_w(a1),d7
 				move.w	d7,Zone_Count_w
 
-assignclips:
-				move.l	(a0)+,a3
+.assign_clips:
+				move.l	(a0)+,a3				; Lvl_ZoneAddsPtr_l are 32-bit offsets from Lvl_DataPtr_l
 				add.l	a4,a3					; pointer to a zone
 				adda.w	#ZoneT_ListOfGraph_w,a3	; pointer to zonelist
 
-dowholezone:
+				; a3 = (UWORD*)(((UBYTE*)&Lvl_DataPtr_l[*Lvl_ZoneAddsPtr_l++]) + ZoneT_ListOfGraph_w)
+
+.do_whole_zone:
 				tst.w	(a3)
-				blt.s	nomorethiszone
+				blt.s	.no_more_this_zone
 
 				tst.w	2(a3)
-				blt.s	thisonenull
+				blt.s	.this_one_null
 
 				move.l	d0,d1
 				asr.l	#1,d1
 				move.w	d1,2(a3)
 
-findnextclip:
+.find_next_clip:
 				cmp.w	#-2,(a2,d0.l)
-				beq.s	foundnextclip
+				beq.s	.found_next_clip
 
 				addq.l	#2,d0
-				bra.s	findnextclip
-foundnextclip:
+				bra.s	.find_next_clip
+
+.found_next_clip:
 				addq.l	#2,d0
 
-thisonenull:
+.this_one_null:
 				addq	#8,a3
-				bra.s	dowholezone
+				bra.s	.do_whole_zone
 
-nomorethiszone:
-				dbra	d7,assignclips
+.no_more_this_zone:
+				dbra	d7,.assign_clips
 
 				lea		(a2,d0.l),a2
 				move.l	a2,Lvl_ConnectTablePtr_l
 
-noclips:
+.noclips:
 
 ************************************
 
@@ -1897,11 +1900,13 @@ nodrawp2:
 .doallrooms:
 				move.w	(a0),d0
 				blt.s	.allroomsdone
+
 				addq	#8,a0
 				move.w	d0,d1
 				asr.w	#3,d0
 				bset	d1,(a1,d0.w)
 				bra		.doallrooms
+
 .allroomsdone:
 
 plr1only:

@@ -329,7 +329,7 @@ ENT_NEXT_2	EQU	(EntT_SizeOf_l*2)	; entity two after current
 		UWORD ZoneT_TelZ_w				; 42, 2
 		UWORD ZoneT_FloorNoise_w		; 44, 2
 		UWORD ZoneT_UpperFloorNoise_w	; 46, 2
-		UWORD ZoneT_ListOfGraph_w		; 48, 2
+		UWORD ZoneT_ListOfGraph_w		; 48, 2 - is this a vector?
 		LABEL ZoneT_SizeOf_l			; 50
 
 ;**************************
