@@ -330,7 +330,7 @@ noload:
 				move.l	a1,Lvl_ZoneGraphAddsPtr_l
 
 				adda.w	#TLGT_ZoneAddsOffset_l,a0
-				move.l	a0,Lvl_ZoneAddsPtr_l
+				move.l	a0,Lvl_ZonePtrsPtr_l
 
 				; This is the loaded location of twolev.bin
 				move.l	Lvl_DataPtr_l,a4
@@ -406,18 +406,25 @@ noload:
 				; a4 => Lvl_DataPtr_l (twolev.bin)
 				; a2 => Lvl_ClipsPtr_l (twolev.clips)
 				; a1 => Lvl_DataPtr_l + 1600 (twolev.bin, after message strings)
-				; a0 => Lvl_ZoneAddsPtr_l (from twolev.graph.bin)
+				; a0 => Lvl_ZonePtrsPtr_l (from twolev.graph.bin)
 				move.l	Lvl_ClipsPtr_l,a2
 				moveq	#0,d0
 				move.w	TLBT_NumZones_w(a1),d7
 				move.w	d7,Zone_Count_w
 
+
+
+
 .assign_clips:
-				move.l	(a0)+,a3				; Lvl_ZoneAddsPtr_l are 32-bit offsets from Lvl_DataPtr_l
-				add.l	a4,a3					; pointer to a zone
+				move.l	(a0),a3		; Lvl_ZonePtrsPtr_l are 32-bit offsets from Lvl_DataPtr_l
+				add.l	a4,a3		; Add the base address to get the pointer to the zone
+
+				; 0xABADCAFE - pointer chase reduction: Preconvert the array to an array of actual pointers
+				move.l	a3,(a0)+	; Replace Lvl_ZonePtrsPtr_l offset with the actual address
+
 				adda.w	#ZoneT_ListOfGraph_w,a3	; pointer to zonelist
 
-				; a3 = (UWORD*)(((UBYTE*)&Lvl_DataPtr_l[*Lvl_ZoneAddsPtr_l++]) + ZoneT_ListOfGraph_w)
+				; a3 = (UWORD*)(((UBYTE*)Lvl_ZonePtrsPtr_l++] + ZoneT_ListOfGraph_w)
 
 .do_whole_zone:
 				; a3 is pointing to a negative value terminated list of words (zone id?)
@@ -1356,7 +1363,7 @@ ASlaveShouldWaitOnHisMaster:
 
 donetalking:
 				move.l	#Zone_BrightTable_vl,a1
-				move.l	Lvl_ZoneAddsPtr_l,a2
+				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	plr2_ListOfGraphRoomsPtr_l,a0
 ; move.l plr2_PointsToRotatePtr_l,a5
 				move.l	a0,a5
@@ -1371,7 +1378,8 @@ doallz:
 				add.w	#8,a0
 
 				move.l	(a2,d0.w*4),a3
-				add.l	Lvl_DataPtr_l,a3
+
+				; add.l	Lvl_DataPtr_l,a3 ; 0xABADCAFE - pointer chase reduction
 				move.w	ZoneT_Brightness_w(a3),d2
 
 				blt.s	justbright
@@ -1645,7 +1653,7 @@ IWasPlayer1:
 ;************* Do reflection ****************
 ;
 ; move.l Lvl_ListOfGraphRoomsPtr_l,a0
-; move.l Lvl_ZoneAddsPtr_l,a1
+; move.l Lvl_ZonePtrsPtr_l,a1
 ;checkwaterheights
 ; move.w (a0),d0
 ; blt allzonesdone
@@ -3517,9 +3525,9 @@ Plr1_Control:
 				move.w	ZoneT_TelZ_w(a0),Plr1_ZOff_l
 				move.l	Plr1_YOff_l,d1
 				sub.l	ZoneT_Floor_l(a0),d1
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d0.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	a0,Plr1_ZonePtr_l
 				add.l	ZoneT_Floor_l(a0),d1
 				move.l	d1,Plr1_SnapYOff_l
@@ -3728,9 +3736,9 @@ Plr2_Control:
 				move.w	ZoneT_TelZ_w(a0),Plr2_ZOff_l
 				move.l	Plr2_YOff_l,d1
 				sub.l	ZoneT_Floor_l(a0),d1
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d0.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	a0,Plr2_ZonePtr_l
 				add.l	ZoneT_Floor_l(a0),d1
 				move.l	d1,Plr2_SnapYOff_l

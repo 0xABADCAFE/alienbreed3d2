@@ -21,9 +21,9 @@ Draw_Zone_Graph:
 
 				move.l	a0,-(a7)
 
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d7.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	ZoneT_Roof_l(a0),SplitHeight
 				move.l	a0,draw_BackupRoomPtr_l
 

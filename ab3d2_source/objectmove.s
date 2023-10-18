@@ -62,9 +62,9 @@ checkwalls:
 				moveq	#0,d1
 				move.w	8(a2),d1
 				blt		thisisawall2
-				move.l	Lvl_ZoneAddsPtr_l,a4
+				move.l	Lvl_ZonePtrsPtr_l,a4
 				move.l	(a4,d1.w*4),a4
-				add.l	Lvl_DataPtr_l,a4
+				;add.l	Lvl_DataPtr_l,a4 ; 0xABADCAFE pointer chase reduction
 
 				move.l	ZoneT_Floor_l(a4),d1
 				move.l	d1,LowerFloorHeight
@@ -463,9 +463,9 @@ anotherwalls:
 				moveq	#0,d1
 				move.w	8(a2),d1
 				blt		.thisisawall2
-				move.l	Lvl_ZoneAddsPtr_l,a4
+				move.l	Lvl_ZonePtrsPtr_l,a4
 				move.l	(a4,d1.w*4),a4
-				add.l	Lvl_DataPtr_l,a4
+				;add.l	Lvl_DataPtr_l,a4 ; 0xABADCAFE pointer chase reduction
 
 				move.l	ZoneT_Floor_l(a4),d1
 				sub.l	ZoneT_Roof_l(a4),d1
@@ -734,9 +734,9 @@ CheckMoreFloorLines
 
 				moveq	#0,d1
 				move.w	8(a2),d1
-				move.l	Lvl_ZoneAddsPtr_l,a4
+				move.l	Lvl_ZonePtrsPtr_l,a4
 				move.l	(a4,d1.w*4),a4
-				add.l	Lvl_DataPtr_l,a4
+				;add.l	Lvl_DataPtr_l,a4 ; 0xABADCAFE pointer chase reduction
 
 				move.l	ZoneT_Roof_l(a4),LowerRoofHeight
 
@@ -751,9 +751,9 @@ okthebottom
 				muls	6(a2),d0
 				moveq	#0,d3
 				move.w	8(a2),d3
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d3.w*4),a3
-				add.l	Lvl_DataPtr_l,a3
+				;add.l	Lvl_DataPtr_l,a3 ; 0xABADCAFE pointer chase reduction
 				sub.l	d1,d0
 				bge		StillSameSide
 
@@ -1531,9 +1531,9 @@ madeit:
 
 				moveq	#0,d3
 				move.w	8(a2),d3
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d3.w*4),a5
-				add.l	Lvl_DataPtr_l,a5
+				;add.l	Lvl_DataPtr_l,a5 ; 0xABADCAFE pointer chase reduction
 
 				clr.b	d2
 				cmp.l	ZoneT_Floor_l(a5),d5
@@ -1647,9 +1647,9 @@ FindCollisionPt:
 				moveq	#0,d3
 				move.w	8(a2),d3
 				blt		foundpt
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d3.w*4),a5
-				add.l	Lvl_DataPtr_l,a5
+				;add.l	Lvl_DataPtr_l,a5 ; 0xABADCAFE pointer chase reduction
 
 				clr.b	d2
 				cmp.l	ZoneT_Floor_l(a5),d5
@@ -1889,9 +1889,9 @@ floortemp:		dc.l	0
 CheckTeleport:
 				clr.b	OKTEL
 				move.w	FromZone,d0
-				move.l	Lvl_ZoneAddsPtr_l,a2
+				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	(a2,d0.w*4),a2
-				add.l	Lvl_DataPtr_l,a2
+				;add.l	Lvl_DataPtr_l,a2 ; 0xABADCAFE pointer chase reduction
 				tst.w	ZoneT_TelZone_w(a2)
 				bge.s	ITSATEL
 				rts
@@ -1899,9 +1899,9 @@ CheckTeleport:
 ITSATEL:
 				move.l	ZoneT_Floor_l(a2),floortemp
 				move.w	ZoneT_TelZone_w(a2),d0
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d0.w*4),a3
-				add.l	Lvl_DataPtr_l,a3
+				;add.l	Lvl_DataPtr_l,a3 ; 0xABADCAFE pointer chase reduction
 				move.l	ZoneT_Floor_l(a3),d0
 				sub.l	floortemp,d0
 				move.l	d0,floortemp
@@ -1922,9 +1922,9 @@ ITSATEL:
 				rts
 .teleport:
 				move.w	ZoneT_TelZone_w(a2),d0
-				move.l	Lvl_ZoneAddsPtr_l,a2
+				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	(a2,d0.w*4),a2
-				add.l	Lvl_DataPtr_l,a2
+				;add.l	Lvl_DataPtr_l,a2 ; 0xABADCAFE pointer chase reduction
 				move.l	a2,objroom
 
 				rts
@@ -1945,9 +1945,9 @@ FindCloseRoom:
 				move.w	4(a1),oldz
 
 				move.w	12(a0),d2
-				move.l	Lvl_ZoneAddsPtr_l,a5
+				move.l	Lvl_ZonePtrsPtr_l,a5
 				move.l	(a5,d2.w*4),d2
-				add.l	Lvl_DataPtr_l,d2
+				;add.l	Lvl_DataPtr_l,d2 ; 0xABADCAFE pointer chase reduction
 				move.l	d2,objroom
 
 				move.w	THISPLRxoff,newx

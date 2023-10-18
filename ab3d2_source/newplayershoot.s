@@ -56,7 +56,7 @@ Plr1_Shot:
 				move.l	#0,targetydiff
 				move.l	#$7fff,d1
 
-				;move.l	Lvl_ZoneAddsPtr_l,a3
+				;move.l	Lvl_ZonePtrsPtr_l,a3
 
 				move.l	#Plr1_ObsInLine_vb,a1
 				move.l	Lvl_ObjectDataPtr_l,a0
@@ -385,7 +385,7 @@ Plr2_Shot:
 				move.l	#0,targetydiff
 				move.l	#$7fff,d1
 
-				;move.l	Lvl_ZoneAddsPtr_l,a3
+				;move.l	Lvl_ZonePtrsPtr_l,a3
 
 				move.l	#Plr2_ObsInLine_vb,a1
 				move.l	Lvl_ObjectDataPtr_l,a0

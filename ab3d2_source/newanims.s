@@ -112,9 +112,9 @@ anim_BrightenPoints:
 				bgt		darken_points
 
 				movem.l	d0-d7/a0-a6,-(a7)
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d3.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	#CurrentPointBrights_vl,a2
 				move.l	Lvl_PointsPtr_l,a3
 				move.l	Lvl_ZoneBorderPointsPtr_l,a4
@@ -124,9 +124,9 @@ bright_points:
 				move.w	(a1),d4
 				blt		bright_all
 
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d4.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				add.w	#8,a1
 				moveq	#9,d7
 				muls	#20,d4
@@ -299,9 +299,9 @@ Anim_BrightenPointsAngle:
 				movem.l	d0-d7/a0-a6,-(a7)
 				move.l	#SinCosTable_vw,a0
 				lea		(a0,d4.w),a6
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d3.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	#CurrentPointBrights_vl,a2
 				move.l	Lvl_PointsPtr_l,a3
 				move.l	Lvl_ZoneBorderPointsPtr_l,a4
@@ -311,9 +311,9 @@ bright_points_A:
 				move.w	(a1),d4
 				blt		bright_all_A
 
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d4.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				add.w	#8,a1
 				moveq	#9,d3
 				muls	#20,d4
@@ -514,9 +514,9 @@ bright_all_A:
 
 darken_points:
 				movem.l	d0-d7/a0-a6,-(a7)
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d3.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	#CurrentPointBrights_vl,a2
 				move.l	Lvl_PointsPtr_l,a3
 				move.l	a0,a1
@@ -565,9 +565,9 @@ Flash:
 .okflash:
 				movem.l	d0/a0/a1,-(a7)
 				move.l	#CurrentPointBrights_vl,a1
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d0.w*4),a0
-				add.l	Lvl_DataPtr_l,a0
+				;add.l	Lvl_DataPtr_l,a0 ; 0xABADCAFE pointer chase reduction
 				move.l	a0,-(a7)
 				add.w	ZoneT_Points_w(a0),a0
 
@@ -846,9 +846,9 @@ okzone:
 				move.l	d1,d3
 				asr.l	#6,d3
 				move.w	d3,2(a1)
-				move.l	Lvl_ZoneAddsPtr_l,a1
+				move.l	Lvl_ZonePtrsPtr_l,a1
 				move.l	(a1,d2.w*4),a1
-				add.l	Lvl_DataPtr_l,a1
+				;add.l	Lvl_DataPtr_l,a1 ; 0xABADCAFE pointer chase reduction
 				move.l	d1,ZoneT_Water_l(a1)
 
 				bra.s	morezones
@@ -910,9 +910,9 @@ notallliftsdone:
 				move.w	d3,(a6)+
 				move.w	2(a0),d2
 				move.w	8(a0),d7
-				move.l	Lvl_ZoneAddsPtr_l,a1
+				move.l	Lvl_ZonePtrsPtr_l,a1
 				move.l	(a1,d7.w*4),a1
-				add.l	Lvl_DataPtr_l,a1
+				;add.l	Lvl_DataPtr_l,a1 ; 0xABADCAFE pointer chase reduction
 				move.b	ZoneT_Echo_b(a1),PlayEcho
 				move.w	d2,d7					; speed of movement.
 				move.w	d2,anim_FloorMoveSpeed_w
@@ -988,9 +988,9 @@ notallliftsdone:
 				;ext.l	d3	; Safety - sign extend before shift
 				;asl.l	#8,d3
 				move.w	(a0)+,d5
-				move.l	Lvl_ZoneAddsPtr_l,a1
+				move.l	Lvl_ZonePtrsPtr_l,a1
 				move.l	(a1,d5.w*4),a1
-				add.l	Lvl_DataPtr_l,a1
+				;add.l	Lvl_DataPtr_l,a1 ; 0xABADCAFE pointer chase reduction
 				move.w	(a1),d5
 				move.l	Plr1_ZonePtr_l,a3
 				move.l	d3,2(a1)
@@ -1280,9 +1280,9 @@ notalldoorsdone:
 				move.w	(a0),d3
 				move.w	2(a0),d2
 				move.w	8(a0),d7
-				move.l	Lvl_ZoneAddsPtr_l,a1
+				move.l	Lvl_ZonePtrsPtr_l,a1
 				move.l	(a1,d7.w*4),a1
-				add.l	Lvl_DataPtr_l,a1
+				;add.l	Lvl_DataPtr_l,a1 ; 0xABADCAFE pointer chase reduction
 				move.b	ZoneT_Echo_b(a1),PlayEcho
 				muls	Anim_TempFrames_w,d2
 				add.w	d2,d3
@@ -1357,10 +1357,10 @@ NOTMOVING:
 				;ext.l	d3		; Safety: Sign extend before shift
 				;asl.l	#8,d3
 
-				move.l	Lvl_ZoneAddsPtr_l,a1
+				move.l	Lvl_ZonePtrsPtr_l,a1
 				move.w	(a0)+,d5
 				move.l	(a1,d5.w*4),a1
-				add.l	Lvl_DataPtr_l,a1
+				;add.l	Lvl_DataPtr_l,a1 ; 0xABADCAFE pointer chase reduction
 				move.l	d3,6(a1)
 				neg.w	d0
 				and.w	#255,d0
@@ -2089,9 +2089,9 @@ notpopping:
 
 notdoneanim:
 				move.b	d2,ShotT_Anim_b(a0)
-				move.l	Lvl_ZoneAddsPtr_l,a2
+				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	(a2,d0.w*4),d0
-				add.l	Lvl_DataPtr_l,d0
+				;add.l	Lvl_DataPtr_l,d0 ; 0xABADCAFE pointer chase reduction
 				move.l	d0,objroom
 
 				move.l	objroom,a3
@@ -2806,9 +2806,9 @@ ComputeBlast:
 				move.w	12(a0),d0
 ; jsr Flash
 
-				move.l	Lvl_ZoneAddsPtr_l,a2
+				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	(a2,d0.w*4),a2
-				add.l	Lvl_DataPtr_l,a2
+				;add.l	Lvl_DataPtr_l,a2 ; 0xABADCAFE pointer chase reduction
 				move.l	a2,anim_MiddleRoom_l
 				move.l	Lvl_ObjectDataPtr_l,a2
 				suba.w	#ObjT_SizeOf_l,a2
@@ -2853,9 +2853,9 @@ HitObjLoop:
 
 .okblast:
 				move.w	ObjT_ZoneID_w(a2),d1
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d1.w*4),a3
-				add.l	Lvl_DataPtr_l,a3
+				;add.l	Lvl_DataPtr_l,a3 ; 0xABADCAFE pointer chase reduction
 				move.l	a3,ToRoom
 				move.l	Lvl_ObjectPointsPtr_l,a3
 				move.w	(a3,d0.w*8),Targetx
@@ -3017,9 +3017,9 @@ CheckedEmAll:
 				clr.b	exitfirst
 				st.b	Obj_WallBounce_b
 				move.w	12(a0),d0
-				move.l	Lvl_ZoneAddsPtr_l,a3
+				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d0.w*4),a3
-				add.l	Lvl_DataPtr_l,a3
+				;add.l	Lvl_DataPtr_l,a3 ; 0xABADCAFE pointer chase reduction
 				move.l	a3,anim_MiddleRoom_l
 				move.l	Plr_ShotDataPtr_l,a3
 				move.w	4(a0),d0

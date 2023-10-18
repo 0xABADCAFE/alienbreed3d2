@@ -25,11 +25,11 @@ Plr_Initialise:
 				add.l	#(LVLT_MESSAGE_LENGTH*LVLT_NUM_MESSAGES),a1
 
 				; player 1
-				; pZone = Lvl_DataPtr_l[Lvl_ZoneAddsPtr_l[zoneId_w]]
+				; pZone = Lvl_DataPtr_l[Lvl_ZonePtrsPtr_l[zoneId_w]]
 				move.w	TBLT_Plr1_StartZoneID_w(a1),d0
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d0.w*4),d0
-				add.l	Lvl_DataPtr_l,d0
+				;add.l	Lvl_DataPtr_l,d0 ; 0xABADCAFE pointer chase reduction
 				move.l	d0,Plr1_ZonePtr_l
 				move.l	Plr1_ZonePtr_l,a0
 				move.l	ZoneT_Floor_l(a0),d0
@@ -45,11 +45,11 @@ Plr_Initialise:
 				move.l	#%100011,plr1_DefaultEnemyFlags_l
 
 				; player 2
-				; pZone = Lvl_DataPtr_l[Lvl_ZoneAddsPtr_l[zoneId_w]]
+				; pZone = Lvl_DataPtr_l[Lvl_ZonePtrsPtr_l[zoneId_w]]
 				move.w	TBLT_Plr2_StartZoneID_w(a1),d0
-				move.l	Lvl_ZoneAddsPtr_l,a0
+				move.l	Lvl_ZonePtrsPtr_l,a0
 				move.l	(a0,d0.w*4),d0
-				add.l	Lvl_DataPtr_l,d0
+				;add.l	Lvl_DataPtr_l,d0  ; 0xABADCAFE pointer chase reduction
 				move.l	d0,Plr2_ZonePtr_l
 				move.l	Plr2_ZonePtr_l,a0
 				move.l	ZoneT_Floor_l(a0),d0
