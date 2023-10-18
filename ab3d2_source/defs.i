@@ -433,12 +433,17 @@ LVLT_NUM_MESSAGES	EQU 10
 ; LEVEL DATA FILES
 ;
 	; twolev.bin data header, after the text messages (first: LVLT_MESSAGE_LENGTH * LVLT_NUM_MESSAGES)
-	STRUCTURE TLBT,12
-		; todo - what are the first 12 bytes?
+	STRUCTURE TLBT,0
+		UWORD TBLT_Plr1_StartXPos_w			; 0
+		UWORD TBLT_Plr1_StartZPos_w			; 2
+		UWORD TBLT_Plr1_StartZoneID_w		; 4
+		UWORD TBLT_Plr2_StartXPos_w			; 6
+		UWORD TBLT_Plr2_StartZPos_w			; 8
+		UWORD TBLT_Plr2_StartZoneID_w		; 10
 		UWORD TLBT_NumControlPoints_w		; 12
 		UWORD TLBT_NumPoints_w				; 14
 		UWORD TLBT_NumZones_w				; 16
-		UWORD TLBT_Unk1_w					; 18
+		UWORD TLBT_Unknown_w				; 18
 		UWORD TLBT_NumObjects_w				; 20
 		ULONG TLBT_PointsOffset_l			; 22
 		ULONG TLBT_FloorLineOffset_l		; 26
