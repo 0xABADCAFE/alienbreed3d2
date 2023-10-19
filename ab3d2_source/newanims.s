@@ -118,7 +118,7 @@ anim_BrightenPoints:
 				move.l	#CurrentPointBrights_vl,a2
 				move.l	Lvl_PointsPtr_l,a3
 				move.l	Lvl_ZoneBorderPointsPtr_l,a4
-				lea		ZoneT_ListOfGraph_w(a0),a1
+				lea		ZoneT_PotVisibleZoneList_vw(a0),a1
 
 bright_points:
 				move.w	(a1),d4
@@ -305,7 +305,7 @@ Anim_BrightenPointsAngle:
 				move.l	#CurrentPointBrights_vl,a2
 				move.l	Lvl_PointsPtr_l,a3
 				move.l	Lvl_ZoneBorderPointsPtr_l,a4
-				lea		ZoneT_ListOfGraph_w(a0),a1
+				lea		ZoneT_PotVisibleZoneList_vw(a0),a1
 
 bright_points_A:
 				move.w	(a1),d4
@@ -583,7 +583,7 @@ flashedall:
 				move.l	#Zone_BrightTable_vl,a1
 				add.w	d1,(a1,d0.w*4)
 				add.w	d1,2(a1,d0.w*4)
-				add.l	#ZoneT_ListOfGraph_w,a0
+				add.l	#ZoneT_PotVisibleZoneList_vw,a0
 
 doemall:
 				move.w	(a0),d0

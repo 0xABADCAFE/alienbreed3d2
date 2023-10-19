@@ -151,12 +151,8 @@ void ZDbg_DumpZone(REG(a0, Zone* zonePtr)) {
 	printf(
 		"Zone {\n"
 		"\tID: %d\n"
-		"\tFloor: %d\n"
-		"\tRoof: %d\n"
-		"\tUpperFloor: %d\n"
-		"\tUpperRoof: %d\n"
-		"\tWater: %d\n"
-		"\tListOfGraph: [\n",
+		"\tHeights: [LF:%d LC:%d UF:%d UC:%d WL:%d]\n"
+		"\tPVS Zones: [\n",
 		(int)zonePtr->z_ID,
 		// Note that heights appear to be 16.8, so scale down to give values
 		// congruent with the editor.
@@ -168,7 +164,7 @@ void ZDbg_DumpZone(REG(a0, Zone* zonePtr)) {
 	);
 
 	int iZone = 0;
-	WORD const* zList = zonePtr->z_ListOfGraph;
+	WORD const* zList = zonePtr->z_PotVisibleZoneList;
 	do {
 		iZone = *zList;
 		printf(

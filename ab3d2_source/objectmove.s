@@ -1315,7 +1315,7 @@ ItMightBeSeen:
 				move.l	ToRoom,a0
 				move.w	(a0),d0
 				move.l	FromRoom,a0
-				adda.w	#ZoneT_ListOfGraph_w,a0
+				adda.w	#ZoneT_PotVisibleZoneList_vw,a0
 				bra.s	InList
 
 Viewerx:		dc.l	0
@@ -1348,7 +1348,7 @@ CanItBeSeen:
 				cmp.l	a0,a1
 				beq.s	insameroom
 
-				adda.w	#ZoneT_ListOfGraph_w,a0
+				adda.w	#ZoneT_PotVisibleZoneList_vw,a0
 
 InList:
 				move.w	(a0),d1

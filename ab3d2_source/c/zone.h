@@ -25,7 +25,7 @@ typedef struct {
     WORD z_TelZ			;// 42, 2
     WORD z_FloorNoise		;// 44, 2
     WORD z_UpperFloorNoise	;// 46, 2
-    WORD z_ListOfGraph[1]	;// 48, 2 Assumed vector, varying length
+    WORD z_PotVisibleZoneList[1]	;// 48, 2 Assumed vector, varying length
 }  __attribute__((packed)) __attribute__ ((aligned (2))) Zone;
 
 extern Zone** Lvl_ZonePtrsPtr_l;

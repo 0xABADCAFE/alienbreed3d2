@@ -419,9 +419,9 @@ noload:
 				; 0xABADCAFE - pointer chase reduction: Preconvert to an array of pointers
 				move.l	a3,(a0)+	; Replace Lvl_ZonePtrsPtr_l offset with the actual address
 
-				adda.w	#ZoneT_ListOfGraph_w,a3	; pointer to zonelist
+				adda.w	#ZoneT_PotVisibleZoneList_vw,a3	; pointer to zonelist
 
-				; a3 = (UWORD*)(((UBYTE*)Lvl_ZonePtrsPtr_l++] + ZoneT_ListOfGraph_w)
+				; a3 = (UWORD*)(((UBYTE*)Lvl_ZonePtrsPtr_l++] + ZoneT_PotVisibleZoneList_vw)
 
 .do_whole_zone:
 				; a3 is pointing to sets of 4 word tuples (or 2,2,4, total size still 8)
@@ -1905,7 +1905,7 @@ nodrawp2:
 				cmp.b	#PLR_SINGLE,Plr_MultiplayerType_b
 				beq.s	plr1only
 
-				lea		ZoneT_ListOfGraph_w(a0),a0
+				lea		ZoneT_PotVisibleZoneList_vw(a0),a0
 .doallrooms:
 				move.w	(a0),d0
 				blt.s	.allroomsdone
@@ -1921,7 +1921,7 @@ nodrawp2:
 plr1only:
 
 				move.l	Plr1_ZonePtr_l,a0
-				lea		ZoneT_ListOfGraph_w(a0),a0
+				lea		ZoneT_PotVisibleZoneList_vw(a0),a0
 .doallrooms2:
 				move.w	(a0),d0
 				blt.s	.allroomsdone2
