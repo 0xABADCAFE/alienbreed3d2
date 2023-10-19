@@ -309,7 +309,9 @@ ENT_NEXT_2	EQU	(EntT_SizeOf_l*2)	; entity two after current
 		LABEL ShotT_SizeOf_l		; 64
 
 	; Zone Structure todo - what gives with the 16-bit alignment of these?
-	STRUCTURE ZoneT,2
+	; TODO - consider rearranging the data after loading into something with optimal alignment
+	STRUCTURE ZoneT,0
+		UWORD ZoneT_ID_w                ;  2, 2
 		ULONG ZoneT_Floor_l				;  2, 4
 		ULONG ZoneT_Roof_l				;  6, 4
 		ULONG ZoneT_UpperFloor_l		; 10, 4
@@ -320,7 +322,7 @@ ENT_NEXT_2	EQU	(EntT_SizeOf_l*2)	; entity two after current
 		UWORD ZoneT_ControlPoint_w		; 26, 2 really UBYTE[2]
 		UWORD ZoneT_BackSFXMask_w		; 28, 2 Originally long but always accessed as word
 		UWORD ZoneT_Unused_w            ; 30, 2 so this is the unused half
-		UWORD ZoneT_ExitList_w			; 32, 2
+		UWORD ZoneT_ExitList_w			; 32, 2 - Appears to be a negative terminated list preceeding the struct
 		UWORD ZoneT_Points_w			; 34, 2
 		UBYTE ZoneT_Back_b				; 36, 1 unused
 		UBYTE ZoneT_Echo_b				; 37, 1

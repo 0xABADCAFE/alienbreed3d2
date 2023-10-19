@@ -353,7 +353,7 @@ noload:
 
 				move.w	TLBT_NumZones_w(a1),d0
 				addq	#1,d0
-				muls	#80,d0 ; zone size is 80?
+				muls	#80,d0 ;
 				add.l	d0,a2
 				move.l	a2,Lvl_ZoneBorderPointsPtr_l
 
@@ -412,14 +412,11 @@ noload:
 				move.w	TLBT_NumZones_w(a1),d7
 				move.w	d7,Zone_Count_w
 
-
-
-
 .assign_clips:
 				move.l	(a0),a3		; Lvl_ZonePtrsPtr_l are 32-bit offsets from Lvl_DataPtr_l
 				add.l	a4,a3		; Add the base address to get the pointer to the zone
 
-				; 0xABADCAFE - pointer chase reduction: Preconvert the array to an array of actual pointers
+				; 0xABADCAFE - pointer chase reduction: Preconvert to an array of pointers
 				move.l	a3,(a0)+	; Replace Lvl_ZonePtrsPtr_l offset with the actual address
 
 				adda.w	#ZoneT_ListOfGraph_w,a3	; pointer to zonelist
@@ -427,7 +424,10 @@ noload:
 				; a3 = (UWORD*)(((UBYTE*)Lvl_ZonePtrsPtr_l++] + ZoneT_ListOfGraph_w)
 
 .do_whole_zone:
-				; a3 is pointing to a negative value terminated list of words (zone id?)
+				; a3 is pointing to sets of 4 word tuples (or 2,2,4, total size still 8)
+				; When tuple[0] < 0, whole list is done
+				; When tuple[1] < 0, clip search for the current tuple is done (TBC)
+				; Unsure what the interpretation of tuple[1] - tuple[3] is
 				tst.w	(a3)
 				blt.s	.no_more_this_zone
 
@@ -449,7 +449,7 @@ noload:
 				addq.l	#2,d0
 
 .this_one_null:
-				addq	#8,a3 				; why 8 ?
+				addq	#8,a3 				; Tuple size
 				bra.s	.do_whole_zone
 
 .no_more_this_zone:

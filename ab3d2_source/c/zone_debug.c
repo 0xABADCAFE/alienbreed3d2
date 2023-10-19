@@ -79,6 +79,9 @@ void ZDbg_First(void)
         "Beginning PVS at Zone %d\n",
         (int)Draw_CurrentZone_w
     );
+
+	ZDbg_DumpZone(Lvl_ZonePtrsPtr_l[Draw_CurrentZone_w]);
+
     if (Dev_DebugFlags & DEV_ZONE_TRACE_VERBOSE_AF) {
         ZDbg_ShowRegs();
     }
@@ -141,4 +144,47 @@ void ZDbg_RightClip(void)
     if (Dev_DebugFlags & DEV_ZONE_TRACE_VERBOSE_AF) {
         ZDbg_ShowRegs();
     }
+}
+
+void ZDbg_DumpZone(REG(a0, Zone* zonePtr)) {
+
+	printf(
+		"Zone {\n"
+		"\tID: %d\n"
+		"\tFloor: %d\n"
+		"\tRoof: %d\n"
+		"\tUpperFloor: %d\n"
+		"\tUpperRoof: %d\n"
+		"\tWater: %d\n"
+		"\tListOfGraph: [\n",
+		(int)zonePtr->z_ID,
+		// Note that heights appear to be 16.8, so scale down to give values
+		// congruent with the editor.
+		zonePtr->z_Floor >> 8,
+		zonePtr->z_Roof >> 8,
+		zonePtr->z_UpperFloor >> 8,
+		zonePtr->z_UpperRoof >> 8,
+		zonePtr->z_Water >> 8
+	);
+
+	int iZone = 0;
+	WORD const* zList = zonePtr->z_ListOfGraph;
+	do {
+		iZone = *zList;
+		printf(
+			"\t\t%3d, %5d, %5d, %5d\n",
+			iZone,
+			(int)zList[1],
+			(int)zList[2], // significant?
+			(int)zList[3]  // significant?
+		);
+		zList += 4; // I have no idea why but these records are 8 bytes apart
+	} while (iZone > -1);
+	printf("\t]\n\tExitList: (%d) [\n", (int)zonePtr->z_ExitList);
+
+	zList = ((WORD*)zonePtr) + zonePtr->z_ExitList;
+	do {
+		printf("\t\t%d,\n", (int)*zList);
+	} while (*zList++ >= 0);
+	puts("\t]\n}\n");
 }

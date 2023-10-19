@@ -40,4 +40,6 @@ typedef struct {
     InventoryItems       inv_Items;
 } __attribute__((packed)) __attribute__ ((aligned (2))) Inventory;
 
+#include "zone.h"
+
 #endif // DEFS_H
