@@ -2496,6 +2496,7 @@ nodl:
 
 				rts
 
+				align 4
 ontoscr:
 val				SET		0
 				REPT	256
@@ -2652,6 +2653,7 @@ itsblack:
 
 				rts
 
+				align 4
 ontoscrGL:
 val				SET		0
 				REPT	256
@@ -2814,6 +2816,7 @@ nodlg:
 
 				rts
 
+				align 4
 ontoscrg:
 val				SET		0
 				REPT	256

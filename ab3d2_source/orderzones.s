@@ -6,8 +6,12 @@ zone_LastPosition_vw: ; basically a short coordinate pair
 				dc.l	-1
 
 Zone_OrderZones:
-				; TODO this needs to be triggered when the player changes zone.
-				; I've tried this by using the ZonePtr but it works only partially.
+				; Only bother if the player has moved enough since last time that it is likely to have affected
+				; the final ordering.
+				; TODO - We should only be sorting the PVS set of zones here. Confirm that. If it's the complete set
+				;        then we should make the effort to understand why.
+				;      - Depending on the total number of zones to sort we can probalby use one of a number of
+				;        different sorting algorithms that are better for shorter and longer lists.
 				move.w	xoff,d0
 				swap	d0
 				move.w	zoff,d0		  ; d0 is the short coordinate location of the player
