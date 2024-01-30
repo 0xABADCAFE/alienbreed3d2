@@ -2253,6 +2253,9 @@ checkbeh:
 
 .guard_clip:
 				movem.l	(a7)+,d0-d7/a0-a6
+
+				;DEV_INC.w Reserved1
+
 				bra		polybehind
 
 .notbeh:
