@@ -1,4 +1,4 @@
-			section data,data
+			section .data,data
 
 ; Statically initialised (non-zero) data
 
@@ -11,6 +11,7 @@ draw_WaterFrames_vb:
 				incbin	"waterfile"
 
 				align 4
+_draw_Palette_vw::
 draw_Palette_vw:
 				incbin	"256pal"
 
@@ -25,18 +26,29 @@ CHARWIDTHS1:
 ENDFONT2:
 CHARWIDTHS2:
 
+_draw_FontPtrs_vl::
 draw_FontPtrs_vl:
-				dc.l	draw_EndFont0_vb,draw_CharWidths0_vb
+				dc.l	draw_EndFont0_vb
+				dc.l	draw_CharWidths0_vb
 				dc.l	ENDFONT1,CHARWIDTHS1
 				dc.l	ENDFONT2,CHARWIDTHS2
 
 				align 4
+_draw_BorderChars_vb::
 draw_BorderChars_vb:
 				incbin	"includes/bordercharsraw"
 
 				align 4
+_draw_ScrollChars_vb::
 draw_ScrollChars_vb:
 				incbin	"includes/scrollfont"
+
+				IFND	GEN_GLYPH_DATA
+				; We are using precalculated glyph spacing data
+_draw_GlyphSpacing_vb::
+draw_GlyphSpacing_vb:
+				incbin	"includes/glyph_spacing.bin"
+				ENDC
 
 				align 4
 draw_Digits_vb:
@@ -47,6 +59,7 @@ draw_BackdropImageName_vb:
 				dc.b	"ab3:includes/rawbackpacked",0
 				align 4
 
+_draw_BorderPacked_vb::
 draw_BorderPacked_vb:
 				incbin	"includes/newborderpacked"
 				ds.b	16	; safety for unLha overrun
@@ -96,3 +109,4 @@ draw_XZAngs_vw:
 
 ; todo - what is this?
 guff:			incbin	"includes/guff"
+

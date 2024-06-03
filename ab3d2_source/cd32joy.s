@@ -223,9 +223,6 @@ _ReadJoy1
 .Mouse
 				rts
 
-
-
-
 _ReadJoy2
 				move.l	a6,-(a7)
 				move.l	#1,d0
@@ -361,7 +358,7 @@ _ReadJoy2
 				beq.s	.findnext
 
 				move.b	d0,Plr2_GunSelected_b
-				jsr		SHOWPLR2GUNNAME
+				jsr		Plr2_ShowGunName
 
 				bra		.nonextweap
 
