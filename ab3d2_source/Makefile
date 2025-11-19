@@ -90,7 +90,7 @@ build-%:
 clean:
 	rm -f *.o
 	rm -rf $(BUILD_DIR)
-	./bumprev.py
+#	./bumprev.py
 
 bump:
 	./bumprev.py --revision
