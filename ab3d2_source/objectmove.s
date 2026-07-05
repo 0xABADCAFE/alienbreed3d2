@@ -13,21 +13,21 @@ MoveObject:
 				move.w	#50,obj_QuitLimit_w
 				move.l	#Obj_RoomPath_vw,obj_RoomPathPtr_l
 				clr.b	hitwall
-				move.w	newx,d0
-				sub.w	oldx,d0
-				move.w	d0,xdiff
-				move.w	newz,d0
-				sub.w	oldz,d0
-				move.w	d0,zdiff
-				tst.w	xdiff
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				move.w	d0,Obj_XDiff_w
+				move.w	Obj_NewZ_w,d0
+				sub.w	Obj_OldZ_w,d0
+				move.w	d0,Obj_ZDiff_w
+				tst.w	Obj_XDiff_w
 				bne.s	.moving
 
-				tst.w	zdiff
+				tst.w	Obj_ZDiff_w
 				bne.s	.moving
 				rts
 
 .moving:
-				move.l	newy,wallhitheight
+				move.l	Obj_NewY_w,wallhitheight
 				move.l	Obj_ZonePtr_l,a0
 
 gobackanddoitallagain:
@@ -72,7 +72,7 @@ checkwalls:
 				cmp.l	thingheight,d1
 				ble		thisisawall1
 
-				move.l	oldy,d0
+				move.l	Obj_OldY_w,d0
 				move.l	d0,d1
 				add.l	thingheight,d1
 				sub.l	ZoneT_Floor_l(a4),d1
@@ -107,7 +107,7 @@ thisisawall1:
 				cmp.l	thingheight,d1
 				ble		thisisawall2
 
-				move.l	oldy,d0
+				move.l	Obj_OldY_w,d0
 				move.l	d0,d1
 				add.l	thingheight,d1
 				sub.l	ZoneT_UpperFloor_l(a4),d1
@@ -153,8 +153,8 @@ thisisawall2:
 				move.w	d4,a6
 
 .notomatoes:
-				move.w	newx,d0
-				move.w	newz,d1
+				move.w	Obj_NewX_w,d0
+				move.w	Obj_NewZ_w,d1
 				sub.w	(a2),d0 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d1
 				sub.w	a4,d0
@@ -189,12 +189,12 @@ chkhttt:
 				add.w	Obj_ExtLen_w,d3
 				divs	d3,d7					;  d
 
-				move.l	newy,d4
-				sub.l	oldy,d4
+				move.l	Obj_NewY_w,d4
+				sub.l	Obj_OldY_w,d4
 ; beq .dontworryhit
 
-				move.w	oldx,d0
-				move.w	oldz,d1
+				move.w	Obj_OldX_w,d0
+				move.w	Obj_OldZ_w,d1
 				sub.w	(a2),d0 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d1
 				sub.w	a4,d0
@@ -219,7 +219,7 @@ chkhttt:
 				muls	d7,d1
 
 .dontworryhit:
-				add.l	newy,d1					; height at point of crossing wall.
+				add.l	Obj_NewY_w,d1					; height at point of crossing wall.
 				move.l	d1,d6
 				add.l	thingheight,d6
 				sub.l	StepUpVal,d6
@@ -259,16 +259,16 @@ chkhttt:
 .calcwherehit:
 
 ; add.w #20,d7
-				move.w	newx,d6
-				sub.w	oldx,d6
+				move.w	Obj_NewX_w,d6
+				sub.w	Obj_OldX_w,d6
 				muls	d7,d6
 				divs	d0,d6
-				add.w	newx,d6
-				move.w	newz,d1
-				sub.w	oldz,d1
+				add.w	Obj_NewX_w,d6
+				move.w	Obj_NewZ_w,d1
+				sub.w	Obj_OldZ_w,d1
 				muls	d7,d1
 				divs	d0,d1
-				add.w	newz,d1
+				add.w	Obj_NewZ_w,d1
 				move.w	d6,d0
 				move.w	d1,d7
 				bra.s	.calcedhit
@@ -282,43 +282,43 @@ chkhttt:
 				divs	d3,d6
 				divs	d3,d7
 				neg.w	d6
-				add.w	newx,d6					; point on wall
-				add.w	newz,d7
+				add.w	Obj_NewX_w,d6					; point on wall
+				add.w	Obj_NewZ_w,d7
 				move.w	d6,d0
 				move.w	d7,d1
 				bra.s	othercheck
 
 .calcedhit:
-				move.w	newx,d6
-				move.w	newz,d7
-				sub.w	oldx,d6
-				sub.w	oldz,d7
+				move.w	Obj_NewX_w,d6
+				move.w	Obj_NewZ_w,d7
+				sub.w	Obj_OldX_w,d6
+				sub.w	Obj_OldZ_w,d7
 				move.w	(a2),d4 ; EdgeT_XPos_w
 				add.w	a4,d4
-				sub.w	oldx,d4
+				sub.w	Obj_OldX_w,d4
 				muls	d4,d7;					negative if on left
 				move.w	EdgeT_ZPos_w(a2),d4
 				add.w	a6,d4
-				sub.w	oldz,d4
+				sub.w	Obj_OldZ_w,d4
 				muls	d4,d6
 				sub.l	d6,d7
 				bgt		oknothitwall
 
 				move.w	d0,d6
 				move.w	d1,d7
-				move.w	newx,d6
-				move.w	newz,d7
-				sub.w	oldx,d6
-				sub.w	oldz,d7
+				move.w	Obj_NewX_w,d6
+				move.w	Obj_NewZ_w,d7
+				sub.w	Obj_OldX_w,d6
+				sub.w	Obj_OldZ_w,d7
 				move.w	(a2),d4 ; EdgeT_XPos_w
 				add.w	a4,d4
 				add.w	d2,d4
-				sub.w	oldx,d4
+				sub.w	Obj_OldX_w,d4
 				muls	d4,d7;					negative if on left
 				move.w	EdgeT_ZPos_w(a2),d4
 				add.w	a6,d4
 				add.w	d5,d4
-				sub.w	oldz,d4
+				sub.w	Obj_OldZ_w,d4
 				muls	d4,d6
 				sub.l	d6,d7
 				blt		oknothitwall
@@ -391,8 +391,8 @@ zispos:
 				bgt.s	oknothitwall
 
 hitthewall:
-				move.w	d0,newx
-				move.w	d1,newz
+				move.w	d0,Obj_NewX_w
+				move.w	d1,Obj_NewZ_w
 				move.w	wallflags(pc),d0
 				or.w	d0,EdgeT_Flags_w(a2)
 				st		hitwall
@@ -405,10 +405,10 @@ no_more_walls:
 				tst.w	Obj_ExtLen_w
 				beq		NOOTHERWALLSNEEDED
 
-				tst.w	xdiff
+				tst.w	Obj_XDiff_w
 				bne.s	notstill
 
-				tst.w	zdiff
+				tst.w	Obj_ZDiff_w
 				bne.s	notstill
 
 				move.l	Obj_ZonePtr_l,a0
@@ -449,7 +449,7 @@ anotherwalls:
 				cmp.l	thingheight,d1
 				ble		.thisisawall1
 
-				move.l	newy,d0
+				move.l	Obj_NewY_w,d0
 				move.l	d0,d1
 				add.l	thingheight,d1
 				sub.l	ZoneT_Floor_l(a4),d1
@@ -479,7 +479,7 @@ anotherwalls:
 				cmp.l	thingheight,d1
 				ble		.thisisawall2
 
-				move.l	newy,d0
+				move.l	Obj_NewY_w,d0
 				move.l	d0,d1
 				add.l	thingheight,d1
 				sub.l	ZoneT_UpperFloor_l(a4),d1
@@ -526,36 +526,36 @@ anotherwalls:
 				move.w	EdgeT_XLen_w(a2),d2
 				sub.w	a4,d2
 				sub.w	a6,d2
-				move.w	d2,deltax
+				move.w	d2,obj_DeltaX_w
 				move.w	EdgeT_ZLen_w(a2),d5
 				add.w	a4,d5
 				sub.w	a6,d5
-				move.w	newx,d0
-				move.w	newz,d1
+				move.w	Obj_NewX_w,d0
+				move.w	Obj_NewZ_w,d1
 				sub.w	(a2),d0 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d1
 				sub.w	a4,d0
 				sub.w	a6,d1
-				muls	deltax,d1
+				muls	obj_DeltaX_w,d1
 				muls	d5,d0
 				sub.l	d1,d0
 				bge		.oknothitwall
 
 				move.l	d0,d7
-				move.w	oldx,d1
-				move.w	newx,d3
+				move.w	Obj_OldX_w,d1
+				move.w	Obj_NewX_w,d3
 				sub.w	d1,d3
 				sub.w	(a2),d1 ; EdgeT_XPos_w
 				sub.w	a4,d1					;e-a=d1
 				move.w	EdgeT_ZPos_w(a2),d2
 				add.w	a6,d2
-				sub.w	oldz,d2					;b-f=d2
-				move.w	newz,d4
-				sub.w	oldz,d4
+				sub.w	Obj_OldZ_w,d2					;b-f=d2
+				move.w	Obj_NewZ_w,d4
+				sub.w	Obj_OldZ_w,d4
 				muls	d4,d1
 				muls	d3,d2
 				add.l	d2,d1					; h(e-a)+g(b-f)
-				muls	deltax,d4
+				muls	obj_DeltaX_w,d4
 				muls	d5,d3
 				sub.l	d3,d4
 				beq		.oknothitwall
@@ -583,19 +583,19 @@ anotherwalls:
 				sub.w	#3,d7
 				move.w	d7,d6
 				muls	d5,d6
-				muls	deltax,d7
+				muls	obj_DeltaX_w,d7
 				divs	d0,d6
 				divs	d0,d7
 				neg.w	d6
-				add.w	newx,d6					; point on wall
-				add.w	newz,d7
-				move.w	oldx,d0
-				move.w	oldz,d1
+				add.w	Obj_NewX_w,d6					; point on wall
+				add.w	Obj_NewZ_w,d7
+				move.w	Obj_OldX_w,d0
+				move.w	Obj_OldZ_w,d1
 				sub.w	(a2),d0 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d1
 				sub.w	a4,d0
 				sub.w	a6,d1
-				muls	deltax,d1
+				muls	obj_DeltaX_w,d1
 				muls	d5,d0
 				sub.l	d1,d0
 				blt		.oknothitwall
@@ -625,7 +625,7 @@ anotherwalls:
 				tst.w	d6
 				bgt.s	.xispos
 
-				move.w	deltax,d7
+				move.w	obj_DeltaX_w,d7
 				bgt.s	.oknothitwall
 
 				cmp.w	d7,d6
@@ -634,7 +634,7 @@ anotherwalls:
 				bra.s	.hitthewall
 
 .xispos:
-				move.w	deltax,d7
+				move.w	obj_DeltaX_w,d7
 				blt.s	.oknothitwall
 
 				cmp.w	d7,d6
@@ -662,8 +662,8 @@ anotherwalls:
 				bgt.s	.oknothitwall
 
 .hitthewall:
-				move.w	d0,newx
-				move.w	d1,newz
+				move.w	d0,Obj_NewX_w
+				move.w	d1,Obj_NewZ_w
 				move.w	wallflags(pc),d0
 				or.w	d0,EdgeT_Flags_w(a2)
 				st		hitwall
@@ -703,8 +703,8 @@ CheckMoreFloorLines:
 				move.l	ZoneT_Roof_l(a4),LowerRoofHeight
 
 okthebottom:
-				move.w	newx,d0
-				move.w	newz,d1
+				move.w	Obj_NewX_w,d0
+				move.w	Obj_NewZ_w,d1
 				sub.w	(a2),d0	; EdgeT_XPos_w				;a
 				sub.w	EdgeT_ZPos_w(a2),d1				;b
 				muls	EdgeT_XLen_w(a2),d1
@@ -729,32 +729,32 @@ checkifcrossed:
 *Need to check if he crossed it.
 
 				move.l	d0,billy
-				move.w	newx,d6
-				move.w	newz,d7
-				sub.w	oldx,d6
-				sub.w	oldz,d7
+				move.w	Obj_NewX_w,d6
+				move.w	Obj_NewZ_w,d7
+				sub.w	Obj_OldX_w,d6
+				sub.w	Obj_OldZ_w,d7
 				move.w	(a2),d4 ; EdgeT_XPos_w
-				sub.w	oldx,d4
+				sub.w	Obj_OldX_w,d4
 				muls	d4,d7;					negative if on left
 				move.w	EdgeT_ZPos_w(a2),d4
-				sub.w	oldz,d4
+				sub.w	Obj_OldZ_w,d4
 				muls	d4,d6
 				sub.l	d6,d7
 				bgt		StillSameSide
 
 				move.w	d0,d6
 				move.w	d1,d7
-				move.w	newx,d6
-				move.w	newz,d7
-				sub.w	oldx,d6
-				sub.w	oldz,d7
+				move.w	Obj_NewX_w,d6
+				move.w	Obj_NewZ_w,d7
+				sub.w	Obj_OldX_w,d6
+				sub.w	Obj_OldZ_w,d7
 				move.w	(a2),d4 ; EdgeT_XPos_w
 				add.w	EdgeT_XLen_w(a2),d4
-				sub.w	oldx,d4
+				sub.w	Obj_OldX_w,d4
 				muls	d4,d7;					negative if on left
 				move.w	EdgeT_ZPos_w(a2),d4
 				add.w	EdgeT_ZLen_w(a2),d4
-				sub.w	oldz,d4
+				sub.w	Obj_OldZ_w,d4
 				muls	d4,d6
 				sub.l	d6,d7
 				blt		StillSameSide
@@ -763,8 +763,8 @@ checkifcrossed:
 
 				move.l	billy,d7
 				divs	EdgeT_Length_w(a2),d7
-				move.w	oldx,d0
-				move.w	oldz,d1
+				move.w	Obj_OldX_w,d0
+				move.w	Obj_OldZ_w,d1
 				sub.w	(a2),d0 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d1
 				muls	EdgeT_XLen_w(a2),d1
@@ -777,11 +777,11 @@ checkifcrossed:
 				moveq	#1,d0
 
 .ohbugger:
-				move.l	newy,d4
-				sub.l	oldy,d4
+				move.l	Obj_NewY_w,d4
+				sub.l	Obj_OldY_w,d4
 				divs	d0,d4
 				muls	d7,d4
-				add.l	newy,d4
+				add.l	Obj_NewY_w,d4
 				cmp.l	LowerRoofHeight,d4
 				slt		StoodInTop
 				move.l	a3,a5
@@ -815,9 +815,9 @@ stopandleave:
 				rts
 
 ERRORINMOVEMENT:
-				move.w	oldx,newx
-				move.w	oldz,newz
-				move.l	oldy,newy
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
+				move.l	Obj_OldY_w,Obj_NewY_w
 				move.l	obj_ZoneBackupPtr_l,Obj_ZonePtr_l
 				st		hitwall
 				rts
@@ -825,19 +825,20 @@ ERRORINMOVEMENT:
 				align 4
 
 ;tstxval:		dc.l	0
-oldx:			dc.l	0
-oldz:			dc.l	0
-oldy:			dc.l	0
-newx:			dc.l	0	; This is really a union because level data has 32-bit values, but on;ly the msw is used
-newz:			dc.l	0	; also here
-newy:			dc.l	0	; and here
+; TODO - these are not really long values but have some holdover initialisation from long in the level data.
+Obj_OldX_w:			dc.l	0
+Obj_OldZ_w:			dc.l	0
+Obj_OldY_w:			dc.l	0
+Obj_NewX_w:			dc.l	0	; This is really a union because level data has 32-bit values, but on;ly the msw is used
+Obj_NewZ_w:			dc.l	0	; also here
+Obj_NewY_w:			dc.l	0	; and here
 
-xdiff:			dc.l	0
-zdiff:			dc.l	0
-Obj_ZonePtr_l:		dc.l	0
+Obj_XDiff_w:			dc.l	0
+Obj_ZDiff_w:			dc.l	0
+Obj_ZonePtr_l:			dc.l	0
 obj_ZoneBackupPtr_l:	dc.l	0
 
-deltax:			dc.w	0
+obj_DeltaX_w:			dc.w	0
 speed:			dc.w	0
 wallflags:		dc.w	0
 distaway:		dc.w	0
@@ -870,12 +871,12 @@ exitfirst:		dc.b	0
 				even
 
 HeadTowards:
-				move.w	newx,d1
-				sub.w	oldx,d1
-				move.w	d1,xdiff
-				move.w	newz,d2
-				sub.w	oldz,d2
-				move.w	d2,zdiff
+				move.w	Obj_NewX_w,d1
+				sub.w	Obj_OldX_w,d1
+				move.w	d1,Obj_XDiff_w
+				move.w	Obj_NewZ_w,d2
+				sub.w	Obj_OldZ_w,d2
+				move.w	d2,Obj_ZDiff_w
 				muls	d1,d1
 				muls	d2,d2
 				move.w	#0,d0
@@ -924,16 +925,16 @@ HeadTowards:
 				sle		GotThere
 				bgt.s	faraway
 
-				move.w	xdiff,d1
-				move.w	zdiff,d2
+				move.w	Obj_XDiff_w,d1
+				move.w	Obj_ZDiff_w,d2
 				muls	Range,d1
 				muls	Range,d2
 				divs	d0,d1
 				divs	d0,d2
 				neg.w	d1
 				neg.w	d2
-				add.w	d1,newx
-				add.w	d2,newz
+				add.w	d1,Obj_NewX_w
+				add.w	d2,Obj_NewZ_w
 				bra		nochange
 
 faraway:
@@ -947,28 +948,28 @@ faraway:
 
 .notoofast:
 				sub.w	Range,d3
-				move.w	xdiff,d1
+				move.w	Obj_XDiff_w,d1
 				muls	d3,d1
 				divs	d0,d1
-				move.w	zdiff,d2
+				move.w	Obj_ZDiff_w,d2
 				muls	d3,d2
 				divs	d0,d2
-				add.w	oldx,d1
-				move.w	d1,newx
-				add.w	oldz,d2
-				move.w	d2,newz
+				add.w	Obj_OldX_w,d1
+				move.w	d1,Obj_NewX_w
+				add.w	Obj_OldZ_w,d2
+				move.w	d2,Obj_NewZ_w
 
 nochange:
 				rts
 
 
 CalcDist:
-				move.w	newx,d1
-				sub.w	oldx,d1
-				move.w	d1,xdiff
-				move.w	newz,d2
-				sub.w	oldz,d2
-				move.w	d2,zdiff
+				move.w	Obj_NewX_w,d1
+				sub.w	Obj_OldX_w,d1
+				move.w	d1,Obj_XDiff_w
+				move.w	Obj_NewZ_w,d2
+				sub.w	Obj_OldZ_w,d2
+				move.w	d2,Obj_ZDiff_w
 				muls	d1,d1
 				muls	d2,d2
 				move.w	#0,d0
@@ -1022,12 +1023,12 @@ CosRet:			dc.w	0
 SinRet:			dc.w	0
 
 HeadTowardsAng:
-				move.w	newx,d1
-				sub.w	oldx,d1
-				move.w	d1,xdiff
-				move.w	newz,d2
-				sub.w	oldz,d2
-				move.w	d2,zdiff
+				move.w	Obj_NewX_w,d1
+				sub.w	Obj_OldX_w,d1
+				move.w	d1,Obj_XDiff_w
+				move.w	Obj_NewZ_w,d2
+				sub.w	Obj_OldZ_w,d2
+				move.w	d2,Obj_ZDiff_w
 				muls	d1,d1
 				muls	d2,d2
 				move.w	#0,d0
@@ -1084,13 +1085,13 @@ HeadTowardsAng:
 				sle		GotThere
 				bgt		.faraway
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				bra		.nochange
 
 				; Unreachable ?
-				move.w	xdiff,d1
-				move.w	zdiff,d2
+				move.w	Obj_XDiff_w,d1
+				move.w	Obj_ZDiff_w,d2
 				muls	Range,d1
 				muls	Range,d2
 				addq	#3,d0
@@ -1099,18 +1100,18 @@ HeadTowardsAng:
 				subq	#3,d0
 				neg.w	d1
 				neg.w	d2
-				add.w	d1,newx
-				add.w	d2,newz
+				add.w	d1,Obj_NewX_w
+				add.w	d2,Obj_NewZ_w
 				tst.b	canshove
 				beq		.nochange
 				move.w	PLR1_opushx(pc),d1
 				add.w	PLR2_opushx(pc),d1
-				sub.w	d1,newx
+				sub.w	d1,Obj_NewX_w
 				move.w	PLR1_opushz(pc),d1
 				add.w	PLR2_opushz(pc),d1
-				sub.w	d1,newz
-				move.w	xdiff,d1
-				move.w	zdiff,d2
+				sub.w	d1,Obj_NewZ_w
+				move.w	Obj_XDiff_w,d1
+				move.w	Obj_ZDiff_w,d2
 				move.w	Range,d3
 				sub.w	d0,d3
 				muls	d3,d1
@@ -1131,29 +1132,29 @@ HeadTowardsAng:
 
 .notoofast:
 				sub.w	Range,d3
-				move.w	xdiff,d1
+				move.w	Obj_XDiff_w,d1
 				muls	d3,d1
 				divs	d0,d1
-				move.w	zdiff,d2
+				move.w	Obj_ZDiff_w,d2
 				muls	d3,d2
 				divs	d0,d2
-				add.w	oldx,d1
-				move.w	d1,newx
-				add.w	oldz,d2
-				move.w	d2,newz
+				add.w	Obj_OldX_w,d1
+				move.w	d1,Obj_NewX_w
+				add.w	Obj_OldZ_w,d2
+				move.w	d2,Obj_NewZ_w
 
 .nochange:
 				tst.w	d0
 				beq.s	nocossin
 
 				add.w	#1,d0
-				move.w	xdiff,d1
+				move.w	Obj_XDiff_w,d1
 				swap	d1
 				clr.w	d1
 				asr.l	#1,d1
 				divs	d0,d1
 				move.w	d1,SinRet
-				move.w	zdiff,d1
+				move.w	Obj_ZDiff_w,d1
 				swap	d1
 				clr.w	d1
 				asr.l	#1,d1
@@ -1204,10 +1205,10 @@ PLR1_opushx:	dc.l	0
 PLR1_opushz:	dc.l	0
 
 CheckHit:
-				move.w	newx,d0
-				sub.w	oldx,d0
-				move.w	newz,d1
-				sub.w	oldz,d1
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				move.w	Obj_NewZ_w,d1
+				sub.w	Obj_OldZ_w,d1
 				muls	d1,d1
 				muls	d0,d0
 				add.l	d0,d1
@@ -1654,10 +1655,10 @@ GoInDirection:
 				add.l	d2,d2
 				swap	d1
 				swap	d2
-				add.w	oldx,d1
-				add.w	oldz,d2
-				move.w	d1,newx
-				move.w	d2,newz
+				add.w	Obj_OldX_w,d1
+				add.w	Obj_OldZ_w,d2
+				move.w	d1,Obj_NewX_w
+				move.w	d2,Obj_NewZ_w
 				rts
 
 Obj_CollideFlags_l:	dc.l	0
@@ -1675,7 +1676,7 @@ Obj_DoCollision:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				move.l	Obj_CollideFlags_l,d7
 				move.b	StoodInTop,d6
-				move.l	newy,d4
+				move.l	Obj_NewY_w,d4
 				move.l	d4,d5
 				add.l	thingheight,d5
 				asr.l	#7,d4
@@ -1740,12 +1741,12 @@ Obj_DoCollision:
 
 				move.w	(a1,d0.w*8),d1
 				move.w	4(a1,d0.w*8),d2
-				sub.w	newx,d1
+				sub.w	Obj_NewX_w,d1
 				bge.s	.xnoneg
 
 				neg.w	d1
 .xnoneg:
-				sub.w	newz,d2
+				sub.w	Obj_NewZ_w,d2
 				bge.s	.znoneg
 
 				neg.w	d2
@@ -1766,13 +1767,13 @@ Obj_DoCollision:
 				move.w	4(a1,d0.w*8),d2
 				move.w	d1,d6
 				move.w	d2,d7
-				sub.w	newx,d6
-				sub.w	newz,d7
+				sub.w	Obj_NewX_w,d6
+				sub.w	Obj_NewZ_w,d7
 				muls	d6,d6
 				muls	d7,d7
 				add.l	d6,d7
-				sub.w	oldx,d1
-				sub.w	oldz,d2
+				sub.w	Obj_OldX_w,d1
+				sub.w	Obj_OldZ_w,d2
 				muls	d1,d1
 				muls	d2,d2
 				add.l	d1,d2
@@ -1810,15 +1811,15 @@ ITSATEL:
 				move.l	ZoneT_Floor_l(a3),d0
 				sub.l	floortemp,d0
 				move.l	d0,floortemp
-				add.l	d0,newy
-				move.w	ZoneT_TelX_w(a2),newx
-				move.w	ZoneT_TelZ_w(a2),newz
+				add.l	d0,Obj_NewY_w
+				move.w	ZoneT_TelX_w(a2),Obj_NewX_w
+				move.w	ZoneT_TelZ_w(a2),Obj_NewZ_w
 				move.l	#%1111111111111111111,Obj_CollideFlags_l
 				movem.l	a0/a1/a2,-(a7)
 				bsr		Obj_DoCollision
 				movem.l	(a7)+,a0/a1/a2
 				move.l	floortemp,d0
-				sub.l	d0,newy
+				sub.l	d0,Obj_NewY_w
 				tst.b	hitwall
 				seq		OKTEL
 				beq.s	.teleport
@@ -1839,38 +1840,38 @@ FindCloseRoom:
 				move.w	ObjT_ZPos_l(a0),d1
 				ext.l	d1
 				asl.l	#7,d1
-				move.l	d1,oldy
-				move.l	d1,newy
+				move.l	d1,Obj_OldY_w
+				move.l	d1,Obj_NewY_w
 				move.w	(a0),d1
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
-				move.w	(a1),oldx
-				move.w	ObjT_ZPos_l(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	ObjT_ZPos_l(a1),Obj_OldZ_w
 				move.w	ObjT_ZoneID_w(a0),d2
 				move.l	Lvl_ZonePtrsPtr_l,a5
 				move.l	(a5,d2.w*4),d2
 				move.l	d2,Obj_ZonePtr_l
-				move.w	THISPLRxoff,newx
-				move.w	THISPLRzoff,newz
+				move.w	THISPLRxoff,Obj_NewX_w
+				move.w	THISPLRzoff,Obj_NewZ_w
 				move.w	d0,speed
 				movem.l	a0/a1,-(a7)
 				jsr		HeadTowards
 
 				movem.l	(a7)+,a0/a1
-				move.w	newx,d0
-				sub.w	oldx,d0
-				move.w	oldz,d1
-				sub.w	newz,d1
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				move.w	Obj_OldZ_w,d1
+				sub.w	Obj_NewZ_w,d1
 				move.w	d1,xd
 				move.w	d0,zd
 				move.l	#100000,StepUpVal
 				move.l	#100000,StepDownVal
 				move.w	#0,thingheight
 				st		exitfirst
-				add.w	oldx,d1
-				add.w	oldz,d0
-				move.w	d1,newx
-				move.w	d0,newz
+				add.w	Obj_OldX_w,d1
+				add.w	Obj_OldZ_w,d0
+				move.w	d1,Obj_NewX_w
+				move.w	d0,Obj_NewZ_w
 
 				SAVEREGS
 
@@ -1888,12 +1889,12 @@ putinmore:
 				bge.s	putinmore
 
 				subq	#2,a3
-				move.w	oldx,d0
+				move.w	Obj_OldX_w,d0
 				sub.w	xd,d0
-				move.w	oldz,d1
+				move.w	Obj_OldZ_w,d1
 				sub.w	zd,d1
-				move.w	d0,newx
-				move.w	d1,newz
+				move.w	d0,Obj_NewX_w
+				move.w	d1,Obj_NewZ_w
 
 				SAVEREGS
 

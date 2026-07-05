@@ -854,8 +854,8 @@ game_main_loop:
 				move.b	d0,Anim_SplatType_w
 				move.l	Plr2_ZonePtr_l,a1
 				move.w	(a1),ObjT_ZoneID_w(a0)
-				move.w	Plr2_TmpXOff_l,newx
-				move.w	Plr2_TmpZOff_l,newz
+				move.w	Plr2_TmpXOff_l,Obj_NewX_w
+				move.w	Plr2_TmpZOff_l,Obj_NewZ_w
 				move.w	#7,d2
 				jsr		Anim_ExplodeIntoBits
 
@@ -899,8 +899,8 @@ game_main_loop:
 
 				move.l	Plr1_ZonePtr_l,a1
 				move.w	(a1),ObjT_ZoneID_w(a0)
-				move.w	Plr1_TmpXOff_l,newx
-				move.w	Plr1_TmpZOff_l,newz
+				move.w	Plr1_TmpXOff_l,Obj_NewX_w
+				move.w	Plr1_TmpZOff_l,Obj_NewZ_w
 				move.w	#7,d2
 				jsr		Anim_ExplodeIntoBits
 
@@ -2820,20 +2820,20 @@ pathpt:			dc.l	Path
 Plr1_Control:
 ; Take a snapshot of everything.
 				move.l	Plr1_XOff_l,d2
-				move.l	d2,oldx
+				move.l	d2,Obj_OldX_w
 				move.l	Plr1_ZOff_l,d3
-				move.l	d3,oldz
+				move.l	d3,Obj_OldZ_w
 				move.l	Plr1_TmpXOff_l,d0
 				move.l	d0,Plr1_XOff_l
-				move.l	d0,newx
+				move.l	d0,Obj_NewX_w
 				move.l	Plr1_TmpZOff_l,d1
-				move.l	d1,newz
+				move.l	d1,Obj_NewZ_w
 				move.l	d1,Plr1_ZOff_l
 				move.l	plr1_TmpHeight_l,Plr1_Height_l
 				sub.l	d2,d0
 				sub.l	d3,d1
-				move.l	d0,xdiff
-				move.l	d1,zdiff
+				move.l	d0,Obj_XDiff_w
+				move.l	d1,Obj_ZDiff_w
 				move.w	Plr1_TmpAngPos_w,d0
 				move.w	d0,Plr1_AngPos_w
 				move.l	#SinCosTable_vw,a1
@@ -2885,8 +2885,8 @@ Plr1_Control:
 
 .otherwob:
 				move.l	d0,Plr1_YOff_l
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 				move.l	d4,thingheight
 				move.l	#40*256,StepUpVal
 				tst.b	Plr1_Squished_b
@@ -2904,8 +2904,8 @@ Plr1_Control:
 				move.w	ZoneT_TelZone_w(a0),d0
 				blt		.noteleport
 
-				move.w	ZoneT_TelX_w(a0),newx
-				move.w	ZoneT_TelZ_w(a0),newz
+				move.w	ZoneT_TelX_w(a0),Obj_NewX_w
+				move.w	ZoneT_TelZ_w(a0),Obj_NewZ_w
 				move.l	Plr1_ObjectPtr_l,a0
 				move.w	(a0),CollId
 				move.l	#%111111111111111111,Obj_CollideFlags_l
@@ -2914,8 +2914,8 @@ Plr1_Control:
 				tst.b	hitwall
 				beq.s	.teleport
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				bra		.noteleport
 
 .teleport:
@@ -2959,8 +2959,8 @@ Plr1_Control:
 				tst.b	hitwall
 				beq.s	.nothitanything
 
-				move.w	oldx,Plr1_XOff_l
-				move.w	oldz,Plr1_ZOff_l
+				move.w	Obj_OldX_w,Plr1_XOff_l
+				move.w	Obj_OldZ_w,Plr1_ZOff_l
 				move.l	Plr1_XOff_l,Plr1_SnapXOff_l
 				move.l	Plr1_ZOff_l,Plr1_SnapZOff_l
 				bra		.cantmove
@@ -2975,8 +2975,8 @@ Plr1_Control:
 
 				move.b	StoodInTop,Plr1_StoodInTop_b
 				move.l	Obj_ZonePtr_l,Plr1_ZonePtr_l
-				move.w	newx,Plr1_XOff_l
-				move.w	newz,Plr1_ZOff_l
+				move.w	Obj_NewX_w,Plr1_XOff_l
+				move.w	Obj_NewZ_w,Plr1_ZOff_l
 				move.l	Plr1_XOff_l,Plr1_SnapXOff_l
 				move.l	Plr1_ZOff_l,Plr1_SnapZOff_l
 
@@ -3017,20 +3017,20 @@ nobackgraphics:
 Plr2_Control:
 ; Take a snapshot of everything.
 				move.l	Plr2_XOff_l,d2
-				move.l	d2,oldx
+				move.l	d2,Obj_OldX_w
 				move.l	Plr2_ZOff_l,d3
-				move.l	d3,oldz
+				move.l	d3,Obj_OldZ_w
 				move.l	Plr2_TmpXOff_l,d0
 				move.l	d0,Plr2_XOff_l
-				move.l	d0,newx
+				move.l	d0,Obj_NewX_w
 				move.l	Plr2_TmpZOff_l,d1
-				move.l	d1,newz
+				move.l	d1,Obj_NewZ_w
 				move.l	d1,Plr2_ZOff_l
 				move.l	plr2_TmpHeight_l,Plr2_Height_l
 				sub.l	d2,d0
 				sub.l	d3,d1
-				move.l	d0,xdiff
-				move.l	d1,zdiff
+				move.l	d0,Obj_XDiff_w
+				move.l	d1,Obj_ZDiff_w
 				move.w	Plr2_TmpAngPos_w,d0
 				move.w	d0,Plr2_AngPos_w
 				move.l	#SinCosTable_vw,a1
@@ -3080,8 +3080,8 @@ Plr2_Control:
 
 .otherwob:
 				move.l	d0,Plr2_YOff_l
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 				move.l	d4,thingheight
 				move.l	#40*256,StepUpVal
 				tst.b	Plr2_Squished_b
@@ -3099,8 +3099,8 @@ Plr2_Control:
 				move.w	ZoneT_TelZone_w(a0),d0
 				blt		.noteleport
 
-				move.w	ZoneT_TelX_w(a0),newx
-				move.w	ZoneT_TelZ_w(a0),newz
+				move.w	ZoneT_TelX_w(a0),Obj_NewX_w
+				move.w	ZoneT_TelZ_w(a0),Obj_NewZ_w
 				move.l	Plr2_ObjectPtr_l,a0
 				move.w	(a0),CollId
 				move.l	#%111111111111111111,Obj_CollideFlags_l
@@ -3109,8 +3109,8 @@ Plr2_Control:
 				tst.b	hitwall
 				beq.s	.teleport
 
-				move.w	Plr2_XOff_l,newx
-				move.w	Plr2_ZOff_l,newz
+				move.w	Plr2_XOff_l,Obj_NewX_w
+				move.w	Plr2_ZOff_l,Obj_NewZ_w
 				bra		.noteleport
 
 .teleport:
@@ -3154,8 +3154,8 @@ Plr2_Control:
 				tst.b	hitwall
 				beq.s	.nothitanything
 
-				move.w	oldx,Plr2_XOff_l
-				move.w	oldz,Plr2_ZOff_l
+				move.w	Obj_OldX_w,Plr2_XOff_l
+				move.w	Obj_OldZ_w,Plr2_ZOff_l
 				move.l	Plr2_XOff_l,Plr2_SnapXOff_l
 				move.l	Plr2_ZOff_l,Plr2_SnapZOff_l
 				bra		.cantmove
@@ -3169,8 +3169,8 @@ Plr2_Control:
 
 				move.b	StoodInTop,Plr2_StoodInTop_b
 				move.l	Obj_ZonePtr_l,Plr2_ZonePtr_l
-				move.w	newx,Plr2_XOff_l
-				move.w	newz,Plr2_ZOff_l
+				move.w	Obj_NewX_w,Plr2_XOff_l
+				move.w	Obj_NewZ_w,Plr2_ZOff_l
 				move.l	Plr2_XOff_l,Plr2_SnapXOff_l
 				move.l	Plr2_ZOff_l,Plr2_SnapZOff_l
 

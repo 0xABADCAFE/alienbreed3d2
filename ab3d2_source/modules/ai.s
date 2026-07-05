@@ -66,13 +66,13 @@ ai_DoTakeDamage:
 .no_copy_in:
 				SAVEREGS
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	(a0),d1
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 				move.w	#-20,Range
 				move.w	#20,speed
 				jsr		HeadTowardsAng
@@ -139,10 +139,10 @@ ai_TakeDamage:
 				move.b	#1,EntT_WhichAnim_b(a0)
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	(a1,d0.w*8),oldx
-				move.w	4(a1,d0.w*8),oldz
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	(a1,d0.w*8),Obj_OldX_w
+				move.w	4(a1,d0.w*8),Obj_OldZ_w
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	#100,speed
 				move.w	#-20,Range
 				jsr		HeadTowardsAng
@@ -179,8 +179,8 @@ ai_JustDied:
 .no_text:
 				move.l	Lvl_ObjectPointsPtr_l,a2
 				move.w	(a0),d3
-				move.w	(a2,d3.w*8),newx
-				move.w	4(a2,d3.w*8),newz
+				move.w	(a2,d3.w*8),Obj_NewX_w
+				move.w	4(a2,d3.w*8),Obj_NewZ_w
 				moveq	#0,d0
 				move.b	EntT_Type_b(a0),d0
 
@@ -521,8 +521,8 @@ ai_Widget:
 				move.w	d0,ai_MiddleCPT_w
 
 				move.l	Lvl_ControlPointCoordsPtr_l,a1
-				move.w	(a1,d0.w*8),newx
-				move.w	2(a1,d0.w*8),newz
+				move.w	(a1,d0.w*8),Obj_NewX_w
+				move.w	2(a1,d0.w*8),Obj_NewZ_w
 
 				asl.w	#2,d0
 				add.w	(a0),d0
@@ -538,16 +538,16 @@ ai_Widget:
 				swap	d2
 				asl.l	#4,d1
 				swap	d1
-				add.w	d1,newx
-				add.w	d2,newz
+				add.w	d1,Obj_NewX_w
+				add.w	d2,Obj_NewZ_w
 
 				move.w	(a0),d1
 				move.l	#ObjRotated_vl,a6
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 				lea		(a6,d1.w*8),a6
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 				move.w	#0,speed
 				tst.b	ai_DoAction_b
 				beq.s	.no_speed
@@ -566,8 +566,8 @@ ai_Widget:
 				move.l	thingheight,d2
 				asr.l	#1,d2
 				sub.l	d2,d0
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
@@ -601,8 +601,8 @@ ai_Widget:
 				tst.b	hitwall
 				beq.s	.can_move
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
 
@@ -723,8 +723,8 @@ ai_ChargeCommon:
 				bra		.no_munch
 
 .no_teleport:
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	Plr1_SinVal_w,tempsin
 				move.w	Plr1_CosVal_w,tempcos
 				move.w	Plr1_TmpXOff_l,tempx
@@ -739,8 +739,8 @@ ai_ChargeCommon:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 				lea		(a6,d1.w*8),a6
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 				move.w	AI_ResponseSpeed_w,d2
 				muls.w	Anim_TempFrames_w,d2
 				move.w	d2,speed
@@ -751,8 +751,8 @@ ai_ChargeCommon:
 				move.l	thingheight,d2
 				asr.l	#1,d2
 				sub.l	d2,d0
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
@@ -766,8 +766,8 @@ ai_ChargeCommon:
 				tst.b	hitwall
 				beq.s	.not_hit_player
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				st		GotThere
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
@@ -778,8 +778,8 @@ ai_ChargeCommon:
 				tst.b	hitwall
 				beq.s	.can_move
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
 
@@ -806,13 +806,13 @@ ai_ChargeCommon:
 				move.b	ai_DoAction_b,d0
 				asl.w	#1,d0
 				add.b	d0,EntT_DamageTaken_b(a5)
-				move.w	newx,d0
-				sub.w	oldx,d0
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
 				ext.l	d0
 				divs	Anim_TempFrames_w,d0
 				add.w	d0,EntT_ImpactX_w(a5)
-				move.w	newz,d0
-				sub.w	oldz,d0
+				move.w	Obj_NewZ_w,d0
+				sub.w	Obj_OldZ_w,d0
 				ext.l	d0
 				divs	Anim_TempFrames_w,d0
 				add.w	d0,EntT_ImpactZ_w(a5)
@@ -901,13 +901,13 @@ ai_AttackWithHitScan:
 
 				SAVEREGS
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	(a0),d1
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 				move.w	#-20,Range
 				move.w	#20,speed
 				jsr		HeadTowardsAng
@@ -1012,8 +1012,8 @@ ai_AttackWithHitScan:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 
-				move.w	(a1),newx
-				move.w	4(a1),newz
+				move.w	(a1),Obj_NewX_w
+				move.w	4(a1),Obj_NewZ_w
 
 				bsr		ai_DoTorch
 
@@ -1047,13 +1047,13 @@ ai_AttackWithProjectile:
 
 				SAVEREGS
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	(a0),d1
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 				move.w	#-20,Range
 				move.w	#20,speed
 				jsr		HeadTowardsAng
@@ -1083,8 +1083,8 @@ ai_AttackWithProjectile:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 
-				move.w	(a1),newx
-				move.w	4(a1),newz
+				move.w	(a1),Obj_NewX_w
+				move.w	4(a1),Obj_NewZ_w
 
 				bsr		ai_DoTorch
 
@@ -1165,10 +1165,10 @@ ai_ChargeFlyingCommon:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 				lea		(a6,d1.w*8),a6
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	Plr1_SinVal_w,tempsin
 				move.w	Plr1_CosVal_w,tempcos
 				move.w	Plr1_TmpXOff_l,tempx
@@ -1188,8 +1188,8 @@ ai_ChargeFlyingCommon:
 				move.l	thingheight,d2
 				asr.l	#1,d2
 				sub.l	d2,d0
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
@@ -1203,8 +1203,8 @@ ai_ChargeFlyingCommon:
 				tst.b	hitwall
 				beq.s	.not_hit_player
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				st		GotThere
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
@@ -1215,8 +1215,8 @@ ai_ChargeFlyingCommon:
 				tst.b	hitwall
 				beq.s	.can_move
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
 
@@ -1300,8 +1300,8 @@ ai_PauseBriefly:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 
-				move.w	(a1),newx
-				move.w	4(a1),newz
+				move.w	(a1),Obj_NewX_w
+				move.w	4(a1),Obj_NewZ_w
 				bsr		ai_DoTorch
 
 				bsr		AI_LookForPlayer1
@@ -1386,11 +1386,11 @@ ai_ApproachCommon:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d1.w*8),a1
 				lea		(a6,d1.w*8),a6
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				move.w	Plr1_SinVal_w,tempsin
 				move.w	Plr1_CosVal_w,tempcos
 				move.w	Plr1_TmpXOff_l,tempx
@@ -1417,8 +1417,8 @@ ai_ApproachCommon:
 				move.l	thingheight,d2
 				asr.l	#1,d2
 				sub.l	d2,d0
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
@@ -1432,8 +1432,8 @@ ai_ApproachCommon:
 				tst.b	hitwall
 				beq.s	.not_hit_player
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				st		GotThere
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
@@ -1444,8 +1444,8 @@ ai_ApproachCommon:
 				tst.b	hitwall
 				beq.s	.can_move
 
-				move.w	oldx,newx
-				move.w	oldz,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				bra		.hit_something
 
@@ -1642,8 +1642,8 @@ ai_GetRoomStats:
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				lea		(a1,d0.w*8),a1
-				move.w	newx,(a1)
-				move.w	newz,4(a1)
+				move.w	Obj_NewX_w,(a1)
+				move.w	Obj_NewZ_w,4(a1)
 
 ai_GetRoomStatsStill:
 				move.l	Obj_ZonePtr_l,a2
@@ -1690,13 +1690,13 @@ ai_CheckInFront:
 
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	(a1,d0.w*8),newx
-				move.w	4(a1,d0.w*8),newz
+				move.w	(a1,d0.w*8),Obj_NewX_w
+				move.w	4(a1,d0.w*8),Obj_NewZ_w
 
 				move.w	Plr1_TmpXOff_l,d0
-				sub.w	newx,d0
+				sub.w	Obj_NewX_w,d0
 				move.w	Plr1_TmpZOff_l,d1
-				sub.w	newz,d1
+				sub.w	Obj_NewZ_w,d1
 
 				move.w	EntT_CurrentAngle_w(a0),d2
 				AMOD_A	d2
@@ -1718,8 +1718,8 @@ AI_LookForPlayer1:
 				move.b	Plr1_StoodInTop_b,Obj_TargetInUpperZone_b
 				move.l	Plr1_ZonePtr_l,Obj_ToZonePtr_l
 				move.l	Obj_ZonePtr_l,Obj_FromZonePtr_l
-				move.w	newx,Obj_ViewerX_w
-				move.w	newz,Obj_ViewerZ_w
+				move.w	Obj_NewX_w,Obj_ViewerX_w
+				move.w	Obj_NewZ_w,Obj_ViewerZ_w
 				move.w	Plr1_XOff_l,Obj_TargetX_w
 				move.w	Plr1_ZOff_l,Obj_TargetZ_w
 				move.l	Plr1_YOff_l,d0
@@ -1868,8 +1868,8 @@ ai_DoTorch:
 				move.w	ALIENBRIGHT,d0
 				bge.s	.nobright
 
-				move.w	newx,d1
-				move.w	newz,d2
+				move.w	Obj_NewX_w,d1
+				move.w	Obj_NewZ_w,d2
 				move.w	4(a0),d3
 				ext.l	d3
 				asl.l	#7,d3

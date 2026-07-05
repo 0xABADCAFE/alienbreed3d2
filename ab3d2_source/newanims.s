@@ -626,9 +626,9 @@ Anim_ExplodeIntoBits:
 				move.l	Lvl_ObjectPointsPtr_l,a2
 				move.w	(a5),d3
 				lea		(a2,d3.w*8),a2
-				move.w	newx,d0
+				move.w	Obj_NewX_w,d0
 				move.w	d0,(a2)
-				move.w	newz,d0
+				move.w	Obj_NewZ_w,d0
 				move.w	d0,4(a2)
 				move.b	#2,16(a2)
 				jsr		GetRand
@@ -2173,8 +2173,8 @@ notdoneanim:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion
 
-				move.w	newx,Obj_ViewerX_w
-				move.w	newz,Obj_ViewerZ_w
+				move.w	Obj_NewX_w,Obj_ViewerX_w
+				move.w	Obj_NewZ_w,Obj_ViewerZ_w
 				move.w	4(a0),Obj_ViewerY_w
 				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
@@ -2245,8 +2245,8 @@ notdoneanim:
 				beq.s	.noexplosion2
 
 				move.w	4(a0),Obj_ViewerY_w
-				move.w	newx,Obj_ViewerX_w
-				move.w	newz,Obj_ViewerZ_w
+				move.w	Obj_NewX_w,Obj_ViewerX_w
+				move.w	Obj_NewZ_w,Obj_ViewerZ_w
 				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
 				SAVEREGS
@@ -2261,7 +2261,7 @@ notdoneanim:
 				move.w	(a0),d1
 				lea		(a1,d1.w*8),a1
 				move.l	(a1),d2
-				move.l	d2,oldx
+				move.l	d2,Obj_OldX_w
 				move.l	ShotT_VelocityX_w(a0),d3
 				move.w	d3,d4
 				swap	d3
@@ -2272,9 +2272,9 @@ notdoneanim:
 				clr.w	d3
 				add.l	d4,d3
 				add.l	d3,d2
-				move.l	d2,newx
+				move.l	d2,Obj_NewX_w
 				move.l	4(a1),d2
-				move.l	d2,oldz
+				move.l	d2,Obj_OldZ_w
 				move.l	ShotT_VelocityZ_w(a0),d3
 				move.w	d3,d4
 				swap	d3
@@ -2284,8 +2284,8 @@ notdoneanim:
 				clr.w	d3
 				add.l	d4,d3
 				add.l	d3,d2
-				move.l	d2,newz
-				move.l	ShotT_AccYPos_w(a0),oldy
+				move.l	d2,Obj_NewZ_w
+				move.l	ShotT_AccYPos_w(a0),Obj_OldY_w
 				move.w	ShotT_VelocityY_w(a0),d3
 				muls	Anim_TempFrames_w,d3
 				move.l	BulT_Gravity_l(a6),d5
@@ -2309,7 +2309,7 @@ nograv:
 				add.l	d3,d4
 				move.l	d4,ShotT_AccYPos_w(a0)
 				sub.l	#5*128,d4
-				move.l	d4,newy
+				move.l	d4,Obj_NewY_w
 				add.l	#5*128,d4
 				asr.l	#7,d4
 				move.w	d4,4(a0)
@@ -2323,11 +2323,11 @@ nograv:
 				move.l	#0,StepUpVal
 				move.l	#$1000000,StepDownVal
 				move.l	#10*128,thingheight
-				move.w	oldx,d0
-				cmp.w	newx,d0
+				move.w	Obj_OldX_w,d0
+				cmp.w	Obj_NewX_w,d0
 				bne.s	lalal
-				move.w	oldz,d0
-				cmp.w	newz,d0
+				move.w	Obj_OldZ_w,d0
+				cmp.w	Obj_NewZ_w,d0
 				beq.s	nomovebul
 
 				move.w	#1,WallLength_w
@@ -2342,9 +2342,9 @@ lalal:
 				beq.s	.nobright
 
 				neg.w	d0
-				move.w	newx,d1
-				move.w	newz,d2
-				move.l	newy,Anim_BrightY_l
+				move.w	Obj_NewX_w,d1
+				move.w	Obj_NewZ_w,d2
+				move.l	Obj_NewY_w,Anim_BrightY_l
 				move.l	Obj_ZonePtr_l,a0
 				move.w	(a0),d3
 				jsr		anim_BrightenPoints
@@ -2430,8 +2430,8 @@ nomovebul:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion
 
-				move.w	newx,Obj_ViewerX_w
-				move.w	newz,Obj_ViewerZ_w
+				move.w	Obj_NewX_w,Obj_ViewerX_w
+				move.w	Obj_NewZ_w,Obj_ViewerZ_w
 				move.w	4(a0),Obj_ViewerY_w
 				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
@@ -2453,8 +2453,8 @@ lab:
 				move.l	Obj_ZonePtr_l,a3
 				move.w	(a3),ObjT_ZoneID_w(a0)
 				move.w	(a3),EntT_ZoneID_w(a0)
-				move.l	newx,(a1)
-				move.l	newz,4(a1)
+				move.l	Obj_NewX_w,(a1)
+				move.l	Obj_NewZ_w,4(a1)
 ;************
 ;* Check if hit a nasty
 
@@ -2466,12 +2466,12 @@ lab:
 notasplut:
 				move.l	Lvl_ObjectDataPtr_l,a3
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	newx,d2
-				sub.w	oldx,d2
-				move.w	d2,xdiff
-				move.w	newz,d1
-				sub.w	oldz,d1
-				move.w	d1,zdiff
+				move.w	Obj_NewX_w,d2
+				sub.w	Obj_OldX_w,d2
+				move.w	d2,Obj_XDiff_w
+				move.w	Obj_NewZ_w,d1
+				sub.w	Obj_OldZ_w,d1
+				move.w	d1,Obj_ZDiff_w
 				move.w	d1,d3
 				move.w	d2,d4
 				muls	d2,d2
@@ -2584,14 +2584,14 @@ notasplut:
 				move.w	d2,d4
 				move.w	4(a1,d1.w*8),d3
 				move.w	d3,d5
-				sub.w	newx,d4
-				sub.w	oldx,d2
+				sub.w	Obj_NewX_w,d4
+				sub.w	Obj_OldX_w,d2
 				move.w	d2,d6
-				sub.w	newz,d5
-				sub.w	oldz,d3
+				sub.w	Obj_NewZ_w,d5
+				sub.w	Obj_OldZ_w,d3
 				move.w	d3,d7
-				muls	zdiff,d6
-				muls	xdiff,d7
+				muls	Obj_ZDiff_w,d6
+				muls	Obj_XDiff_w,d7
 				sub.l	d7,d6
 				bgt.s	.pos
 
@@ -2649,8 +2649,8 @@ notasplut:
 				beq.s	.noexplosion3
 
 				move.w	4(a0),Obj_ViewerY_w
-				move.w	newx,Obj_ViewerX_w
-				move.w	newz,Obj_ViewerZ_w
+				move.w	Obj_NewX_w,Obj_ViewerX_w
+				move.w	Obj_NewZ_w,Obj_ViewerZ_w
 
 				SAVEREGS
 
@@ -3059,7 +3059,7 @@ CheckedEmAll:
 				move.w	4(a0),d0
 				ext.l	d0
 				asl.l	#7,d0
-				move.l	d0,oldy
+				move.l	d0,Obj_OldY_w
 				moveq	#2,d5
 				move.w	#NUM_PLR_SHOT_DATA-1,NUMTOCHECK
 				move.w	#2,d6
@@ -3085,8 +3085,8 @@ DOFLAMES:
 				add.w	#1,anim_DoneFlames_w
 				move.w	anim_MiddleX_w,d1
 				move.w	anim_MiddleZ_w,d2
-				move.w	d1,oldx
-				move.w	d2,oldz
+				move.w	d1,Obj_OldX_w
+				move.w	d2,Obj_OldZ_w
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				jsr		GetRand
 
@@ -3108,15 +3108,15 @@ DOFLAMES:
 
 .znz:
 				add.w	d0,d2
-				move.l	oldy,d3
+				move.l	Obj_OldY_w,d3
 				jsr		GetRand
 
 				muls	d5,d0
 				asr.l	#3,d0
 				add.l	d0,d3
-				move.l	d3,newy
-				move.w	d1,newx
-				move.w	d2,newz
+				move.l	d3,Obj_NewY_w
+				move.w	d1,Obj_NewX_w
+				move.w	d2,Obj_NewZ_w
 				move.l	anim_MiddleRoom_l,Obj_ZonePtr_l
 
 				movem.l	d5/d6/a0/a1/a3/d7/a6,-(a7)
@@ -3128,7 +3128,7 @@ DOFLAMES:
 
 				move.l	Obj_ZonePtr_l,a2
 				move.w	(a2),12(a3)
-				move.l	newy,d0
+				move.l	Obj_NewY_w,d0
 				move.l	ZoneT_Floor_l(a2),d1
 				move.l	ZoneT_Roof_l(a2),d2
 				tst.b	ShotT_InUpperZone_b(a0)
@@ -3162,8 +3162,8 @@ DOFLAMES:
 				st		ShotT_Worry_b(a3)
 				move.w	(a3),d0
 				move.l	Lvl_ObjectPointsPtr_l,a2
-				move.w	newx,(a2,d0.w*8)
-				move.w	newz,4(a2,d0.w*8)
+				move.w	Obj_NewX_w,(a2,d0.w*8)
+				move.w	Obj_NewZ_w,4(a2,d0.w*8)
 				adda.w	#64,a3
 				sub.w	#1,NUMTOCHECK
 				blt.s	.nomore

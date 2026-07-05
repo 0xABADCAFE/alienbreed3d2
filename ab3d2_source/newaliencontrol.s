@@ -471,8 +471,8 @@ StillHere:
 				move.l	d0,Obj_ZonePtr_l
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	(a1,d0.w*8),newx
-				move.w	4(a1,d0.w*8),newz
+				move.w	(a1,d0.w*8),Obj_NewX_w
+				move.w	4(a1,d0.w*8),Obj_NewZ_w
 				jsr		AI_LookForPlayer1
 
 				GETREGS
@@ -730,8 +730,8 @@ Plr1_CheckObjectCollide:
 				eor.b	d0,d1
 				bne		.NotSameZone
 
-				move.w	Plr1_XOff_l,oldx
-				move.w	Plr1_ZOff_l,oldz
+				move.w	Plr1_XOff_l,Obj_OldX_w
+				move.w	Plr1_ZOff_l,Obj_OldZ_w
 				move.w	Plr1_Zone_w,d7
 				cmp.w	ObjT_ZoneID_w(a0),d7
 				bne		.NotSameZone
@@ -751,8 +751,8 @@ Plr1_CheckObjectCollide:
 
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	(a1,d0.w*8),newx
-				move.w	4(a1,d0.w*8),newz
+				move.w	(a1,d0.w*8),Obj_NewX_w
+				move.w	4(a1,d0.w*8),Obj_NewZ_w
 				move.w	ODefT_CollideRadius_w(a2),d2
 				muls	d2,d2
 				jsr		CheckHit
@@ -770,8 +770,8 @@ Plr2_CheckObjectCollide:
 				eor.b	d0,d1
 				bne		.NotSameZone
 
-				move.w	Plr2_XOff_l,oldx
-				move.w	Plr2_ZOff_l,oldz
+				move.w	Plr2_XOff_l,Obj_OldX_w
+				move.w	Plr2_ZOff_l,Obj_OldZ_w
 				move.w	Plr2_Zone_w,d7
 
 				cmp.w	ObjT_ZoneID_w(a0),d7
@@ -793,8 +793,8 @@ Plr2_CheckObjectCollide:
 
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
-				move.w	(a1,d0.w*8),newx
-				move.w	4(a1,d0.w*8),newz
+				move.w	(a1,d0.w*8),Obj_NewX_w
+				move.w	4(a1,d0.w*8),Obj_NewZ_w
 				move.w	ODefT_CollideRadius_w(a2),d2
 				muls	d2,d2
 				jsr		CheckHit
@@ -1005,11 +1005,11 @@ tempz:			dc.w	0
 
 RunAround:
 				movem.l	d0/d1/d2/d3/a0/a1,-(a7)
-				move.w	oldx,d0
-				sub.w	newx,d0					; dx
+				move.w	Obj_OldX_w,d0
+				sub.w	Obj_NewX_w,d0					; dx
 				asr.w	#1,d0
-				move.w	oldz,d1
-				sub.w	newz,d1					; dz
+				move.w	Obj_OldZ_w,d1
+				sub.w	Obj_NewZ_w,d1					; dz
 				asr.w	#1,d1
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				move.w	(a0),d2
@@ -1027,8 +1027,8 @@ RunAround:
 				neg.w	d1
 
 headleft:
-				sub.w	d1,newx
-				add.w	d0,newz
+				sub.w	d1,Obj_NewX_w
+				add.w	d0,Obj_NewZ_w
 				movem.l	(a7)+,d0/d1/d2/d3/a0/a1
 				rts
 
@@ -1039,18 +1039,18 @@ fsx:			dc.w	0
 fsz:			dc.w	0
 
 SHOOTPLAYER1:
-				move.w	oldx,tsx
-				move.w	oldz,tsz
-				move.w	newx,fsx
-				move.w	newz,fsz
-				move.w	Plr1_TmpXOff_l,newx
-				move.w	Plr1_TmpZOff_l,newz
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
-				move.w	newx,d1
-				sub.w	oldx,d1
-				move.w	newz,d2
-				sub.w	oldz,d2
+				move.w	Obj_OldX_w,tsx
+				move.w	Obj_OldZ_w,tsz
+				move.w	Obj_NewX_w,fsx
+				move.w	Obj_NewZ_w,fsz
+				move.w	Plr1_TmpXOff_l,Obj_NewX_w
+				move.w	Plr1_TmpZOff_l,Obj_NewZ_w
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
+				move.w	Obj_NewX_w,d1
+				sub.w	Obj_OldX_w,d1
+				move.w	Obj_NewZ_w,d2
+				sub.w	Obj_OldZ_w,d2
 				jsr		GetRand
 
 				asr.w	#4,d0
@@ -1058,8 +1058,8 @@ SHOOTPLAYER1:
 				muls	d0,d2
 				swap	d1
 				swap	d2
-				add.w	d1,newz
-				sub.w	d2,newx
+				add.w	d1,Obj_NewZ_w
+				sub.w	d2,Obj_NewX_w
 				move.l	Plr1_TmpYOff_l,d1
 				add.l	#15*128,d1
 				asr.l	#7,d1
@@ -1069,11 +1069,11 @@ SHOOTPLAYER1:
 				add.w	d2,d1
 				ext.l	d1
 				asl.l	#7,d1
-				move.l	d1,newy
+				move.l	d1,Obj_NewY_w
 				move.w	4(a0),d1
 				ext.l	d1
 				asl.l	#7,d1
-				move.l	d1,oldy
+				move.l	d1,Obj_OldY_w
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				st		exitfirst
 				move.w	#0,Obj_ExtLen_w
@@ -1092,18 +1092,18 @@ SHOOTPLAYER1:
 				tst.b	hitwall
 				bne.s	.nofurther
 
-				move.w	newx,d0
-				sub.w	oldx,d0
-				add.w	d0,oldx
-				add.w	d0,newx
-				move.w	newz,d0
-				sub.w	oldz,d0
-				add.w	d0,oldz
-				add.w	d0,newz
-				move.l	newy,d0
-				sub.l	oldy,d0
-				add.l	d0,oldy
-				add.l	d0,newy
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				add.w	d0,Obj_OldX_w
+				add.w	d0,Obj_NewX_w
+				move.w	Obj_NewZ_w,d0
+				sub.w	Obj_OldZ_w,d0
+				add.w	d0,Obj_OldZ_w
+				add.w	d0,Obj_NewZ_w
+				move.l	Obj_NewY_w,d0
+				sub.l	Obj_OldY_w,d0
+				add.l	d0,Obj_OldY_w
+				add.l	d0,Obj_NewY_w
 				bra		.again
 
 .nofurther:
@@ -1122,17 +1122,17 @@ SHOOTPLAYER1:
 				NEXT_OBJ	a0
 				dbra	d1,.findonefree2
 
-				move.w	tsx,oldx
-				move.w	tsz,oldz
-				move.w	fsx,newx
-				move.w	fsz,newz
+				move.w	tsx,Obj_OldX_w
+				move.w	tsz,Obj_OldZ_w
+				move.w	fsx,Obj_NewX_w
+				move.w	fsz,Obj_NewZ_w
 				rts
 
 .foundonefree2:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				move.w	(a0),d2
-				move.w	newx,(a1,d2.w*8)
-				move.w	newz,4(a1,d2.w*8)
+				move.w	Obj_NewX_w,(a1,d2.w*8)
+				move.w	Obj_NewZ_w,4(a1,d2.w*8)
 				move.b	#1,ShotT_Status_b(a0)
 				move.w	#0,ShotT_Gravity_w(a0)
 				move.b	#0,ShotT_Size_b(a0)
@@ -1144,10 +1144,10 @@ SHOOTPLAYER1:
 				move.l	d0,ShotT_AccYPos_w(a0)
 				asr.l	#7,d0
 				move.w	d0,4(a0)
-				move.w	tsx,oldx
-				move.w	tsz,oldz
-				move.w	fsx,newx
-				move.w	fsz,newz
+				move.w	tsx,Obj_OldX_w
+				move.w	tsz,Obj_OldZ_w
+				move.w	fsx,Obj_NewX_w
+				move.w	fsz,Obj_NewZ_w
 
 				rts
 
@@ -1192,10 +1192,10 @@ FireAtPlayer1:
 				move.l	Lvl_ObjectPointsPtr_l,a2
 				move.w	(a5),d1
 				lea		(a2,d1.w*8),a2
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 
 				jsr		CalcDist
 
@@ -1203,23 +1203,23 @@ FireAtPlayer1:
 				muls	distaway,d6
 				divs	SHOTSPEED,d6
 				asr.w	#4,d6
-				add.w	d6,newx
+				add.w	d6,Obj_NewX_w
 				move.w	ZDiff_w,d6
 				muls	distaway,d6
 				divs	SHOTSPEED,d6
 				asr.w	#4,d6
-				add.w	d6,newz
-				move.w	newx,futurex
-				move.w	newz,futurez
+				add.w	d6,Obj_NewZ_w
+				move.w	Obj_NewX_w,futurex
+				move.w	Obj_NewZ_w,futurez
 
 				move.w	SHOTSPEED,speed
 				move.w	#0,Range
 				jsr		HeadTowards
 
-				move.w	newx,d0
-				sub.w	oldx,d0
-				move.w	newz,d1
-				sub.w	oldz,d1
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				move.w	Obj_NewZ_w,d1
+				sub.w	Obj_OldZ_w,d1
 				move.w	SHOTOFFMULT,d2
 				beq.s	.nooffset
 
@@ -1227,20 +1227,20 @@ FireAtPlayer1:
 				muls	d2,d1
 				asr.l	#8,d0
 				asr.l	#8,d1
-				add.w	d1,oldx
-				sub.w	d0,oldz
-				move.w	futurex,newx
-				move.w	futurez,newz
+				add.w	d1,Obj_OldX_w
+				sub.w	d0,Obj_OldZ_w
+				move.w	futurex,Obj_NewX_w
+				move.w	futurez,Obj_NewZ_w
 				jsr		HeadTowards
 
 .nooffset:
-				move.w	newx,d0
+				move.w	Obj_NewX_w,d0
 				move.w	d0,(a2)
-				sub.w	oldx,d0
+				sub.w	Obj_OldX_w,d0
 				move.w	d0,ShotT_VelocityX_w(a5)
-				move.w	newz,d0
+				move.w	Obj_NewZ_w,d0
 				move.w	d0,4(a2)
-				sub.w	oldz,d0
+				sub.w	Obj_OldZ_w,d0
 				move.w	d0,ShotT_VelocityZ_w(a5)
 
 				move.l	#%110010,EntT_EnemyFlags_l(a5)
@@ -1293,18 +1293,18 @@ FireAtPlayer1:
 
 
 SHOOTPLAYER2:
-				move.w	oldx,tsx
-				move.w	oldz,tsz
-				move.w	newx,fsx
-				move.w	oldx,fsz
-				move.w	Plr2_TmpXOff_l,newx
-				move.w	Plr2_TmpZOff_l,newz
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
-				move.w	newx,d1
-				sub.w	oldx,d1
-				move.w	newz,d2
-				sub.w	oldz,d2
+				move.w	Obj_OldX_w,tsx
+				move.w	Obj_OldZ_w,tsz
+				move.w	Obj_NewX_w,fsx
+				move.w	Obj_OldX_w,fsz
+				move.w	Plr2_TmpXOff_l,Obj_NewX_w
+				move.w	Plr2_TmpZOff_l,Obj_NewZ_w
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
+				move.w	Obj_NewX_w,d1
+				sub.w	Obj_OldX_w,d1
+				move.w	Obj_NewZ_w,d2
+				sub.w	Obj_OldZ_w,d2
 				jsr		GetRand
 
 				asr.w	#4,d0
@@ -1312,8 +1312,8 @@ SHOOTPLAYER2:
 				muls	d0,d2
 				swap	d1
 				swap	d2
-				add.w	d1,newz
-				sub.w	d2,newx
+				add.w	d1,Obj_NewZ_w
+				sub.w	d2,Obj_NewX_w
 				move.l	Plr2_TmpYOff_l,d1
 				add.l	#15*128,d1
 				asr.l	#7,d1
@@ -1323,11 +1323,11 @@ SHOOTPLAYER2:
 				add.w	d2,d1
 				ext.l	d1
 				asl.l	#7,d1
-				move.l	d1,newy
+				move.l	d1,Obj_NewY_w
 				move.w	4(a0),d1
 				ext.l	d1
 				asl.l	#7,d1
-				move.l	d1,oldy
+				move.l	d1,Obj_OldY_w
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 
 				st		exitfirst
@@ -1347,18 +1347,18 @@ SHOOTPLAYER2:
 				tst.b	hitwall
 				bne.s	.nofurther
 
-				move.w	newx,d0
-				sub.w	oldx,d0
-				add.w	d0,oldx
-				add.w	d0,newx
-				move.w	newz,d0
-				sub.w	oldz,d0
-				add.w	d0,oldz
-				add.w	d0,newz
-				move.l	newy,d0
-				sub.l	oldy,d0
-				add.l	d0,oldy
-				add.l	d0,newy
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				add.w	d0,Obj_OldX_w
+				add.w	d0,Obj_NewX_w
+				move.w	Obj_NewZ_w,d0
+				sub.w	Obj_OldZ_w,d0
+				add.w	d0,Obj_OldZ_w
+				add.w	d0,Obj_NewZ_w
+				move.l	Obj_NewY_w,d0
+				sub.l	Obj_OldY_w,d0
+				add.l	d0,Obj_OldY_w
+				add.l	d0,Obj_NewY_w
 				bra		.again
 
 .nofurther:
@@ -1377,17 +1377,17 @@ SHOOTPLAYER2:
 				NEXT_OBJ	a0
 				dbra	d1,.findonefree2
 
-				move.w	tsx,oldx
-				move.w	tsz,oldz
-				move.w	fsx,newx
-				move.w	fsz,oldx
+				move.w	tsx,Obj_OldX_w
+				move.w	tsz,Obj_OldZ_w
+				move.w	fsx,Obj_NewX_w
+				move.w	fsz,Obj_OldX_w
 				rts
 
 .foundonefree2:
 				move.l	Lvl_ObjectPointsPtr_l,a1
 				move.w	(a0),d2
-				move.w	newx,(a1,d2.w*8)
-				move.w	newz,4(a1,d2.w*8)
+				move.w	Obj_NewX_w,(a1,d2.w*8)
+				move.w	Obj_NewZ_w,4(a1,d2.w*8)
 				move.b	#1,ShotT_Status_b(a0)
 				move.w	#0,ShotT_Gravity_w(a0)
 				move.b	#0,ShotT_Size_b(a0)
@@ -1399,10 +1399,10 @@ SHOOTPLAYER2:
 				move.l	d0,ShotT_AccYPos_w(a0)
 				asr.l	#7,d0
 				move.w	d0,4(a0)
-				move.w	tsx,oldx
-				move.w	tsz,oldz
-				move.w	fsx,newx
-				move.w	fsz,oldx
+				move.w	tsx,Obj_OldX_w
+				move.w	tsz,Obj_OldZ_w
+				move.w	fsx,Obj_NewX_w
+				move.w	fsz,Obj_OldX_w
 				rts
 
 FireAtPlayer2:
@@ -1440,18 +1440,18 @@ FireAtPlayer2:
 				move.l	Lvl_ObjectPointsPtr_l,a2
 				move.w	(a5),d1
 				lea		(a2,d1.w*8),a2
-				move.w	(a1),oldx
-				move.w	4(a1),oldz
-				move.w	Plr2_XOff_l,newx
-				move.w	Plr2_ZOff_l,newz
+				move.w	(a1),Obj_OldX_w
+				move.w	4(a1),Obj_OldZ_w
+				move.w	Plr2_XOff_l,Obj_NewX_w
+				move.w	Plr2_ZOff_l,Obj_NewZ_w
 				move.w	SHOTSPEED,speed
 				move.w	#0,Range
 				jsr		HeadTowards
 
-				move.w	newx,d0
-				sub.w	oldx,d0
-				move.w	newz,d1
-				sub.w	oldz,d1
+				move.w	Obj_NewX_w,d0
+				sub.w	Obj_OldX_w,d0
+				move.w	Obj_NewZ_w,d1
+				sub.w	Obj_OldZ_w,d1
 				move.w	SHOTOFFMULT,d2
 				beq.s	.nooffset
 
@@ -1459,20 +1459,20 @@ FireAtPlayer2:
 				muls	d2,d1
 				asr.l	#8,d0
 				asr.l	#8,d1
-				add.w	d1,oldx
-				sub.w	d0,oldz
-				move.w	Plr2_XOff_l,newx
-				move.w	Plr2_ZOff_l,newz
+				add.w	d1,Obj_OldX_w
+				sub.w	d0,Obj_OldZ_w
+				move.w	Plr2_XOff_l,Obj_NewX_w
+				move.w	Plr2_ZOff_l,Obj_NewZ_w
 				jsr		HeadTowards
 
 .nooffset:
-				move.w	newx,d0
+				move.w	Obj_NewX_w,d0
 				move.w	d0,(a2)
-				sub.w	oldx,d0
+				sub.w	Obj_OldX_w,d0
 				move.w	d0,ShotT_VelocityX_w(a5)
-				move.w	newz,d0
+				move.w	Obj_NewZ_w,d0
 				move.w	d0,4(a2)
-				sub.w	oldz,d0
+				sub.w	Obj_OldZ_w,d0
 				move.w	d0,ShotT_VelocityZ_w(a5)
 				move.l	#%110010,EntT_EnemyFlags_l(a5)
 				move.w	ObjT_ZoneID_w(a0),ObjT_ZoneID_w(a5)
