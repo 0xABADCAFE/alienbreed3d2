@@ -1714,18 +1714,18 @@ ai_CheckInFront:
 AI_LookForPlayer1:
 				clr.b	ObjT_SeePlayer_b(a0)
 				clr.b	CanSee
-				move.b	ShotT_InUpperZone_b(a0),ViewerTop
-				move.b	Plr1_StoodInTop_b,TargetTop
+				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
+				move.b	Plr1_StoodInTop_b,Obj_TargetInUpperZone_b
 				move.l	Plr1_ZonePtr_l,Obj_ToZonePtr_l
 				move.l	Obj_ZonePtr_l,Obj_FromZonePtr_l
-				move.w	newx,Viewerx
-				move.w	newz,Viewerz
-				move.w	Plr1_XOff_l,Targetx
-				move.w	Plr1_ZOff_l,Targetz
+				move.w	newx,Obj_ViewerX_w
+				move.w	newz,Obj_ViewerZ_w
+				move.w	Plr1_XOff_l,Obj_TargetX_w
+				move.w	Plr1_ZOff_l,Obj_TargetZ_w
 				move.l	Plr1_YOff_l,d0
 				asr.l	#7,d0
-				move.w	d0,Targety
-				move.w	4(a0),Viewery
+				move.w	d0,Obj_TargetY_w
+				move.w	4(a0),Obj_ViewerY_w
 				jsr		CanItBeSeen
 
 				tst.b	CanSee

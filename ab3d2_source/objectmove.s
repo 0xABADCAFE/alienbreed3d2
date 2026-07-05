@@ -828,9 +828,9 @@ ERRORINMOVEMENT:
 oldx:			dc.l	0
 oldz:			dc.l	0
 oldy:			dc.l	0
-newx:			dc.l	0
-newz:			dc.l	0
-newy:			dc.l	0
+newx:			dc.l	0	; This is really a union because level data has 32-bit values, but on;ly the msw is used
+newz:			dc.l	0	; also here
+newy:			dc.l	0	; and here
 
 xdiff:			dc.l	0
 zdiff:			dc.l	0
@@ -1259,10 +1259,10 @@ CanItBeSeenAng:
 				add.w	d0,a0
 				move.w	(a0),d0 ; SINE_OFS
 				move.w	COSINE_OFS(a0),d1
-				move.w	Targetx,d2
-				sub.w	Viewerx,d2
-				move.w	Targetz,d3
-				sub.w	Viewerz,d3
+				move.w	Obj_TargetX_w,d2
+				sub.w	Obj_ViewerX_w,d2
+				move.w	Obj_TargetZ_w,d3
+				sub.w	Obj_ViewerZ_w,d3
 				muls	d1,d2
 				muls	d0,d3
 				sub.l	d3,d2
@@ -1281,21 +1281,21 @@ ItMightBeSeen:
 				bra.s	InList
 
 				align 4
-Viewerx:		dc.l	0
-Viewerz:		dc.l	0
-Targetx:		dc.l	0
-Targetz:		dc.l	0
-ViewerTop:		dc.b	0
-TargetTop:		dc.b	0
-Viewery:		dc.w	0
-Targety:		dc.w	0
+Obj_ViewerX_w:				dc.w	0
+Obj_ViewerZ_w:				dc.w	0
+Obj_TargetX_w:				dc.w	0
+Obj_TargetZ_w:				dc.w	0
+Obj_ViewerInUpperZone_b:	dc.b	0
+Obj_TargetInUpperZone_b:	dc.b	0
+Obj_ViewerY_w:				dc.w	0
+Obj_TargetY_w:				dc.w	0
 
 				even
 
 insameroom:
 				st		CanSee
-				move.b	ViewerTop,d0
-				move.b	TargetTop,d1
+				move.b	Obj_ViewerInUpperZone_b,d0
+				move.b	Obj_TargetInUpperZone_b,d1
 				eor.b	d0,d1
 				bne		outlist
 
@@ -1337,10 +1337,10 @@ isinlist:
 
 				st		CanSee
 				move.l	Lvl_PointsPtr_l,a2
-				move.w	Targetx,d1
-				move.w	Targetz,d2
-				sub.w	Viewerx,d1
-				sub.w	Viewerz,d2
+				move.w	Obj_TargetX_w,d1
+				move.w	Obj_TargetZ_w,d2
+				sub.w	Obj_ViewerX_w,d1
+				sub.w	Obj_ViewerZ_w,d2
 				moveq	#0,d3
 				move.w	-6(a0),d3
 				blt		nomorerclips
@@ -1358,9 +1358,9 @@ checklcliploop:
 
 				move.l	(a2,d0.w*4),d3
 				move.w	d3,d4
-				sub.w	Viewerz,d4
+				sub.w	Obj_ViewerZ_w,d4
 				swap	d3
-				sub.w	Viewerx,d3
+				sub.w	Obj_ViewerX_w,d3
 				muls	d2,d3
 				muls	d1,d4
 				sub.l	d3,d4
@@ -1381,9 +1381,9 @@ checkrcliploop:
 				blt.s	norightone
 				move.l	(a2,d0.w*4),d3
 				move.w	d3,d4
-				sub.w	Viewerz,d4
+				sub.w	Obj_ViewerZ_w,d4
 				swap	d3
-				sub.w	Viewerx,d3
+				sub.w	Obj_ViewerX_w,d3
 				muls	d2,d3
 				muls	d1,d4
 				sub.l	d3,d4
@@ -1397,15 +1397,15 @@ nomorerclips:
 ; No clipping points in the way; got to do the
 ; vertical working out now.
 
-				move.w	Targetx,d0
-				move.w	Targetz,d1
-				sub.w	Viewerx,d0
-				sub.w	Viewerz,d1
+				move.w	Obj_TargetX_w,d0
+				move.w	Obj_TargetZ_w,d1
+				sub.w	Obj_ViewerX_w,d0
+				sub.w	Obj_ViewerZ_w,d1
 				move.l	Obj_FromZonePtr_l,a5
 				move.l	Lvl_ZoneEdgePtr_l,a1
-				move.b	ViewerTop,d2
-				move.w	Targety,d7
-				sub.w	Viewery,d7
+				move.b	Obj_ViewerInUpperZone_b,d2
+				move.w	Obj_TargetY_w,d7
+				sub.w	Obj_ViewerY_w,d7
 
 GoThroughZones:
 				move.l	a5,a0
@@ -1418,8 +1418,8 @@ FindWayOut:
 				lea		(a1,d5.w),a2
 				move.w	(a2),d3 ; EdgeT_XPos_w
 				move.w	EdgeT_ZPos_w(a2),d4
-				sub.w	Viewerx,d3
-				sub.w	Viewerz,d4
+				sub.w	Obj_ViewerX_w,d3
+				sub.w	Obj_ViewerZ_w,d4
 				move.w	d3,d5
 				move.w	d4,d6
 				muls	d1,d3
@@ -1440,15 +1440,15 @@ FindWayOut:
 ; Here is the exit from the room. Calculate the height at which
 ; we meet it.
 
-				move.w	Targetx,d3
-				move.w	Targetz,d4
+				move.w	Obj_TargetX_w,d3
+				move.w	Obj_TargetZ_w,d4
 				sub.w	(a2),d3 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d4
 				muls	EdgeT_XLen_w(a2),d4
 				muls	EdgeT_ZLen_w(a2),d3
 				sub.l	d3,d4					; positive
-				move.w	Viewerx,d5
-				move.w	Viewerz,d6
+				move.w	Obj_ViewerX_w,d5
+				move.w	Obj_ViewerZ_w,d6
 				sub.w	(a2),d5 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d6
 				muls	EdgeT_XLen_w(a2),d6
@@ -1462,7 +1462,7 @@ FindWayOut:
 				divs	d4,d5
 
 sameheight:
-				add.w	Viewery,d5				; height at which we cross wall
+				add.w	Obj_ViewerY_w,d5				; height at which we cross wall
 				ext.l	d5
 				asl.l	#7,d5
 				tst.b	d2
@@ -1506,7 +1506,7 @@ GotIn:
 				cmp.l	Obj_ToZonePtr_l,a5
 				bne		GoThroughZones
 
-				move.b	TargetTop,d3
+				move.b	Obj_TargetInUpperZone_b,d3
 				eor.b	d2,d3
 				bne		outlist
 
@@ -1527,15 +1527,15 @@ outlist:
 FindCollisionPt:
 				SAVEREGS
 
-				move.w	Targetx,d0
-				move.w	Targetz,d1
-				sub.w	Viewerx,d0
-				sub.w	Viewerz,d1
+				move.w	Obj_TargetX_w,d0
+				move.w	Obj_TargetZ_w,d1
+				sub.w	Obj_ViewerX_w,d0
+				sub.w	Obj_ViewerZ_w,d1
 				move.l	Obj_FromZonePtr_l,a5
 				move.l	Lvl_ZoneEdgePtr_l,a1
-				move.b	ViewerTop,d2
-				move.w	Targety,d7
-				sub.w	Viewery,d7
+				move.b	Obj_ViewerInUpperZone_b,d2
+				move.w	Obj_TargetY_w,d7
+				sub.w	Obj_ViewerY_w,d7
 
 .GoThroughZones:
 				move.l	a5,a0
@@ -1548,8 +1548,8 @@ FindCollisionPt:
 				lea		(a1,d5.w),a2
 				move.w	(a2),d3 ; EdgeT_XPos_w
 				move.w	EdgeT_ZPos_w(a2),d4
-				sub.w	Viewerx,d3
-				sub.w	Viewerz,d4
+				sub.w	Obj_ViewerX_w,d3
+				sub.w	Obj_ViewerZ_w,d4
 				move.w	d3,d5
 				move.w	d4,d6
 				muls	d1,d3
@@ -1567,15 +1567,15 @@ FindCollisionPt:
 ; Here is the exit from the room. Calculate the height at which
 ; we meet it.
 
-				move.w	Targetx,d3
-				move.w	Targetz,d4
+				move.w	Obj_TargetX_w,d3
+				move.w	Obj_TargetZ_w,d4
 				sub.w	(a2),d3 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d4
 				muls	EdgeT_XLen_w(a2),d4
 				muls	EdgeT_ZLen_w(a2),d3
 				sub.l	d3,d4					; positive
-				move.w	Viewerx,d5
-				move.w	Viewerz,d6
+				move.w	Obj_ViewerX_w,d5
+				move.w	Obj_ViewerZ_w,d6
 				sub.w	(a2),d5 ; EdgeT_XPos_w
 				sub.w	EdgeT_ZPos_w(a2),d6
 				muls	EdgeT_XLen_w(a2),d6
@@ -1590,7 +1590,7 @@ FindCollisionPt:
 				divs	d4,d5
 
 .sameheight:
-				add.w	Viewery,d5				; height at which we cross wall
+				add.w	Obj_ViewerY_w,d5				; height at which we cross wall
 				ext.l	d5
 				asl.l	#7,d5
 				moveq	#0,d3
@@ -1617,17 +1617,17 @@ FindCollisionPt:
 				bra		.GoThroughZones
 
 				; Unreachable ?
-				tst.w	d4
-				beq.s	foundpt
-				muls	d6,d0
-				divs	d4,d0
-				muls	d6,d1
-				divs	d4,d1
-				add.w	Viewerx,d0
-				add.w	Viewerz,d1
-				move.w	d0,Targetx
-				move.w	d1,Targetz
-				move.l	d5,Targety
+				;tst.w	d4
+				;beq.s	foundpt
+				;muls	d6,d0
+				;divs	d4,d0
+				;muls	d6,d1
+				;divs	d4,d1
+				;add.w	Obj_ViewerX_w,d0
+				;add.w	Obj_ViewerZ_w,d1
+				;move.w	d0,Obj_TargetX_w
+				;move.w	d1,Obj_TargetZ_w
+				;move.l	d5,Obj_TargetY_w ; TODO is this a bug?
 
 foundpt:
 				GETREGS

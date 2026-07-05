@@ -2173,10 +2173,10 @@ notdoneanim:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion
 
-				move.w	newx,Viewerx
-				move.w	newz,Viewerz
-				move.w	4(a0),Viewery
-				move.b	ShotT_InUpperZone_b(a0),ViewerTop
+				move.w	newx,Obj_ViewerX_w
+				move.w	newz,Obj_ViewerZ_w
+				move.w	4(a0),Obj_ViewerY_w
+				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
 				SAVEREGS
 
@@ -2244,10 +2244,10 @@ notdoneanim:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion2
 
-				move.w	4(a0),Viewery
-				move.w	newx,Viewerx
-				move.w	newz,Viewerz
-				move.b	ShotT_InUpperZone_b(a0),ViewerTop
+				move.w	4(a0),Obj_ViewerY_w
+				move.w	newx,Obj_ViewerX_w
+				move.w	newz,Obj_ViewerZ_w
+				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
 				SAVEREGS
 
@@ -2430,10 +2430,10 @@ nomovebul:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion
 
-				move.w	newx,Viewerx
-				move.w	newz,Viewerz
-				move.w	4(a0),Viewery
-				move.b	ShotT_InUpperZone_b(a0),ViewerTop
+				move.w	newx,Obj_ViewerX_w
+				move.w	newz,Obj_ViewerZ_w
+				move.w	4(a0),Obj_ViewerY_w
+				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 
 				SAVEREGS
 
@@ -2648,9 +2648,9 @@ notasplut:
 				move.l	BulT_ExplosiveForce_l(a6),d0
 				beq.s	.noexplosion3
 
-				move.w	4(a0),Viewery
-				move.w	newx,Viewerx
-				move.w	newz,Viewerz
+				move.w	4(a0),Obj_ViewerY_w
+				move.w	newx,Obj_ViewerX_w
+				move.w	newz,Obj_ViewerZ_w
 
 				SAVEREGS
 
@@ -2890,10 +2890,10 @@ HitObjLoop:
 				move.l	(a3,d1.w*4),a3
 				move.l	a3,Obj_ToZonePtr_l
 				move.l	Lvl_ObjectPointsPtr_l,a3
-				move.w	(a3,d0.w*8),Targetx
-				move.w	4(a3,d0.w*8),Targetz
-				move.w	4(a2),Targety
-				move.b	ShotT_InUpperZone_b(a2),TargetTop
+				move.w	(a3,d0.w*8),Obj_TargetX_w
+				move.w	4(a3,d0.w*8),Obj_TargetZ_w
+				move.w	4(a2),Obj_TargetY_w
+				move.b	ShotT_InUpperZone_b(a2),Obj_TargetInUpperZone_b
 				jsr		CanItBeSeen
 
 				tst.b	CanSee
@@ -2902,11 +2902,11 @@ HitObjLoop:
 				; 0xABADAFE - TODO - Revisit this
 				; Splash Damage does not seem to take vertical separation into consideration
 				; here, only X and Z coordinates
-				move.w	Targetx,d0
-				sub.w	Viewerx,d0 ; tx-vx
+				move.w	Obj_TargetX_w,d0
+				sub.w	Obj_ViewerX_w,d0 ; tx-vx
 				move.w	d0,d2
-				move.w	Targetz,d1
-				sub.w	Viewerz,d1 ; tz-vx
+				move.w	Obj_TargetZ_w,d1
+				sub.w	Obj_ViewerZ_w,d1 ; tz-vx
 				move.w	d1,d3
 				muls	d2,d2      ; (tx-vx)^2
 				muls	d3,d3      ; (tz-vz)^2

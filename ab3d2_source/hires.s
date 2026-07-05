@@ -1580,18 +1580,18 @@ findaverage:
 
 				move.l	Plr1_ZonePtr_l,Obj_FromZonePtr_l
 				move.l	Plr2_ZonePtr_l,Obj_ToZonePtr_l
-				move.w	Plr1_TmpXOff_l,Viewerx
-				move.w	Plr1_TmpZOff_l,Viewerz
+				move.w	Plr1_TmpXOff_l,Obj_ViewerX_w
+				move.w	Plr1_TmpZOff_l,Obj_ViewerZ_w
 				move.l	Plr1_TmpYOff_l,d0
 				asr.l	#7,d0
-				move.w	d0,Viewery
-				move.w	Plr2_TmpXOff_l,Targetx
-				move.w	Plr2_TmpZOff_l,Targetz
+				move.w	d0,Obj_ViewerY_w
+				move.w	Plr2_TmpXOff_l,Obj_TargetX_w
+				move.w	Plr2_TmpZOff_l,Obj_TargetZ_w
 				move.l	Plr2_TmpYOff_l,d0
 				asr.l	#7,d0
-				move.w	d0,Targety
-				move.b	Plr1_StoodInTop_b,ViewerTop
-				move.b	Plr2_StoodInTop_b,TargetTop
+				move.w	d0,Obj_TargetY_w
+				move.b	Plr1_StoodInTop_b,Obj_ViewerInUpperZone_b
+				move.b	Plr2_StoodInTop_b,Obj_TargetInUpperZone_b
 				jsr		CanItBeSeen
 
 				move.l	Plr1_ObjectPtr_l,a0
