@@ -745,7 +745,7 @@ BACKSFX:
 				move.l	GLF_DatabasePtr_l,a0
 				add.l	#GLFT_AmbientSFX_l,a0
 				move.w	(a0,d0.w*2),Aud_SampleNum_w
-				move.w	#$fff0,IDNUM
+				move.w	#$fff0,Aud_IDNum_w
 				st.b	notifplaying
 				move.l	#0,Aud_NoiseX_w
 				move.b	#0,PlayEcho
@@ -957,7 +957,7 @@ next_lift:
 
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	#$fffd,IDNUM
+				move.w	#$fffd,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -983,7 +983,7 @@ next_lift:
 
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	#$fffd,IDNUM
+				move.w	#$fffd,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1105,7 +1105,7 @@ liftwalls:
 
 				move.b	#1,Aud_ChannelPick_b
 				st		notifplaying
-				move.w	#$fffe,IDNUM
+				move.w	#$fffe,Aud_IDNum_w
 
 				movem.l	a0/a3/a4/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1297,7 +1297,7 @@ next_door:
 
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	#$fffd,IDNUM
+				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
 
@@ -1321,7 +1321,7 @@ nolower:
 
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	#$fffd,IDNUM
+				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
 
@@ -1466,7 +1466,7 @@ doorwalls:
 
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	#$fffd,IDNUM
+				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
 
@@ -1615,7 +1615,7 @@ backtoend:
 				move.w	#10,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
 				st		notifplaying
-				move.w	#$fffc,IDNUM
+				move.w	#$fffc,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1676,7 +1676,7 @@ p1_SpaceIsPressed:
 				move.w	#10,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
 				st		notifplaying
-				move.w	#$fffc,IDNUM
+				move.w	#$fffc,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1734,7 +1734,7 @@ p2_SpaceIsPressed:
 				move.w	#10,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
 				st		notifplaying
-				move.w	#$fffc,IDNUM
+				move.w	#$fffc,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
 
@@ -1871,7 +1871,7 @@ JUMPBULLET:
 ;				move.w	#22,Aud_SampleNum_w
 ;				move.b	#1,Aud_ChannelPick_b
 ;				clr.b	notifplaying
-;				move.w	(a0),IDNUM
+;				move.w	(a0),Aud_IDNum_w
 ;				jsr		MakeSomeNoise
 ;
 ;				GETREGS
@@ -2161,7 +2161,7 @@ notdoneanim:
 ; swap d0
 				move.w	#200,Aud_NoiseVol_w
 				move.w	d0,Aud_SampleNum_w
-				move.w	d1,IDNUM
+				move.w	d1,Aud_IDNum_w
 
 				SAVEREGS
 
@@ -2231,7 +2231,7 @@ notdoneanim:
 				move.l	(a1,d1.w*8),Aud_NoiseX_w
 				move.w	#200,Aud_NoiseVol_w
 				move.w	d0,Aud_SampleNum_w
-				move.w	d1,IDNUM
+				move.w	d1,Aud_IDNum_w
 
 				SAVEREGS
 
@@ -2418,7 +2418,7 @@ nomovebul:
 				move.l	(a1,d1.w*8),Aud_NoiseX_w
 				move.w	#200,Aud_NoiseVol_w
 				move.w	d0,Aud_SampleNum_w
-				move.w	d1,IDNUM
+				move.w	d1,Aud_IDNum_w
 
 				SAVEREGS
 
@@ -2636,7 +2636,7 @@ notasplut:
 				move.l	(a1,d1.w*8),Aud_NoiseX_w
 				move.w	#200,Aud_NoiseVol_w
 				move.w	d0,Aud_SampleNum_w
-				move.w	d1,IDNUM
+				move.w	d1,Aud_IDNum_w
 
 				SAVEREGS
 

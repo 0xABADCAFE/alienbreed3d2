@@ -151,7 +151,7 @@ Plr1_Shot:
 				move.w	#100,Plr1_NoiseVol_w
 				move.w	#12,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.b	#$fb,IDNUM
+				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
 				rts
@@ -182,7 +182,7 @@ Plr1_Shot:
 				move.b	#2,Aud_ChannelPick_b
 				clr.b	notifplaying
 				movem.l	d0/a0/d5/d6/d7/a6/a4/a5,-(a7)
-				move.b	#$fb,IDNUM
+				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
 				movem.l	(a7)+,d0/a0/d5/d6/d7/a6/a4/a5
@@ -491,7 +491,7 @@ Plr2_Shot:
 				move.w	#100,Plr2_NoiseVol_w
 				move.w	#12,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.b	#$fb,IDNUM
+				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
 				rts
@@ -523,7 +523,7 @@ Plr2_Shot:
 				clr.b	notifplaying
 
 				movem.l	d0/a0/d5/d6/d7/a6/a4/a5,-(a7)
-				move.b	#$fb,IDNUM
+				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
 				movem.l	(a7)+,d0/a0/d5/d6/d7/a6/a4/a5

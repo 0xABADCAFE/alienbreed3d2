@@ -613,13 +613,13 @@ scaledownlop:
 
 				; TODO - check music is enabled
 
-				st		CHANNELDATA
+				st		Aud_ChannelData_vw
 				jsr		mt_init
 
 *********************************
 
-				st		CHANNELDATA
-				st		CHANNELDATA+8
+				st		Aud_ChannelData_vw
+				st		Aud_ChannelData_vw+8
 
 				move.l	Aud_SampleList_vl+6*8,pos0LEFT
 				move.l	Aud_SampleList_vl+6*8+4,Samp0endLEFT
@@ -2307,7 +2307,7 @@ Plr1_Use:
 
 				SAVEREGS
 
-				move.w	#$fffa,IDNUM
+				move.w	#$fffa,Aud_IDNum_w
 				move.w	#19,Aud_SampleNum_w
 				clr.b	notifplaying
 				move.w	#0,Aud_NoiseX_w
@@ -2578,7 +2578,7 @@ Plr2_Use:
 
 				move.w	#19,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.w	#$fffa,IDNUM
+				move.w	#$fffa,Aud_IDNum_w
 				move.w	#0,Aud_NoiseX_w
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#60,Aud_NoiseVol_w
@@ -2941,7 +2941,7 @@ Plr1_Control:
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#26,Aud_SampleNum_w
 				move.w	#100,Aud_NoiseVol_w
-				move.w	#$fff9,IDNUM
+				move.w	#$fff9,Aud_IDNum_w
 				jsr		MakeSomeNoise
 				GETREGS
 
@@ -3136,7 +3136,7 @@ Plr2_Control:
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#26,Aud_SampleNum_w
 				move.w	#100,Aud_NoiseVol_w
-				move.w	#$fff9,IDNUM
+				move.w	#$fff9,Aud_IDNum_w
 				jsr		MakeSomeNoise
 				GETREGS
 
@@ -6126,7 +6126,7 @@ NOSIDES2:
 				subq	#1,d0
 				move.w	d0,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
 				move.w	(a0),d0
@@ -6319,14 +6319,14 @@ OLDLTOG:		dc.w	0
 
 pastster:
 				cmp.b	#'4',d1
-				seq		CHANNELDATA+8
-				seq		CHANNELDATA+12
-				seq		CHANNELDATA+24
-				seq		CHANNELDATA+28
+				seq		Aud_ChannelData_vw+8
+				seq		Aud_ChannelData_vw+12
+				seq		Aud_ChannelData_vw+24
+				seq		Aud_ChannelData_vw+28
 
 				;* Mt_init *********************
-				st		CHANNELDATA+8
-				st		CHANNELDATA
+				st		Aud_ChannelData_vw+8
+				st		Aud_ChannelData_vw
 				;*******************************
 
 				move.w	#$f,$dff000+dmacon
@@ -6873,7 +6873,7 @@ swappedem:		dc.w	0
 newsampbitl:
 				move.w	#$200,$dff000+intreq
 
-				tst.b	CHANNELDATA
+				tst.b	Aud_ChannelData_vw
 				bne		nochannel0
 
 				move.l	pos0LEFT,a0
@@ -6952,8 +6952,8 @@ loop:
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endLEFT
 				move.b	#0,vol0left
-				clr.w	LEFTCHANDATA+32
-				move.w	#0,LEFTCHANDATA+2
+				clr.w	Aud_LeftChannelData_vw+32
+				move.w	#0,Aud_LeftChannelData_vw+2
 .notoffendsamp1:
 
 				cmp.l	Samp2endLEFT,a1
@@ -6961,8 +6961,8 @@ loop:
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endLEFT
 				move.b	#0,vol2left
-				clr.w	LEFTCHANDATA+32+8
-				move.w	#0,LEFTCHANDATA+2+8
+				clr.w	Aud_LeftChannelData_vw+32+8
+				move.w	#0,Aud_LeftChannelData_vw+2+8
 .notoffendsamp2:
 
 				move.l	a0,pos0LEFT
@@ -6970,7 +6970,7 @@ loop:
 
 nochannel0:
 
-				tst.b	CHANNELDATA+16
+				tst.b	Aud_ChannelData_vw+16
 				bne		nochannel1
 
 
@@ -7047,8 +7047,8 @@ ok01:
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endRIGHT
 				move.b	#0,vol0right
-				clr.w	RIGHTCHANDATA+32
-				move.w	#0,RIGHTCHANDATA+2
+				clr.w	Aud_RightChannelData_vw+32
+				move.w	#0,Aud_RightChannelData_vw+2
 .notoffendsamp1:
 
 				cmp.l	Samp2endRIGHT,a1
@@ -7056,8 +7056,8 @@ ok01:
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endRIGHT
 				move.b	#0,vol2right
-				clr.w	RIGHTCHANDATA+32+8
-				move.w	#0,RIGHTCHANDATA+2+8
+				clr.w	Aud_RightChannelData_vw+32+8
+				move.w	#0,Aud_RightChannelData_vw+2+8
 .notoffendsamp2:
 
 				move.l	a0,pos0RIGHT
@@ -7141,8 +7141,8 @@ loop3:											; mixing two channels, 50 * 4
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp1endLEFT
 				move.b	#0,vol1left
-				clr.w	LEFTCHANDATA+32+4
-				move.w	#0,LEFTCHANDATA+2+4
+				clr.w	Aud_LeftChannelData_vw+32+4
+				move.w	#0,Aud_LeftChannelData_vw+2+4
 .notoffendsamp3:
 
 				cmp.l	Samp3endLEFT,a1
@@ -7150,8 +7150,8 @@ loop3:											; mixing two channels, 50 * 4
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endLEFT
 				move.b	#0,vol3left
-				clr.w	LEFTCHANDATA+32+12
-				move.w	#0,LEFTCHANDATA+2+12
+				clr.w	Aud_LeftChannelData_vw+32+12
+				move.w	#0,Aud_LeftChannelData_vw+2+12
 .notoffendsamp4:
 
 				move.l	a0,pos1LEFT
@@ -7227,8 +7227,8 @@ loop4:
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp1endRIGHT
 				move.b	#0,vol1right
-				clr.w	RIGHTCHANDATA+32+4
-				move.w	#0,RIGHTCHANDATA+2+4
+				clr.w	Aud_RightChannelData_vw+32+4
+				move.w	#0,Aud_RightChannelData_vw+2+4
 notoffendsamp3:
 
 				cmp.l	Samp3endRIGHT,a1
@@ -7236,8 +7236,8 @@ notoffendsamp3:
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endRIGHT
 				move.b	#0,vol3right
-				clr.w	RIGHTCHANDATA+32+12
-				move.w	#0,RIGHTCHANDATA+2+12
+				clr.w	Aud_RightChannelData_vw+32+12
+				move.w	#0,Aud_RightChannelData_vw+2+12
 notoffendsamp4:
 
 				move.l	a0,pos1RIGHT
@@ -7255,15 +7255,16 @@ notoffendsamp4:
 ***********************************
 
 fourchannel:
+
 				move.l	#$dff000,a6
 
-				tst.b	LEFTCHANDATA
+				tst.b	Aud_LeftChannelData_vw
 				bne.s	NoChan0sound
 
 				btst	#7,intreqrl(a6)
 				beq.s	nofinish0
-; move.w #0,LEFTCHANDATA+2
-; st LEFTCHANDATA+1
+; move.w #0,Aud_LeftChannelData_vw+2
+; st Aud_LeftChannelData_vw+1
 				move.l	#Aud_Null1_vw,$a0(a6)
 				move.w	#100,$a4(a6)
 				move.w	#$0080,intreq(a6)
@@ -7278,11 +7279,16 @@ nofinish0:
 				lsr.l	#1,d0
 				move.w	d0,$a4(a6)
 				move.l	d1,$a0(a6)
-				ext.l	d0
 
-				divs	#100,d0 ; todo approximate?
+;				ext.l	d0
+;				divs	#100,d0 ; todo approximate?
 
-				move.w	d0,playnull0
+				muls	#655,d0 ; 65536/100
+				;swap	d0
+
+				DEV_INC.w Reserved1
+
+				move.l	d0,playnull0
 				move.w	#$8201,dmacon(a6)
 				moveq	#0,d0
 				move.b	vol0left,d0
@@ -7309,9 +7315,16 @@ nofinish1:
 				lsr.l	#1,d0
 				move.w	d0,$b4(a6)
 				move.l	d1,$b0(a6)
-				ext.l	d0
-				divs	#100,d0
-				move.w	d0,playnull1
+
+				;ext.l	d0
+				;divs	#100,d0
+
+				muls	#655,d0 ; 65536/100
+				;swap	d0
+
+				DEV_INC.w Reserved1
+
+				move.l	d0,playnull1
 				move.w	#$8202,dmacon(a6)
 				moveq	#0,d0
 				move.b	vol0right,d0
@@ -7337,9 +7350,16 @@ nofinish2:
 				sub.l	d1,d0
 				lsr.l	#1,d0
 				move.w	d0,$c4(a6)
-				ext.l	d0
-				divs	#100,d0
-				move.w	d0,playnull2
+
+				;ext.l	d0
+				;divs	#100,d0
+
+				muls	#655,d0 ; 65536/100
+				;swap	d0
+
+				DEV_INC.w Reserved1
+
+				move.l	d0,playnull2
 
 				move.l	d1,$c0(a6)
 				move.w	#$8204,dmacon(a6)
@@ -7366,11 +7386,16 @@ nofinish3:
 				sub.l	d1,d0
 				lsr.l	#1,d0
 				move.w	d0,$d4(a6)
-				ext.l	d0
 
-				divs	#100,d0 ; todo - approximate?
+				;ext.l	d0
+				;divs	#100,d0 ; todo - approximate?
 
-				move.w	d0,playnull3
+				muls	#655,d0 ; 65536/100
+				;swap	d0
+
+				DEV_INC.w Reserved1
+
+				move.l	d0,playnull3
 				move.l	d1,$d0(a6)
 				move.w	#$8208,dmacon(a6)
 				moveq	#0,d0
@@ -7392,8 +7417,8 @@ nomorechannels:
 				sub.w	#1,playnull0
 				bra.s	chan0still
 nnul0:
-				move.w	#0,LEFTCHANDATA+2
-				clr.w	LEFTCHANDATA+32
+				move.w	#0,Aud_LeftChannelData_vw+2
+				clr.w	Aud_LeftChannelData_vw+32
 chan0still:
 
 				tst.b	NoiseMade0pRIGHT
@@ -7403,8 +7428,8 @@ chan0still:
 				sub.w	#1,playnull1
 				bra.s	chan1still
 nnul1:
-				move.w	#0,RIGHTCHANDATA+2
-				clr.w	RIGHTCHANDATA+32
+				move.w	#0,Aud_RightChannelData_vw+2
+				clr.w	Aud_RightChannelData_vw+32
 chan1still:
 
 				tst.b	NoiseMade1pRIGHT
@@ -7414,8 +7439,8 @@ chan1still:
 				sub.w	#1,playnull2
 				bra.s	chan2still
 nnul2:
-				move.w	#0,RIGHTCHANDATA+2+4
-				clr.w	RIGHTCHANDATA+32+4
+				move.w	#0,Aud_RightChannelData_vw+2+4
+				clr.w	Aud_RightChannelData_vw+32+4
 chan2still:
 
 				tst.b	NoiseMade1pLEFT
@@ -7425,8 +7450,8 @@ chan2still:
 				sub.w	#1,playnull3
 				bra.s	chan3still
 nnul3:
-				move.w	#0,LEFTCHANDATA+2+4
-				clr.w	LEFTCHANDATA+32+4
+				move.w	#0,Aud_LeftChannelData_vw+2+4
+				clr.w	Aud_LeftChannelData_vw+32+4
 
 chan3still:
 				GETREGS
@@ -7436,10 +7461,18 @@ chan3still:
 
 backbeat:		dc.w	0
 
+; These values are word but we allocate a longword each so that we can use a multiplication to replace
+; a division and rather than relying on swapping the result, we can just write the long and read back
+; the word instead.
+
 playnull0:		dc.w	0
+				dc.w	0
 playnull1:		dc.w	0
+				dc.w	0
 playnull2:		dc.w	0
+				dc.w	0
 playnull3:		dc.w	0
+				dc.w	0
 
 Samp0endRIGHT:	dc.l	Aud_EmptyBufferEnd
 Samp1endRIGHT:	dc.l	Aud_EmptyBufferEnd
@@ -7488,19 +7521,19 @@ Aud_NoiseX_w:       dc.w	0
 Aud_NoiseZ_w:       dc.w	0
 Aud_NoiseVol_w:     dc.w	0
 Aud_ChannelPick_b:  dc.w	0
-IDNUM:              dc.w	0
+Aud_IDNum_w:        dc.w	0
 Aud_NeedLeft_b:     dc.b	0
 Aud_NeedRight_b:    dc.b	0
 Aud_Stereo_b:       dc.b	$FF
 
 				even
-CHANNELDATA:
-LEFTCHANDATA:
+Aud_ChannelData_vw:
+Aud_LeftChannelData_vw:
 				dc.l	$00000000
 				dc.l	$00000000
 				dc.l	$FF000000
 				dc.l	$FF000000
-RIGHTCHANDATA:
+Aud_RightChannelData_vw:
 				dc.l	$00000000
 				dc.l	$00000000
 				dc.l	$FF000000
@@ -7508,15 +7541,12 @@ RIGHTCHANDATA:
 
 				ds.l	8
 
-RIGHTPLAYEDTAB:	ds.l	20
-LEFTPLAYEDTAB:	ds.l	20
-
 SourceEcho:		dc.w	0
 PLREcho:		dc.w	0
 
 
-LEFTOFFSET:		dc.l	0
-RIGHTOFFSET:	dc.l	0
+Aud_LeftOffset_l:	dc.l	0
+Aud_RightOffset_l:	dc.l	0
 
 ; TODO - this is a replacement hook
 Aud_PlaySound:
@@ -7557,16 +7587,18 @@ MakeSomeNoise:
 
 ; find if we are already playing
 
-				move.w	IDNUM,d0
+				move.w	Aud_IDNum_w,d0
 				cmp.w	#$ffff,d0
 				beq.s	dontworry
+
 				move.w	#7,d1
-				lea		CHANNELDATA,a3
+				lea		Aud_ChannelData_vw,a3
 findsameasme:
 				tst.b	(a3)
 				bne.s	notavail
 				cmp.w	32(a3),d0
 				beq		SameAsMe
+
 notavail:
 				add.w	#4,a3
 				dbra	d1,findsameasme
@@ -7593,11 +7625,11 @@ dontworry:
 				beq		pastcalc
 
 				move.w	#31,d0
-.findhigh
+.findhigh:
 				btst	d0,d2
 				bne		.foundhigh
 				dbra	d0,.findhigh
-.foundhigh
+.foundhigh:
 				asr.w	#1,d0
 				clr.l	d3
 				bset	d0,d3
@@ -7611,7 +7643,7 @@ dontworry:
 				sub.w	d3,d0					; second approx
 				bgt		.stillnot0
 				move.w	#1,d0
-.stillnot0
+.stillnot0:
 
 				move.w	d0,d3
 				muls	d3,d3
@@ -7629,7 +7661,7 @@ dontworry:
 				cmp.l	#32767,d3
 				ble.s	.nnnn
 				move.l	#32767,d3
-.nnnn
+.nnnn:
 
 				asr.w	#2,d0
 				addq	#1,d0
@@ -7647,7 +7679,7 @@ notooloud:
 
 				move.w	d3,d4
 				tst.b	Aud_Stereo_b
-				beq		NOSTEREO
+				beq		Aud_DoMono
 
 				move.w	d3,d2
 				muls	Aud_NoiseX_w,d2
@@ -7659,10 +7691,12 @@ notooloud:
 				bge.s	donequiet
 				move.w	#0,d4
 				bra.s	donequiet
+
 quietleft:
 				sub.w	d2,d3
 				bge.s	donequiet
 				move.w	#0,d3
+
 donequiet:
 
 ; d3=leftvol?
@@ -7673,14 +7707,14 @@ donequiet:
 
 				move.w	#$ffff,Aud_NeedLeft_b
 
-				move.l	#0,RIGHTOFFSET
-				move.l	#0,LEFTOFFSET
+				move.l	#0,Aud_RightOffset_l
+				move.l	#0,Aud_LeftOffset_l
 
 				cmp.b	d3,d4
 				bgt.s	RightLouder
 				beq.s	NoLouder
 
-				move.l	#4,LEFTOFFSET
+				move.l	#4,Aud_LeftOffset_l
 
 ; Left is louder; is it MUCH louder?
 
@@ -7692,7 +7726,7 @@ donequiet:
 				bra		aboutsame
 
 RightLouder:
-				move.l	#4,RIGHTOFFSET
+				move.l	#4,Aud_RightOffset_l
 				st		Aud_NeedRight_b
 				move.w	d4,d2
 				sub.w	d3,d2
@@ -7701,23 +7735,25 @@ RightLouder:
 
 aboutsame:
 NoLouder:
-
-
 ; Find least important sound on left
 
 				move.l	#0,a2
 				move.l	#0,d5
 				move.w	#32767,d2
-				move.w	IDNUM,d0
-				lea		LEFTCHANDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_LeftChannelData_vw,a3
 				move.w	#3,d1
-FindLeftChannel
+
+FindLeftChannel:
 				tst.b	(a3)
 				bne.s	.notactive
+
 				cmp.w	32(a3),d0
 				beq.s	FOUNDLEFT
+
 				cmp.w	2(a3),d2
 				blt.s	.notactive
+
 				move.w	2(a3),d2
 				move.l	a3,a2
 				move.w	d5,d6
@@ -7728,6 +7764,7 @@ FindLeftChannel
 				dbra	d1,FindLeftChannel
 				move.l	a2,a3
 				bra.s	gopastleft
+
 FOUNDLEFT:
 				move.w	d5,d6
 gopastleft:
@@ -7738,66 +7775,54 @@ NONOISE:
 ; move.w #$8010,$dff000+intena
 				rts
 FOUNDALEFT:
-
+				; This code path is for stereo mode
 				cmp.w	noiseloud,d2
 				bge		dorightchan
 
 ; d6 = channel number
 				cmp.w	#$ffff,d0
 				bne.s	.noche
+
 				move.w	#$fffe,d0
 .noche:
 				move.w	d0,32(a3)
 				move.w	noiseloud,2(a3)
-
 				move.w	Aud_SampleNum_w,d5
 
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
-				add.l	LEFTOFFSET,a1
+				add.l	Aud_LeftOffset_l,a1
 				move.l	4(a3,d5.w*8),a2
-				add.l	LEFTOFFSET,a2
-
+				add.l	Aud_LeftOffset_l,a2
 				tst.b	d6
 				seq		NoiseMade0LEFT
 				beq.s	.chan0
 				cmp.b	#2,d6
 				slt		NoiseMade1LEFT
 				blt		.chan1
+
 				seq		NoiseMade2LEFT
 				beq		.chan2
-				st		NoiseMade3LEFT
 
-				move.b	d5,LEFTPLAYEDTAB+9
-				move.b	d3,LEFTPLAYEDTAB+1+9
-				move.b	d4,LEFTPLAYEDTAB+2+9
+				st		NoiseMade3LEFT
 				move.b	d3,vol3left
 				move.l	a1,pos3LEFT
 				move.l	a2,Samp3endLEFT
 				bra		dorightchan
 
 .chan0:
-				move.b	d5,LEFTPLAYEDTAB
-				move.b	d3,LEFTPLAYEDTAB+1
-				move.b	d4,LEFTPLAYEDTAB+2
 				move.l	a1,pos0LEFT
 				move.l	a2,Samp0endLEFT
 				move.b	d3,vol0left
 				bra		dorightchan
 
 .chan1:
-				move.b	d5,LEFTPLAYEDTAB+3
-				move.b	d3,LEFTPLAYEDTAB+1+3
-				move.b	d4,LEFTPLAYEDTAB+2+3
 				move.b	d3,vol1left
 				move.l	a1,pos1LEFT
 				move.l	a2,Samp1endLEFT
 				bra		dorightchan
 
 .chan2:
-				move.b	d5,LEFTPLAYEDTAB+6
-				move.b	d3,LEFTPLAYEDTAB+1+6
-				move.b	d4,LEFTPLAYEDTAB+2+6
 				move.l	a1,pos2LEFT
 				move.l	a2,Samp2endLEFT
 				move.b	d3,vol2left
@@ -7809,8 +7834,8 @@ dorightchan:
 				move.l	#0,a2
 				move.l	#0,d5
 				move.w	#10000,d2
-				move.w	IDNUM,d0
-				lea		RIGHTCHANDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_RightChannelData_vw,a3
 				move.w	#3,d1
 FindRightChannel
 				tst.b	(a3)
@@ -7855,8 +7880,8 @@ FOUNDARIGHT:
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
 				move.l	4(a3,d5.w*8),a2
-				add.l	RIGHTOFFSET,a1
-				add.l	RIGHTOFFSET,a2
+				add.l	Aud_RightOffset_l,a1
+				add.l	Aud_RightOffset_l,a2
 
 				tst.b	d6
 				seq		NoiseMade0RIGHT
@@ -7868,9 +7893,6 @@ FOUNDARIGHT:
 				beq		.chan2
 				st		NoiseMade3RIGHT
 
-				move.b	d5,RIGHTPLAYEDTAB+9
-				move.b	d3,RIGHTPLAYEDTAB+1+9
-				move.b	d4,RIGHTPLAYEDTAB+2+9
 				move.b	d4,vol3right
 				move.l	a1,pos3RIGHT
 				move.l	a2,Samp3endRIGHT
@@ -7878,9 +7900,6 @@ FOUNDARIGHT:
 				rts
 
 .chan0:
-				move.b	d5,RIGHTPLAYEDTAB
-				move.b	d3,RIGHTPLAYEDTAB+1
-				move.b	d4,RIGHTPLAYEDTAB+2
 				move.l	a1,pos0RIGHT
 				move.l	a2,Samp0endRIGHT
 				move.b	d4,vol0right
@@ -7888,9 +7907,6 @@ FOUNDARIGHT:
 				rts
 
 .chan1:
-				move.b	d5,RIGHTPLAYEDTAB+3
-				move.b	d3,RIGHTPLAYEDTAB+1+3
-				move.b	d4,RIGHTPLAYEDTAB+2+3
 				move.b	d3,vol1right
 				move.l	a1,pos1RIGHT
 				move.l	a2,Samp1endRIGHT
@@ -7898,21 +7914,18 @@ FOUNDARIGHT:
 				rts
 
 .chan2:
-				move.b	d5,RIGHTPLAYEDTAB+6
-				move.b	d3,RIGHTPLAYEDTAB+1+6
-				move.b	d4,RIGHTPLAYEDTAB+2+6
 				move.l	a1,pos2RIGHT
 				move.l	a2,Samp2endRIGHT
 				move.b	d3,vol2right
 ; move.w #$8010,$dff000+intena
 				rts
 
-NOSTEREO:
+Aud_DoMono:
 				move.l	#0,a2
 				move.l	#-1,d5
 				move.w	#32767,d2
-				move.w	IDNUM,d0
-				lea		CHANNELDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_ChannelData_vw,a3
 				move.w	#7,d1
 				moveq	#-1,d6
 
@@ -7957,33 +7970,35 @@ FOUNDACHAN:
 
 				cmp.w	#$ffff,d0
 				bne.s	.noche
+
 				move.w	#$fffe,d0
 .noche:
 				move.w	d0,32(a3)
 				move.w	noiseloud,2(a3)
-
 				move.w	Aud_SampleNum_w,d5
-
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
 				move.l	4(a3,d5.w*8),a2
 
 				tst.b	d6
 				beq		.chan0
+
 				cmp.b	#2,d6
 				blt		.chan1
+
 				beq		.chan2
+
 				cmp.b	#4,d6
 				blt		.chan3
+
 				beq		.chan4
+
 				cmp.b	#6,d6
 				blt		.chan5
-				beq		.chan6
-				st		NoiseMade3RIGHT
 
-				move.b	d5,RIGHTPLAYEDTAB+9
-				move.b	d3,RIGHTPLAYEDTAB+1+9
-				move.b	d4,RIGHTPLAYEDTAB+2+9
+				beq		.chan6
+
+				st		NoiseMade3RIGHT
 				move.b	d4,vol3right
 				move.l	a1,pos3RIGHT
 				move.l	a2,Samp3endRIGHT
@@ -7992,9 +8007,6 @@ FOUNDACHAN:
 
 .chan3:
 				st		NoiseMade3LEFT
-				move.b	d5,LEFTPLAYEDTAB+9
-				move.b	d3,LEFTPLAYEDTAB+1+9
-				move.b	d4,LEFTPLAYEDTAB+2+9
 				move.b	d3,vol3left
 				move.l	a1,pos3LEFT
 				move.l	a2,Samp3endLEFT
@@ -8003,9 +8015,6 @@ FOUNDACHAN:
 
 .chan0:
 				st		NoiseMade0LEFT
-				move.b	d5,LEFTPLAYEDTAB
-				move.b	d3,LEFTPLAYEDTAB+1
-				move.b	d4,LEFTPLAYEDTAB+2
 				move.l	a1,pos0LEFT
 				move.l	a2,Samp0endLEFT
 				move.b	d3,vol0left
@@ -8014,9 +8023,6 @@ FOUNDACHAN:
 
 .chan1:
 				st		NoiseMade1LEFT
-				move.b	d5,LEFTPLAYEDTAB+3
-				move.b	d3,LEFTPLAYEDTAB+1+3
-				move.b	d4,LEFTPLAYEDTAB+2+3
 				move.b	d3,vol1left
 				move.l	a1,pos1LEFT
 				move.l	a2,Samp1endLEFT
@@ -8025,9 +8031,6 @@ FOUNDACHAN:
 
 .chan2:
 				st		NoiseMade2LEFT
-				move.b	d5,LEFTPLAYEDTAB+6
-				move.b	d3,LEFTPLAYEDTAB+1+6
-				move.b	d4,LEFTPLAYEDTAB+2+6
 				move.l	a1,pos2LEFT
 				move.l	a2,Samp2endLEFT
 				move.b	d3,vol2left
@@ -8036,9 +8039,6 @@ FOUNDACHAN:
 
 .chan4:
 				st		NoiseMade0RIGHT
-				move.b	d5,RIGHTPLAYEDTAB
-				move.b	d3,RIGHTPLAYEDTAB+1
-				move.b	d4,RIGHTPLAYEDTAB+2
 				move.l	a1,pos0RIGHT
 				move.l	a2,Samp0endRIGHT
 				move.b	d4,vol0right
@@ -8047,9 +8047,6 @@ FOUNDACHAN:
 
 .chan5:
 				st		NoiseMade1RIGHT
-				move.b	d5,RIGHTPLAYEDTAB+3
-				move.b	d3,RIGHTPLAYEDTAB+1+3
-				move.b	d4,RIGHTPLAYEDTAB+2+3
 				move.b	d3,vol1right
 				move.l	a1,pos1RIGHT
 				move.l	a2,Samp1endRIGHT
@@ -8058,9 +8055,6 @@ FOUNDACHAN:
 
 .chan6:
 				st		NoiseMade2RIGHT
-				move.b	d5,RIGHTPLAYEDTAB+6
-				move.b	d3,RIGHTPLAYEDTAB+1+6
-				move.b	d4,RIGHTPLAYEDTAB+2+6
 				move.l	a1,pos2RIGHT
 				move.l	a2,Samp2endRIGHT
 				move.b	d3,vol2right

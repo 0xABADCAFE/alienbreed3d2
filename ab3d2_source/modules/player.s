@@ -957,7 +957,7 @@ plr_Fall:
 				move.w	#0,Aud_NoiseX_w
 				move.w	#100,Aud_NoiseZ_w
 				move.w	#80,Aud_NoiseVol_w
-				move.w	#$fff8,IDNUM
+				move.w	#$fff8,Aud_IDNum_w
 				clr.b	notifplaying
 				jsr		MakeSomeNoise
 
@@ -1038,7 +1038,7 @@ plr_DoFootstepFX:
 				move.w	#0,Aud_NoiseX_w
 				move.w	#100,Aud_NoiseZ_w
 				move.w	#80,Aud_NoiseVol_w
-				move.w	#$fff8,IDNUM
+				move.w	#$fff8,Aud_IDNum_w
 				clr.b	notifplaying
 				move.b	PlrT_Echo_b(a0),SourceEcho
 				jsr		MakeSomeNoise

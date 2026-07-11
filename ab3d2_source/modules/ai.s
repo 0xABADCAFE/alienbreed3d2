@@ -1792,7 +1792,7 @@ ai_CheckDamage:
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
 				st		backbeat
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
 
@@ -1831,7 +1831,7 @@ ai_CheckDamage:
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
 				st		backbeat
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
 
@@ -1853,7 +1853,7 @@ ai_CheckDamage:
 				move.w	screamsound,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
 				clr.b	notifplaying
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				st		backbeat
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise

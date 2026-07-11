@@ -643,7 +643,7 @@ Plr1_CollectItem:
 
 				move.w	d0,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
 				move.w	(a0),d0
@@ -705,7 +705,7 @@ Plr2_CollectItem:
 
 				move.w	d0,Aud_SampleNum_w
 				clr.b	notifplaying
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
 				move.w	(a0),d0
@@ -1185,7 +1185,7 @@ FireAtPlayer1:
 				move.b	ALIENECHO,PlayEcho
 				move.b	SHOTPOWER,ShotT_Power_w(a5)
 				movem.l	a5/a1/a0,-(a7)
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				jsr		MakeSomeNoise
 				movem.l	(a7)+,a5/a1/a0
 
@@ -1432,7 +1432,7 @@ FireAtPlayer2:
 				move.b	d0,ShotT_Size_b(a5)
 				move.b	SHOTPOWER,ShotT_Power_w(a5)
 				movem.l	a5/a1/a0,-(a7)
-				move.w	(a0),IDNUM
+				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
 				movem.l	(a7)+,a5/a1/a0
