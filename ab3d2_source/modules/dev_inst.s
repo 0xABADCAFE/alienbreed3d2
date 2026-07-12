@@ -66,6 +66,8 @@ dev_Reserved5_w:			ds.w	1
 dev_FrameIndex_w:			ds.w	1	; frame number % DEV_GRAPH_BUFFER_SIZE
 
 
+dev_AudioCount_w:			ds.w	1
+
 ; Character buffer for printing
 dev_CharBuffer_vb:			dcb.b	64
 
@@ -271,7 +273,7 @@ Dev_PrintStats:
 
 				; Door mask
 				;lea			Zone_RenderDoorState_w,a1
-				lea			dev_Reserved1_w,a1
+				lea			Aud_Enabled_b,a1
 				lea			.dev_ss_door_mask_vb,a0
 				move.l		#24,d0
 				bsr			Dev_PrintF

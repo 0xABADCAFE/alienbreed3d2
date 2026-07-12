@@ -490,6 +490,8 @@ noload:
 				clr.b	Plr1_StoodInTop_b
 				move.l	#PLR_STAND_HEIGHT,Plr1_SnapHeight_l
 
+				; Audio is really 6 channels because hardware channel zero is
+				; reserved for the soundtrack.
 				move.l	#Aud_EmptyBuffer_vl,pos1LEFT
 				move.l	#Aud_EmptyBuffer_vl,pos2LEFT
 				move.l	#Aud_EmptyBuffer_vl,pos1RIGHT
@@ -653,7 +655,7 @@ NOCLTXT:
 ********************************************
 
 				st		Game_Running_b
-				st		dosounds
+				st		Aud_Enabled_b
 
 				jsr		AI_InitAlienWorkspace
 
@@ -3406,7 +3408,7 @@ Game_Running_b:	dc.w	0						; does main game run?
 
 endlevel:
 ; 	_break #0
-				clr.b	dosounds
+				clr.b	Aud_Enabled_b
 				clr.b	Game_Running_b
 
 				; waiting for serial transmit complete?
@@ -6801,11 +6803,8 @@ control2:
 nocontrols:
 				move.l	#$dff000,a6
 
-				tst.b	dosounds
-				beq.s	nomuckabout
-
-				cmp.b	#'4',Prefsfile+1
-				bne.s	nomuckabout
+				tst.b	Aud_Enabled_b
+				beq.s	JUSTSOUNDS
 
 				move.w	#$0,d0
 				tst.b	NoiseMade0LEFT
@@ -6831,28 +6830,14 @@ noturnoff3:
 
 				move.w	d0,dmacon(a6)
 
-nomuckabout:
 
-firenownotpressed2:
-; fire has been released.
-
-firenotpressed2
-; fire was not pressed last frame...
-
-
-dointer
 
 JUSTSOUNDS:
-				tst.b	dosounds
-				beq.s	.notthing
-
-				cmp.b	#'4',Prefsfile+1
-				beq		fourchannel
-
 				btst	#1,$dff000+intreqr
-				bne.s	newsampbitl
+				bne.s	Aud_DoPacket
 
 .notthing:
+;				DEV_INC.w AudioCount
 
 ; move.w #$f,$dff000+dmacon
 
@@ -6866,11 +6851,19 @@ JUSTSOUNDS:
 ********************************************************************
 
 
-dosounds:		dc.w	0
+Aud_Enabled_b:		dc.w	0
 
 swappedem:		dc.w	0
 
-newsampbitl:
+;
+; The main entry point for audio. Called once per interrupt, generates the next packed of audio
+; for the sound system.
+;
+; TODO - this is the place to introduce the new high-spec packet mixer
+;
+Aud_DoPacket:
+				;DEV_INC.w Reserved1
+
 				move.w	#$200,$dff000+intreq
 
 				tst.b	Aud_ChannelData_vw
@@ -6925,6 +6918,7 @@ donechan0:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -6944,9 +6938,10 @@ loop:
 
 				tst.b	swappedem
 				beq.s	.ok23
-				exg		a0,a1
-.ok23:
 
+				exg		a0,a1
+
+.ok23:
 				cmp.l	Samp0endLEFT,a0
 				blt.s	.notoffendsamp1
 				move.l	#Aud_EmptyBuffer_vl,a0
@@ -6954,8 +6949,8 @@ loop:
 				move.b	#0,vol0left
 				clr.w	Aud_LeftChannelData_vw+32
 				move.w	#0,Aud_LeftChannelData_vw+2
-.notoffendsamp1:
 
+.notoffendsamp1:
 				cmp.l	Samp2endLEFT,a1
 				blt.s	.notoffendsamp2
 				move.l	#Aud_EmptyBuffer_vl,a1
@@ -6963,27 +6958,22 @@ loop:
 				move.b	#0,vol2left
 				clr.w	Aud_LeftChannelData_vw+32+8
 				move.w	#0,Aud_LeftChannelData_vw+2+8
-.notoffendsamp2:
 
+.notoffendsamp2:
 				move.l	a0,pos0LEFT
 				move.l	a1,pos2LEFT
 
 nochannel0:
-
 				tst.b	Aud_ChannelData_vw+16
 				bne		nochannel1
 
-
 				move.l	pos0RIGHT,a0
 				move.l	pos2RIGHT,a1
-
 				move.l	Aupt1,a3
 				move.l	a3,$dff0b0
 				move.l	Auback1,Aupt1
 				move.l	a3,Auback1
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol0right,d0
@@ -6994,7 +6984,6 @@ nochannel0:
 
 ; d1 is bigger so scale d0 and use d1
 ; as audiochannel volume.
-
 				exg		a0,a1
 				asl.w	#6,d0
 				divs	d1,d0
@@ -7006,6 +6995,7 @@ nochannel0:
 fbig1:
 				tst.w	d0
 				beq.s	donechan1
+
 				asl.w	#6,d1
 				divs	d0,d1
 				lsl.w	#8,d1
@@ -7020,6 +7010,7 @@ donechan1:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop2:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -7039,39 +7030,38 @@ loop2:
 
 				tst.b	swappedem
 				beq.s	ok01
+
 				exg		a0,a1
 ok01:
-
 				cmp.l	Samp0endRIGHT,a0
 				blt.s	.notoffendsamp1
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endRIGHT
 				move.b	#0,vol0right
 				clr.w	Aud_RightChannelData_vw+32
 				move.w	#0,Aud_RightChannelData_vw+2
-.notoffendsamp1:
 
+.notoffendsamp1:
 				cmp.l	Samp2endRIGHT,a1
 				blt.s	.notoffendsamp2
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endRIGHT
 				move.b	#0,vol2right
 				clr.w	Aud_RightChannelData_vw+32+8
 				move.w	#0,Aud_RightChannelData_vw+2+8
-.notoffendsamp2:
 
+.notoffendsamp2:
 				move.l	a0,pos0RIGHT
 				move.l	a1,pos2RIGHT
 
 nochannel1:
 
 ******************* Other two channels
-
 				move.l	pos1LEFT,a0
 				move.l	pos3LEFT,a1
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol1left,d0
@@ -7101,12 +7091,10 @@ fbig2:
 				move.w	d0,$dff0d8
 
 donechan2:
-
 				move.l	Aupt2,a3
 				move.l	a3,$dff0d0
 				move.l	Auback2,Aupt2
 				move.l	a3,Auback2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -7114,6 +7102,7 @@ donechan2:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop3:											; mixing two channels, 50 * 4
 				move.l	(a0)+,d0				; this is sometimes reading past beyond the sample buffer
 				move.b	(a1)+,d1
@@ -7133,9 +7122,10 @@ loop3:											; mixing two channels, 50 * 4
 
 				tst.b	swappedem
 				beq.s	.ok23
-				exg		a0,a1
-.ok23:
 
+				exg		a0,a1
+
+.ok23:
 				cmp.l	Samp1endLEFT,a0
 				blt.s	.notoffendsamp3
 				move.l	#Aud_EmptyBuffer_vl,a0
@@ -7143,30 +7133,27 @@ loop3:											; mixing two channels, 50 * 4
 				move.b	#0,vol1left
 				clr.w	Aud_LeftChannelData_vw+32+4
 				move.w	#0,Aud_LeftChannelData_vw+2+4
-.notoffendsamp3:
 
+.notoffendsamp3:
 				cmp.l	Samp3endLEFT,a1
 				blt.s	.notoffendsamp4
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endLEFT
 				move.b	#0,vol3left
 				clr.w	Aud_LeftChannelData_vw+32+12
 				move.w	#0,Aud_LeftChannelData_vw+2+12
-.notoffendsamp4:
 
+.notoffendsamp4:
 				move.l	a0,pos1LEFT
 				move.l	a1,pos3LEFT
-
 				move.l	pos1RIGHT,a0
 				move.l	pos3RIGHT,a1
-
 				move.l	Aupt3,a3
 				move.l	a3,$dff0c0
 				move.l	Auback3,Aupt3
 				move.l	a3,Auback3
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol1right,d0
@@ -7186,13 +7173,14 @@ loop3:											; mixing two channels, 50 * 4
 fbig3:
 				tst.w	d0
 				beq.s	donechan3
+
 				asl.w	#6,d1
 				divs	d0,d1
 				lsl.w	#8,d1
 				adda.w	d1,a2
 				move.w	d0,$dff0c8
-donechan3:
 
+donechan3:
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -7200,6 +7188,7 @@ donechan3:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop4:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -7220,259 +7209,36 @@ loop4:
 				tst.b	swappedem
 				beq.s	.ok23
 				exg		a0,a1
-.ok23:
 
+.ok23:
 				cmp.l	Samp1endRIGHT,a0
 				blt.s	notoffendsamp3
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp1endRIGHT
 				move.b	#0,vol1right
 				clr.w	Aud_RightChannelData_vw+32+4
 				move.w	#0,Aud_RightChannelData_vw+2+4
-notoffendsamp3:
 
+notoffendsamp3:
 				cmp.l	Samp3endRIGHT,a1
 				blt.s	notoffendsamp4
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endRIGHT
 				move.b	#0,vol3right
 				clr.w	Aud_RightChannelData_vw+32+12
 				move.w	#0,Aud_RightChannelData_vw+2+12
-notoffendsamp4:
 
+notoffendsamp4:
 				move.l	a0,pos1RIGHT
 				move.l	a1,pos3RIGHT
 
 				GETREGS
 
 				move.w	#$820f,$dff000+dmacon
-
 				moveq	#0,d0					; VERTB interrupt needs to return Z flag set
 				rts
-
-***********************************
-* 4 channel sound routine
-***********************************
-
-fourchannel:
-
-				move.l	#$dff000,a6
-
-				tst.b	Aud_LeftChannelData_vw
-				bne.s	NoChan0sound
-
-				btst	#7,intreqrl(a6)
-				beq.s	nofinish0
-; move.w #0,Aud_LeftChannelData_vw+2
-; st Aud_LeftChannelData_vw+1
-				move.l	#Aud_Null1_vw,$a0(a6)
-				move.w	#100,$a4(a6)
-				move.w	#$0080,intreq(a6)
-
-nofinish0:
-				tst.b	NoiseMade0pLEFT
-				beq.s	NoChan0sound
-
-				move.l	Samp0endLEFT,d0
-				move.l	pos0LEFT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$a4(a6)
-				move.l	d1,$a0(a6)
-
-;				ext.l	d0
-;				divs	#100,d0 ; todo approximate?
-
-				muls	#655,d0 ; 65536/100
-				;swap	d0
-
-				DEV_INC.w Reserved1
-
-				move.l	d0,playnull0
-				move.w	#$8201,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol0left,d0
-				move.w	d0,$a8(a6)
-
-NoChan0sound:
-
-*****************************************
-*****************************************
-
-				btst	#0,intreqr(a6)
-				beq.s	nofinish1
-				move.l	#Aud_Null1_vw,$b0(a6)
-				move.w	#100,$b4(a6)
-				move.w	#$0100,intreq(a6)
-
-nofinish1:
-				tst.b	NoiseMade0pRIGHT
-				beq.s	NoChan1sound
-
-				move.l	Samp0endRIGHT,d0
-				move.l	pos0RIGHT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$b4(a6)
-				move.l	d1,$b0(a6)
-
-				;ext.l	d0
-				;divs	#100,d0
-
-				muls	#655,d0 ; 65536/100
-				;swap	d0
-
-				DEV_INC.w Reserved1
-
-				move.l	d0,playnull1
-				move.w	#$8202,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol0right,d0
-				move.w	d0,$b8(a6)
-
-NoChan1sound:
-
-*****************************************
-*****************************************
-
-				btst	#1,intreqr(a6)
-				beq.s	nofinish2
-				move.l	#Aud_Null1_vw,$c0(a6)
-				move.w	#100,$c4(a6)
-				move.w	#$0200,intreq(a6)
-nofinish2:
-
-				tst.b	NoiseMade1pRIGHT
-				beq.s	NoChan2sound
-
-				move.l	Samp1endRIGHT,d0
-				move.l	pos1RIGHT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$c4(a6)
-
-				;ext.l	d0
-				;divs	#100,d0
-
-				muls	#655,d0 ; 65536/100
-				;swap	d0
-
-				DEV_INC.w Reserved1
-
-				move.l	d0,playnull2
-
-				move.l	d1,$c0(a6)
-				move.w	#$8204,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol1right,d0
-				move.w	d0,$c8(a6)
-
-NoChan2sound:
-
-*****************************************
-*****************************************
-
-				btst	#2,intreqr(a6)
-				beq.s	nofinish3
-				move.l	#Aud_Null1_vw,$d0(a6)
-				move.w	#100,$d4(a6)
-				move.w	#$0400,intreq(a6)
-nofinish3:
-				tst.b	NoiseMade1pLEFT
-				beq.s	NoChan3sound
-
-				move.l	Samp1endLEFT,d0
-				move.l	pos1LEFT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$d4(a6)
-
-				;ext.l	d0
-				;divs	#100,d0 ; todo - approximate?
-
-				muls	#655,d0 ; 65536/100
-				;swap	d0
-
-				DEV_INC.w Reserved1
-
-				move.l	d0,playnull3
-				move.l	d1,$d0(a6)
-				move.w	#$8208,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol1left,d0
-				move.w	d0,$d8(a6)
-
-NoChan3sound:
-
-nomorechannels:
-				move.l	NoiseMade0LEFT,NoiseMade0pLEFT
-				move.l	#0,NoiseMade0LEFT
-				move.l	NoiseMade0RIGHT,NoiseMade0pRIGHT
-				move.l	#0,NoiseMade0RIGHT
-
-				tst.b	NoiseMade0pLEFT
-				bne.s	chan0still
-				tst.w	playnull0
-				beq.s	nnul0
-				sub.w	#1,playnull0
-				bra.s	chan0still
-nnul0:
-				move.w	#0,Aud_LeftChannelData_vw+2
-				clr.w	Aud_LeftChannelData_vw+32
-chan0still:
-
-				tst.b	NoiseMade0pRIGHT
-				bne.s	chan1still				;it'll never work
-				tst.w	playnull1
-				beq.s	nnul1
-				sub.w	#1,playnull1
-				bra.s	chan1still
-nnul1:
-				move.w	#0,Aud_RightChannelData_vw+2
-				clr.w	Aud_RightChannelData_vw+32
-chan1still:
-
-				tst.b	NoiseMade1pRIGHT
-				bne.s	chan2still
-				tst.w	playnull2
-				beq.s	nnul2
-				sub.w	#1,playnull2
-				bra.s	chan2still
-nnul2:
-				move.w	#0,Aud_RightChannelData_vw+2+4
-				clr.w	Aud_RightChannelData_vw+32+4
-chan2still:
-
-				tst.b	NoiseMade1pLEFT
-				bne.s	chan3still
-				tst.w	playnull3
-				beq.s	nnul3
-				sub.w	#1,playnull3
-				bra.s	chan3still
-nnul3:
-				move.w	#0,Aud_LeftChannelData_vw+2+4
-				clr.w	Aud_LeftChannelData_vw+32+4
-
-chan3still:
-				GETREGS
-
-				moveq	#0,d0					; VERTB interrupt needs to return Z flag set
-				rts
-
-backbeat:		dc.w	0
-
-; These values are word but we allocate a longword each so that we can use a multiplication to replace
-; a division and rather than relying on swapping the result, we can just write the long and read back
-; the word instead.
-
-playnull0:		dc.w	0
-				dc.w	0
-playnull1:		dc.w	0
-				dc.w	0
-playnull2:		dc.w	0
-				dc.w	0
-playnull3:		dc.w	0
-				dc.w	0
 
 Samp0endRIGHT:	dc.l	Aud_EmptyBufferEnd
 Samp1endRIGHT:	dc.l	Aud_EmptyBufferEnd
@@ -7533,12 +7299,14 @@ Aud_LeftChannelData_vw:
 				dc.l	$00000000
 				dc.l	$FF000000
 				dc.l	$FF000000
+
 Aud_RightChannelData_vw:
 				dc.l	$00000000
 				dc.l	$00000000
 				dc.l	$FF000000
 				dc.l	$FF000000
 
+; What is this set of
 				ds.l	8
 
 SourceEcho:		dc.w	0
@@ -7591,8 +7359,10 @@ MakeSomeNoise:
 				cmp.w	#$ffff,d0
 				beq.s	dontworry
 
+				; This loops over 8 channel definitions in Aud_ChannelData_vw
 				move.w	#7,d1
 				lea		Aud_ChannelData_vw,a3
+
 findsameasme:
 				tst.b	(a3)
 				bne.s	notavail
@@ -7602,6 +7372,7 @@ findsameasme:
 notavail:
 				add.w	#4,a3
 				dbra	d1,findsameasme
+
 				bra		dontworry
 SameAsMe
 ; move.w #$8010,$dff000+intena
@@ -7687,8 +7458,10 @@ notooloud:
 				divs	d0,d2
 
 				bgt.s	quietleft
+
 				add.w	d2,d4
 				bge.s	donequiet
+
 				move.w	#0,d4
 				bra.s	donequiet
 
