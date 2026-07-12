@@ -6801,45 +6801,16 @@ control2:
 .plr2_no_joystick:
 
 nocontrols:
-				move.l	#$dff000,a6
-
-				tst.b	Aud_Enabled_b
-				beq.s	JUSTSOUNDS
-
-				move.w	#$0,d0
-				tst.b	NoiseMade0LEFT
-				beq.s	noturnoff0
-				move.w	#1,d0
-noturnoff0:
-				tst.b	NoiseMade0RIGHT
-				beq.s	noturnoff1
-				or.w	#2,d0
-noturnoff1:
-				tst.b	NoiseMade1RIGHT
-				beq.s	noturnoff2
-				or.w	#4,d0
-noturnoff2:
-				tst.b	NoiseMade1LEFT
-				beq.s	noturnoff3
-				or.w	#8,d0
-noturnoff3:
-
-*********************
-				and.w	#$fffe,d0
-*********************
-
-				move.w	d0,dmacon(a6)
-
-
 
 JUSTSOUNDS:
-				btst	#1,$dff000+intreqr
+				;btst	#1,$dff000+intreqr - this only checks channel 2
+
+				; Check if any of the channel interrupts are set
+				move.w	$dff000+intreqr,d0
+				and.w 	#$0700,d0
 				bne.s	Aud_DoPacket
 
-.notthing:
-;				DEV_INC.w AudioCount
-
-; move.w #$f,$dff000+dmacon
+				DEV_INC.w AudioCount
 
 				GETREGS
 
@@ -6850,7 +6821,7 @@ JUSTSOUNDS:
 * End of VBlank code
 ********************************************************************
 
-
+; TODO - make this an actual toggle for sound replay. Right now it's basically useless.
 Aud_Enabled_b:		dc.w	0
 
 swappedem:		dc.w	0
@@ -6862,7 +6833,6 @@ swappedem:		dc.w	0
 ; TODO - this is the place to introduce the new high-spec packet mixer
 ;
 Aud_DoPacket:
-				;DEV_INC.w Reserved1
 
 				move.w	#$200,$dff000+intreq
 
@@ -6903,14 +6873,11 @@ fbig0:
 				move.w	d0,$dff0a8
 
 donechan0:
-
 				move.l	Aupt0,a3
 				move.l	a3,$dff0a0
 				move.l	Auback0,Aupt0
 				move.l	a3,Auback0
-
 				move.l	Auback0,a3
-
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -6944,6 +6911,7 @@ loop:
 .ok23:
 				cmp.l	Samp0endLEFT,a0
 				blt.s	.notoffendsamp1
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endLEFT
 				move.b	#0,vol0left
@@ -6953,6 +6921,7 @@ loop:
 .notoffendsamp1:
 				cmp.l	Samp2endLEFT,a1
 				blt.s	.notoffendsamp2
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endLEFT
 				move.b	#0,vol2left
