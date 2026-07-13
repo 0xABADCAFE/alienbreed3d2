@@ -96,7 +96,7 @@ ai_DoDie:
 				FREE_ENT	a0
 
 				move.b	#OBJ_TYPE_ALIEN,ObjT_TypeID_b(a0)
-				clr.b	ShotT_Worry_b(a0)
+				sf		ShotT_Worry_b(a0)
 				st		ai_GetOut_w
 
 .still_dying:
@@ -111,7 +111,7 @@ ai_DoDie:
 				rts
 
 ai_TakeDamage:
-				clr.b	ai_GetOut_w
+				sf		ai_GetOut_w
 				moveq	#0,d0
 				move.b	EntT_DamageTaken_b(a0),d0
 				move.l	AI_DamagePtr_l,a2
@@ -326,7 +326,7 @@ ai_ProwlRandomFlying:
 				bra		ai_ProwlFly
 
 ai_ProwlRandom:
-				clr.b	AI_FlyABit_w
+				sf		AI_FlyABit_w
 				move.l	#30*256,StepDownVal
 
 ai_ProwlFly:
@@ -571,8 +571,8 @@ ai_Widget:
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
-				clr.b	canshove
-				clr.b	GotThere
+				sf		canshove
+				sf		GotThere
 				jsr		HeadTowardsAng
 				move.w	AngRet,EntT_CurrentAngle_w(a0)
 
@@ -607,7 +607,7 @@ ai_Widget:
 				bra		.hit_something
 
 .can_move:
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				move.b	StoodInTop,ShotT_InUpperZone_b(a0)
@@ -692,14 +692,14 @@ ai_Widget:
 ***********************************************
 
 ai_ChargeToSide:
-				clr.b	AI_FlyABit_w
+				sf		AI_FlyABit_w
 				st		ai_ToSide_w
 				move.l	#30*256,StepDownVal
 				bra		ai_ChargeCommon
 
 ai_Charge:
-				clr.b	AI_FlyABit_w
-				clr.b	ai_ToSide_w
+				sf		AI_FlyABit_w
+				sf		ai_ToSide_w
 				move.l	#30*256,StepDownVal
 
 ai_ChargeCommon:
@@ -756,8 +756,8 @@ ai_ChargeCommon:
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
-				clr.b	canshove
-				clr.b	GotThere
+				sf		canshove
+				sf		GotThere
 				jsr		HeadTowardsAng
 				move.w	#%1000000000,wallflags
 
@@ -784,7 +784,7 @@ ai_ChargeCommon:
 				bra		.hit_something
 
 .can_move:
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				move.b	StoodInTop,ShotT_InUpperZone_b(a0)
@@ -858,7 +858,7 @@ ai_AttackWithGunFlying:
 				bra		ai_AttackCommon
 
 ai_AttackWithGun:
-				clr.b	AI_FlyABit_w
+				sf		AI_FlyABit_w
 
 ai_AttackCommon:
 				move.l	GLF_DatabasePtr_l,a1
@@ -1130,7 +1130,7 @@ ai_ChargeToSideFlying:
 				bra		ai_ChargeFlyingCommon
 
 ai_ChargeFlying:
-				clr.b	ai_ToSide_w
+				sf		ai_ToSide_w
 				st		AI_FlyABit_w
 				move.l	#1000*256,StepDownVal
 
@@ -1193,8 +1193,8 @@ ai_ChargeFlyingCommon:
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
-				clr.b	canshove
-				clr.b	GotThere
+				sf		canshove
+				sf		GotThere
 				jsr		HeadTowardsAng
 				move.w	#%1000000000,wallflags
 
@@ -1221,7 +1221,7 @@ ai_ChargeFlyingCommon:
 				bra		.hit_something
 
 .can_move:
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				move.b	StoodInTop,ShotT_InUpperZone_b(a0)
@@ -1336,15 +1336,15 @@ ai_PauseBriefly:
 
 
 ai_Approach:
-				clr.b	AI_FlyABit_w
+				sf		AI_FlyABit_w
 				move.l	#30*256,StepDownVal
-				clr.b	ai_ToSide_w
+				sf		ai_ToSide_w
 				bra		ai_ApproachCommon
 
 ai_ApproachFlying:
 				st		AI_FlyABit_w
 				move.l	#1000*256,StepDownVal
-				clr.b	ai_ToSide_w
+				sf		ai_ToSide_w
 				bra		ai_ApproachCommon
 
 ai_ApproachToSideFlying:
@@ -1355,7 +1355,7 @@ ai_ApproachToSideFlying:
 
 ai_ApproachToSide:
 				st		ai_ToSide_w
-				clr.b	AI_FlyABit_w
+				sf		AI_FlyABit_w
 				move.l	#30*256,StepDownVal
 
 ai_ApproachCommon:
@@ -1422,8 +1422,8 @@ ai_ApproachCommon:
 
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				movem.l	d0/a0/a1/a3/a4/d7,-(a7)
-				clr.b	canshove
-				clr.b	GotThere
+				sf		canshove
+				sf		GotThere
 				jsr		HeadTowardsAng
 				move.w	#%1000000000,wallflags
 
@@ -1450,7 +1450,7 @@ ai_ApproachCommon:
 				bra		.hit_something
 
 .can_move:
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 				movem.l	(a7)+,d0/a0/a1/a3/a4/d7
 				move.b	StoodInTop,ShotT_InUpperZone_b(a0)
@@ -1685,7 +1685,7 @@ ai_CheckForDark:
 
 ai_CheckInFront:
 
-; clr.b ObjT_SeePlayer_b(a0)
+; sf	 ObjT_SeePlayer_b(a0)
 ; rts
 
 				move.w	(a0),d0
@@ -1712,8 +1712,8 @@ ai_CheckInFront:
 				rts
 
 AI_LookForPlayer1:
-				clr.b	ObjT_SeePlayer_b(a0)
-				clr.b	CanSee
+				sf		ObjT_SeePlayer_b(a0)
+				sf		CanSee
 				move.b	ShotT_InUpperZone_b(a0),Obj_ViewerInUpperZone_b
 				move.b	Plr1_StoodInTop_b,Obj_TargetInUpperZone_b
 				move.l	Plr1_ZonePtr_l,Obj_ToZonePtr_l
@@ -1790,7 +1790,7 @@ ai_CheckDamage:
 				move.w	#400,Aud_NoiseVol_w
 				move.w	#14,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
@@ -1828,7 +1828,7 @@ ai_CheckDamage:
 				move.w	#200,Aud_NoiseVol_w
 				move.w	screamsound,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
@@ -1840,7 +1840,7 @@ ai_CheckDamage:
 				rts
 
 .not_dead_yet:
-				clr.b	EntT_DamageTaken_b(a0)
+				sf		EntT_DamageTaken_b(a0)
 
 				SAVEREGS
 
@@ -1850,7 +1850,7 @@ ai_CheckDamage:
 				move.w	#200,Aud_NoiseVol_w
 				move.w	screamsound,Aud_SampleNum_w
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.b	ALIENECHO,PlayEcho
 				jsr		MakeSomeNoise
@@ -1910,9 +1910,9 @@ ai_DoAttackAnim:
 				muls	#A_FrameLen,d1
 				st		1(a5)
 				move.b	(a5),ai_DoAction_b
-				clr.b	(a5)
+				sf		(a5)
 				move.b	3(a5),ai_FinishedAnim_b
-				clr.b	3(a5)
+				sf		3(a5)
 				move.l	#0,8(a0)
 				move.b	(a6,d1.w),9(a0)
 				move.b	1(a6,d1.w),d0
@@ -2031,7 +2031,7 @@ ai_CheckAttackOnGround:
 				beq.s	.attack_player
 
 .dont_attack_player:
-				clr.b	d0
+				sf		d0
 				rts
 
 .attack_player:

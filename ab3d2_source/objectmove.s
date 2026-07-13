@@ -12,7 +12,7 @@ MoveObject:
 				move.l	Obj_ZonePtr_l,obj_ZoneBackupPtr_l
 				move.w	#50,obj_QuitLimit_w
 				move.l	#Obj_RoomPath_vw,obj_RoomPathPtr_l
-				clr.b	hitwall
+				sf		hitwall
 				move.w	Obj_NewX_w,d0
 				sub.w	Obj_OldX_w,d0
 				move.w	d0,Obj_XDiff_w
@@ -694,7 +694,7 @@ CheckMoreFloorLines:
 				tst.w	EdgeT_JoinZone_w(a2)
 				blt.s	CheckMoreFloorLines
 
-				;clr.b	CrossIntoTop
+				;sf		CrossIntoTop
 
 				moveq	#0,d1
 				move.w	EdgeT_JoinZone_w(a2),d1
@@ -1219,7 +1219,7 @@ CheckHit:
 ONLYSEE:		dc.w	0
 
 GetNextCPt:
-				clr.b	ONLYSEE
+				sf		ONLYSEE
 				cmp.w	d0,d1
 				beq.s	noneedforhassle
 
@@ -1269,7 +1269,7 @@ CanItBeSeenAng:
 				sub.l	d3,d2
 				bgt.s	ItMightBeSeen
 
-				clr.b	CanSee
+				sf		CanSee
 
 				GETREGS
 				rts
@@ -1489,7 +1489,7 @@ madeit:
 				move.w	EdgeT_JoinZone_w(a2),d3
 				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d3.w*4),a5
-				clr.b	d2
+				sf		d2
 				cmp.l	ZoneT_Floor_l(a5),d5
 				bgt		outlist
 
@@ -1519,7 +1519,7 @@ clipstocheck:	dc.l	0
 donessomething:	dc.w	0
 
 outlist:
-				clr.b	CanSee
+				sf		CanSee
 
 				GETREGS
 
@@ -1600,7 +1600,7 @@ FindCollisionPt:
 
 				move.l	Lvl_ZonePtrsPtr_l,a3
 				move.l	(a3,d3.w*4),a5
-				clr.b	d2
+				sf		d2
 				cmp.l	ZoneT_Floor_l(a5),d5
 				bgt		foundpt
 
@@ -1681,7 +1681,7 @@ Obj_DoCollision:
 				add.l	thingheight,d5
 				asr.l	#7,d4
 				asr.l	#7,d5
-				clr.b	hitwall
+				sf		hitwall
 
 .check_collide:
 				NEXT_OBJ	a0
@@ -1795,7 +1795,7 @@ OKTEL:			dc.w	0
 floortemp:		dc.l	0
 
 CheckTeleport:
-				clr.b	OKTEL
+				sf		OKTEL
 				move.w	FromZone,d0
 				move.l	Lvl_ZonePtrsPtr_l,a2
 				move.l	(a2,d0.w*4),a2
@@ -1875,7 +1875,7 @@ FindCloseRoom:
 
 				SAVEREGS
 
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 
 				GETREGS
@@ -1898,7 +1898,7 @@ putinmore:
 
 				SAVEREGS
 
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				jsr		MoveObject
 
 				GETREGS

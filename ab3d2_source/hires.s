@@ -131,23 +131,23 @@ _startup:
 
 				; init default control method
 				IFNE	CD32VER
-				clr.b	Plr1_Keys_b
-				clr.b	Plr1_Path_b
-				clr.b	Plr1_Mouse_b
+				sf		Plr1_Keys_b
+				sf		Plr1_Path_b
+				sf		Plr1_Mouse_b
 				st		Plr1_Joystick_b
-				clr.b	Plr2_Keys_b
-				clr.b	Plr2_Path_b
-				clr.b	Plr2_Mouse_b
+				sf		Plr2_Keys_b
+				sf		Plr2_Path_b
+				sf		Plr2_Mouse_b
 				st		Plr2_Joystick_b
 				ELSE
-				clr.b	Plr1_Keys_b
-				clr.b	Plr1_Path_b
+				sf		Plr1_Keys_b
+				sf		Plr1_Path_b
 				st		Plr1_Mouse_b
-				clr.b	Plr1_Joystick_b
-				clr.b	Plr2_Keys_b
-				clr.b	Plr2_Path_b
+				sf		Plr1_Joystick_b
+				sf		Plr2_Keys_b
+				sf		Plr2_Path_b
 				st		Plr2_Mouse_b
-				clr.b	Plr2_Joystick_b
+				sf		Plr2_Joystick_b
 				ENDC
 
 				; Setup constant table
@@ -487,7 +487,7 @@ noload:
 				movem.l	(sp)+,d0/d1/a0/a1
 
 .noclips:
-				clr.b	Plr1_StoodInTop_b
+				sf		Plr1_StoodInTop_b
 				move.l	#PLR_STAND_HEIGHT,Plr1_SnapHeight_l
 
 				; Audio is really 6 channels because hardware channel zero is
@@ -540,7 +540,7 @@ noload:
 				tst.l	d0
 				beq.s	.tryAgain
 
-				clr.b	Vid_WaitForDisplayMsg_b
+				sf		Vid_WaitForDisplayMsg_b
 
 .skipChangeScreen:
 				jsr		Plr_Initialise
@@ -603,10 +603,10 @@ scaledownlop:
 				move.w	#%111111111111,Conditions
 .nokeys:
 				move.l	#KeyMap_vb,a5
-				clr.b	RAWKEY_ESC(a5)
+				sf		RAWKEY_ESC(a5)
 
 				move.l	Lvl_MusicPtr_l,mt_data
-				clr.b	UseAllChannels
+				sf		UseAllChannels
 
 ; cmp.b #'b',Prefsfile+3
 ; bne.s .noback
@@ -632,7 +632,7 @@ scaledownlop:
 
 				CALLC	Sys_ClearKeyboard
 
-				clr.b	Game_MasterQuit_b
+				sf		Game_MasterQuit_b
 
 				cmp.b	#PLR_SINGLE,Plr_MultiplayerType_b
 				seq		Game_SlaveQuit_b
@@ -643,10 +643,10 @@ scaledownlop:
 
 NOCLTXT:
 				;FIXME: need to load the game palette here?
-				clr.b	Plr1_Ducked_b
-				clr.b	Plr2_Ducked_b
-				clr.b	plr1_TmpDucked_b
-				clr.b	plr2_TmpDucked_b
+				sf		Plr1_Ducked_b
+				sf		Plr2_Ducked_b
+				sf		plr1_TmpDucked_b
+				sf		plr2_TmpDucked_b
 
 ********************************************
 
@@ -728,7 +728,7 @@ NOALLWALLS:
 				move.w	#SMALL_WIDTH,Vid_RightX_w
 				move.w	#SMALL_HEIGHT,Vid_BottomY_w
 				move.w	#SMALL_HEIGHT/2,TOTHEMIDDLE
-				clr.b	Vid_FullScreen_b
+				sf		Vid_FullScreen_b
 				CALLC	Draw_ResetGameDisplay
 
 				st		Plr1_Weapons_vb+1
@@ -764,13 +764,13 @@ CLRDAM:
 				lea		Sys_PrevFrameTimeECV_q,a0
 				CALLC 	Sys_MarkTime
 
-				clr.b	Plr2_Fire_b
-				clr.b	Plr2_TmpFire_b
-				clr.b	Plr2_Used_b
-				clr.b	Plr2_TmpSpcTap_b
+				sf		Plr2_Fire_b
+				sf		Plr2_TmpFire_b
+				sf		Plr2_Used_b
+				sf		Plr2_TmpSpcTap_b
 
-				clr.b	plr1_Dead_b
-				clr.b	plr2_Dead_b
+				sf		plr1_Dead_b
+				sf		plr2_Dead_b
 
 				move.l	Plr1_ObjectPtr_l,a0
 				move.l	Plr2_ObjectPtr_l,a1
@@ -931,7 +931,7 @@ game_main_loop:
 				bne		.nopause
 				tst.b	RAWKEY_P(a5)
 				beq.s	.nopause
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 .waitrel:
 				tst.b	Plr1_Joystick_b
@@ -968,7 +968,7 @@ nofadedownhc:
 				move.b	Game_SlavePaused_b,d0
 				or.b	Game_MasterPaused_b,d0
 				beq.s	.nopause
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 				move.l	#KeyMap_vb,a5
 .waitrel:
@@ -1000,8 +1000,8 @@ nofadedownhc:
 				jsr		RECFIRST
 
 .masfirst:
-				clr.b	Game_SlavePaused_b
-				clr.b	Game_MasterPaused_b
+				sf		Game_SlavePaused_b
+				sf		Game_MasterPaused_b
 				st		Game_Running_b
 
 .nopause:
@@ -1090,7 +1090,7 @@ waitmaster:
 				bra.s	.screenSwapDone
 
 .failed:
-				clr.b	Vid_WaitForDisplayMsg_b		; last attempt failed, so don't wait for next message
+				sf		Vid_WaitForDisplayMsg_b		; last attempt failed, so don't wait for next message
 
 .screenSwapDone:
 				CALLC	Sys_FrameLap
@@ -1165,9 +1165,9 @@ okwat:
 				move.w	Plr1_Bobble_w,plr1_TmpBobble_w
 				move.b	Plr1_Clicked_b,Plr1_TmpClicked_b
 				move.b	Plr1_Fire_b,Plr1_TmpFire_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Clicked_b
 				move.b	Plr1_Used_b,Plr1_TmpSpcTap_b
-				clr.b	Plr1_Used_b
+				sf		Plr1_Used_b
 				move.b	Plr1_Ducked_b,plr1_TmpDucked_b
 				move.b	Plr1_GunSelected_b,Plr1_TmpGunSelected_b
 
@@ -1228,10 +1228,10 @@ NotOnePlayer:
 				move.w	Plr1_SnapAngPos_w,Plr1_TmpAngPos_w
 				move.w	Plr1_Bobble_w,plr1_TmpBobble_w
 				move.b	Plr1_Clicked_b,Plr1_TmpClicked_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Clicked_b
 				move.b	Plr1_Fire_b,Plr1_TmpFire_b
 				move.b	Plr1_Used_b,Plr1_TmpSpcTap_b
-				clr.b	Plr1_Used_b
+				sf		Plr1_Used_b
 				move.b	Plr1_Ducked_b,plr1_TmpDucked_b
 				move.b	Plr1_GunSelected_b,Plr1_TmpGunSelected_b
 
@@ -1344,10 +1344,10 @@ ASlaveShouldWaitOnHisMaster:
 				move.w	Plr2_SnapAngPos_w,Plr2_TmpAngPos_w
 				move.w	Plr2_Bobble_w,plr2_TmpBobble_w
 				move.b	Plr2_Clicked_b,Plr2_TmpClicked_b
-				clr.b	Plr2_Clicked_b
+				sf		Plr2_Clicked_b
 				move.b	Plr2_Fire_b,Plr2_TmpFire_b
 				move.b	Plr2_Used_b,Plr2_TmpSpcTap_b
-				clr.b	Plr2_Used_b
+				sf		Plr2_Used_b
 				move.b	Plr2_Ducked_b,plr2_TmpDucked_b
 				move.b	Plr2_GunSelected_b,Plr2_TmpGunSelected_b
 
@@ -1749,7 +1749,7 @@ IWasPlayer1:
 ; move.w #0,draw_TopClip_w
 ; move.w #Vid_BottomY_w/2,draw_BottomClip_w
 ;
-; clr.b DOANYWATER
+; sf	 DOANYWATER
 ;
 ; bsr DrawDisplay
 ;
@@ -1843,18 +1843,18 @@ nodrawp2:
 
 .nomap:
 				;move.b	plr1_Teleported_b,d5
-				;clr.b	plr1_Teleported_b
+				;sf		plr1_Teleported_b
 				;cmp.b	#PLR_SLAVE,Plr_MultiplayerType_b
 				;bne.s	.notplr2
 				;move.b	plr2_Teleported_b,d5
-				;clr.b	plr2_Teleported_b
+				;sf		plr2_Teleported_b
 
 				move.b	plr1_Teleported_b,d5
 				or.b	plr2_Teleported_b,d5
 				move.b	d5,C2P_Teleporting_b
 				or.b	d5,C2P_NeedsInit_b ; trigger reinit
-				clr.b	plr1_Teleported_b
-				clr.b	plr1_Teleported_b
+				sf		plr1_Teleported_b
+				sf		plr1_Teleported_b
 
 .notplr2:
 				;tst.b Plr1_Mouse_b
@@ -1925,7 +1925,7 @@ nodrawp2:
 
 ;				tst.b	RAWKEY_F9(a5)
 ;				beq.s	.skip_resolution_cycle
-;				clr.b	RAWKEY_F9(a5)
+;				sf		RAWKEY_F9(a5)
 ;				addq.b	#1,Vid_ResolutionOption_b
 ;
 ;				btst.b	#0,Vid_ResolutionOption_b
@@ -1948,7 +1948,7 @@ nodrawp2:
 
 				tst.b	RAWKEY_F9(a5)
 				beq		.skip_double_height
-				clr.b	RAWKEY_F9(a5)
+				sf		RAWKEY_F9(a5)
 				tst.b	LASTDH
 				bne		.not_double_height
 				st		LASTDH
@@ -1966,13 +1966,13 @@ nodrawp2:
 				bra.s	.not_double_height
 
 .skip_double_height:
-				clr.b	LASTDH
+				sf		LASTDH
 
 .not_double_height:
 				; Hijacking this for the simple wall test
 				tst.b	RAWKEY_F8(a5)
 				beq.s	.skip_double_width
-				clr.b	RAWKEY_F8(a5)
+				sf		RAWKEY_F8(a5)
 				tst.b	LASTDW
 				bne		.not_double_width
 
@@ -1984,7 +1984,7 @@ nodrawp2:
 				bra.s	.not_double_width
 
 .skip_double_width:
-				clr.b	LASTDW
+				sf		LASTDW
 
 .not_double_width:
 
@@ -2311,7 +2311,7 @@ Plr1_Use:
 
 				move.w	#$fffa,Aud_IDNum_w
 				move.w	#19,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#0,Aud_NoiseX_w
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#60,Aud_NoiseVol_w
@@ -2579,7 +2579,7 @@ Plr2_Use:
 				SAVEREGS
 
 				move.w	#19,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffa,Aud_IDNum_w
 				move.w	#0,Aud_NoiseX_w
 				move.w	#0,Aud_NoiseZ_w
@@ -2971,8 +2971,8 @@ Plr1_Control:
 				move.w	#40,Obj_ExtLen_w
 				move.b	#0,Obj_AwayFromWall_b
 
-				clr.b	exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		exitfirst
+				sf		Obj_WallBounce_b
 				bsr		MoveObject
 
 				move.b	StoodInTop,Plr1_StoodInTop_b
@@ -3165,8 +3165,8 @@ Plr2_Control:
 .nothitanything:
 				move.w	#40,Obj_ExtLen_w
 				move.b	#0,Obj_AwayFromWall_b
-				clr.b	exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		exitfirst
+				sf		Obj_WallBounce_b
 				bsr		MoveObject
 
 				move.b	StoodInTop,Plr2_StoodInTop_b
@@ -3214,7 +3214,7 @@ DONTDOGUN:
 
 				include "modules/draw/draw_zone_graph.s"
 DrawDisplay:
-				clr.b	fillscrnwater
+				sf		fillscrnwater
 
 				; bigsine is 16kb = 8192 words for 4pi (720deg)
 				; --> 4096 words per 2pi
@@ -3408,8 +3408,8 @@ Game_Running_b:	dc.w	0						; does main game run?
 
 endlevel:
 ; 	_break #0
-				clr.b	Aud_Enabled_b
-				clr.b	Game_Running_b
+				sf		Aud_Enabled_b
+				sf		Game_Running_b
 
 				; waiting for serial transmit complete?
 ;waitfortop22:
@@ -3443,7 +3443,7 @@ endlevel:
 
 				move.l	#gameover,mt_data
 				st		UseAllChannels
-				clr.b	reachedend
+				sf		reachedend
 				jsr		mt_init
 
 playgameover:
@@ -3471,7 +3471,7 @@ wevewon:
 .nonextlev:
 				move.l	#welldone,mt_data
 				st		UseAllChannels
-				clr.b	reachedend
+				sf		reachedend
 
 				jsr		mt_init
 playwelldone:
@@ -3500,7 +3500,7 @@ wevelost:
 				jmp		closeeverything
 
 endnomusic:
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 
 				jmp		closeeverything
@@ -3519,7 +3519,7 @@ across:
 
 ENDGAMESCROLL:
 				move.l	Lvl_MusicPtr_l,mt_data
-				clr.b	UseAllChannels
+				sf		UseAllChannels
 				jsr		mt_init
 
 ;				move.w	#$fff,MIXCOLL
@@ -3737,7 +3737,7 @@ notbelow:
 				moveq	#0,d4					; some points left to left clip
 				moveq	#0,d5					; some points fully between left and right clip
 				moveq	#0,d6					; some points right of right clip
-				clr.b	anyclipping				; some clipping will be necessary?
+				sf		anyclipping				; some clipping will be necessary?
 
 
 cornerprocessloop: ;	figure					out if any left/right clipping is necessary
@@ -5013,7 +5013,7 @@ noclipleftGOUR:
 				muls	d3,d6
 				add.w	#256*4,d6
 				asr.w	#2,d6
-				clr.b	d6
+				sf		d6
 				add.w	leftbright,d6
 				bge.s	.oklbnn
 				moveq	#0,d6
@@ -5675,7 +5675,7 @@ draw_WaterSurface:
 				move.l	draw_Distance_l,d0
 
 ;				asr.l	#2,d0 ; 0xABADCAFE - this seems to affect the opacity
-				;clr.b	d0
+				;sf		d0
 
 				and.l	#$3f00,d0
 
@@ -5763,7 +5763,7 @@ draw_WaterSurfaceDouble:
 				add.l	#256*16,a1
 				move.l	draw_Distance_l,d0
 				asr.l	#2,d0
-				clr.b	d0
+				sf		d0
 
 				add.w	d0,d0
 				cmp.w	#9*512,d0
@@ -5890,7 +5890,7 @@ key_interrupt:
 ;		beq	.key_cont
 
 				move.b	$bfec01,d0
-				clr.b	$bfec01
+				sf		$bfec01
 
 				tst.b	d0
 				beq		.key_cont
@@ -6127,7 +6127,7 @@ NOSIDES2:
 
 				subq	#1,d0
 				move.w	d0,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
@@ -6375,7 +6375,7 @@ pastster:
 				bra		notogglesound2
 
 notogglesound:
-				clr.b	lasttogsound
+				sf		lasttogsound
 
 notogglesound2:
 				tst.b	RAWKEY_F4(a5)
@@ -6406,7 +6406,7 @@ pastlighttext:
 				bra		nolighttoggle2
 
 nolighttoggle:
-				clr.b	OLDLTOG
+				sf		OLDLTOG
 
 nolighttoggle2:
 				tst.b	draw_RenderMap_b
@@ -6436,12 +6436,12 @@ nolighttoggle2:
 				bra		.nogood2
 
 .nogood:
-				clr.b	OLDGOOD
+				sf		OLDGOOD
 
 .nogood2:
 				tst.b	RAWKEY_TAB(a5)
 				bne.s	.tabprsd
-				clr.b	tabheld
+				sf		tabheld
 				bra.s	.noswitch
 
 .tabprsd:
@@ -6523,7 +6523,7 @@ justshake:
 
 				tst.b	oktodisplay
 				beq		dontshowtime
-				clr.b	oktodisplay
+				sf		oktodisplay
 				subq.w	#1,dispco
 				bgt		dontshowtime
 				move.w	#10,dispco
@@ -6620,8 +6620,8 @@ nostartalan:
 
 				FREE_OBJ_2	a0,ENT_NEXT_2
 
-				clr.b	Plr1_Fire_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Fire_b
+				sf		Plr1_Clicked_b
 				move.w	#0,Plr_AddToBobble_w
 				move.l	#PLR_CROUCH_HEIGHT,Plr1_SnapHeight_l
 				move.w	View_LookMax_w,d0					; Is this related to render buffer height
@@ -6711,7 +6711,7 @@ control2:
 
 				FREE_OBJ_2	a0,ENT_NEXT_2
 
-				clr.b	Plr2_Fire_b
+				sf		Plr2_Fire_b
 				move.w	#0,Plr_AddToBobble_w
 				move.l	#PLR_CROUCH_HEIGHT,Plr2_SnapHeight_l
 				move.w	View_LookMax_w,d0
@@ -6803,14 +6803,18 @@ control2:
 nocontrols:
 
 JUSTSOUNDS:
-				;btst	#1,$dff000+intreqr - this only checks channel 2
+				tst.b	Aud_Enabled_b
+				beq.s	.skip
+
+				; otherwise check if we have a pending interrupt
+				btst	#1,$dff000+intreqr ; this only checks channel 2 ?
 
 				; Check if any of the channel interrupts are set
-				move.w	$dff000+intreqr,d0
-				and.w 	#$0700,d0
+				;move.w	$dff000+intreqr,d0
+				;and.w 	#$0700,d0
 				bne.s	Aud_DoPacket
 
-				DEV_INC.w AudioCount
+.skip:
 
 				GETREGS
 
@@ -6821,7 +6825,7 @@ JUSTSOUNDS:
 * End of VBlank code
 ********************************************************************
 
-; TODO - make this an actual toggle for sound replay. Right now it's basically useless.
+; This regulates when the sound mixer is active, turned off when the end music plays.
 Aud_Enabled_b:		dc.w	0
 
 swappedem:		dc.w	0
@@ -8056,7 +8060,7 @@ STOPCOUNT:
 okcount:
 				add.l	d0,TimeCount
 				addq.l	#1,NumTimes
-				clr.b	counting
+				sf		counting
 				move.l	(a7)+,d0
 				rts
 
@@ -8071,7 +8075,7 @@ STOPCOUNTNOADD:
 				add.l	#313*256,d0
 okcount2:
 				add.l	d0,TimeCount
-				clr.b	counting
+				sf		counting
 				move.l	(a7)+,d0
 				rts
 

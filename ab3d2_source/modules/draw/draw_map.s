@@ -22,14 +22,14 @@ DoTheMapWotNastyCharlesIsForcingMeToDo:
 				tst.b	RAWKEY_NUM_ENTER(a5)
 				beq.s	.skip_render_toggle
 
-				clr.b	RAWKEY_NUM_ENTER(a5)
+				sf		RAWKEY_NUM_ENTER(a5)
 				not.b	Draw_MapTransparent_b
 
 .skip_render_toggle:
 				tst.b	RAWKEY_F1(a5)			; Zoom In
 				beq.s	.skip_zoom_in
 
-				clr.b	RAWKEY_F1(a5)
+				sf		RAWKEY_F1(a5)
 
 				tst.w	Draw_MapZoomLevel_w
 				beq.s	.skip_zoom_in
@@ -40,7 +40,7 @@ DoTheMapWotNastyCharlesIsForcingMeToDo:
 				tst.b	RAWKEY_F2(a5)			; Zoom Out
 				beq.s	.skip_zoom_out
 
-				clr.b	RAWKEY_F2(a5)
+				sf		RAWKEY_F2(a5)
 
 				cmp.w	#7,Draw_MapZoomLevel_w
 				bge.s	.skip_zoom_out

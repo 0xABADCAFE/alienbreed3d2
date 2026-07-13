@@ -172,7 +172,7 @@ Collectable:
 				tst.w	d0
 				beq.s	.NotCollected1
 				move.w	#-1,ObjT_ZoneID_w(a0)
-				clr.b	ShotT_Worry_b(a0)
+				sf		ShotT_Worry_b(a0)
 
 .NotCollected1:
 				cmp.b	#PLR_SINGLE,Plr_MultiplayerType_b
@@ -189,7 +189,7 @@ Collectable:
 
 				; todo - is this what is removing the item?
 				move.w	#-1,ObjT_ZoneID_w(a0)
-				clr.b	ShotT_Worry_b(a0)
+				sf		ShotT_Worry_b(a0)
 
 .NotCollected2:
 				rts
@@ -343,7 +343,7 @@ ACTIVATED:
 
 .DEACTIVATE:
 				move.w	#0,EntT_Timer1_w(a0)
-				clr.b	EntT_WhichAnim_b(a0)
+				sf		EntT_WhichAnim_b(a0)
 				rts
 
 .NotDeactivated1:
@@ -361,7 +361,7 @@ ACTIVATED:
 ; within range of the object.
 
 				move.w	#0,EntT_Timer1_w(a0)
-				clr.b	EntT_WhichAnim_b(a0)
+				sf		EntT_WhichAnim_b(a0)
 				rts
 
 .NotDeactivated2:
@@ -642,7 +642,7 @@ Plr1_CollectItem:
 				SAVEREGS
 
 				move.w	d0,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
@@ -704,7 +704,7 @@ Plr2_CollectItem:
 				SAVEREGS
 
 				move.w	d0,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
@@ -718,7 +718,7 @@ Plr2_CollectItem:
 
 .nosoundmake:
 				moveq	#1,d0 ; we collected the item
-				clr.b	ShotT_Worry_b(a0) ; why ?
+				sf		ShotT_Worry_b(a0) ; why ?
 
 .no_collect:
 				rts
@@ -1178,7 +1178,7 @@ FireAtPlayer1:
 				move.l	(a6),Aud_NoiseX_w
 				move.w	#100,Aud_NoiseVol_w
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.b	SHOTTYPE,d0
 				move.w	#0,ShotT_Lifetime_w(a5)
 				move.b	d0,ShotT_Size_b(a5)
@@ -1426,7 +1426,7 @@ FireAtPlayer2:
 				move.l	(a6),Aud_NoiseX_w
 				move.w	#100,Aud_NoiseVol_w
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.b	SHOTPOWER,d0
 				move.w	#0,ShotT_Lifetime_w(a5)
 				move.b	d0,ShotT_Size_b(a5)

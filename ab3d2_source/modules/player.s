@@ -219,7 +219,7 @@ plr_KeyboardControl:
 				bra.s	.no_next_weapon
 
 .no_next_weapon_pre:
-				clr.b	plr_PrevNextWeaponKeyState_b
+				sf		plr_PrevNextWeaponKeyState_b
 
 .no_next_weapon:
 				move.b	operate_key,d7
@@ -237,7 +237,7 @@ plr_KeyboardControl:
 				tst.b	(a5,d7.w)
 				beq.s	.notduck
 
-				clr.b	(a5,d7.w)
+				sf		(a5,d7.w)
 				move.l	#PLR_STAND_HEIGHT,PlrT_SnapTargHeight_l(a0)
 				not.b	PlrT_Ducked_b(a0)
 				beq.s	.notduck
@@ -255,7 +255,7 @@ plr_KeyboardControl:
 				sub.l	ZoneT_UpperRoof_l(a4),d0
 
 .use_bottom:
-				clr.b	PlrT_Squished_b(a0)
+				sf		PlrT_Squished_b(a0)
 				move.l	#PLR_STAND_HEIGHT,PlrT_SnapSquishedHeight_l(a0)
 				cmp.l	#PLR_STAND_HEIGHT+3*1024,d0
 				bgt.s	.oktostand
@@ -286,7 +286,7 @@ plr_KeyboardControl:
 				tst.b	RAWKEY_K(a5)
 				beq.s	.notselkey
 
-				clr.b	RAWKEY_K(a5)
+				sf		RAWKEY_K(a5)
 
 				st		PlrT_InvMouse_b(a0) ; hack for when mouse is re-selected
 
@@ -297,9 +297,9 @@ plr_KeyboardControl:
 
 				move.l	(sp)+,a0
 				st		PlrT_Keys_b(a0)
-				clr.b	PlrT_Path_b(a0)
-				clr.b	PlrT_Mouse_b(a0)
-				clr.b	PlrT_Joystick_b(a0)
+				sf		PlrT_Path_b(a0)
+				sf		PlrT_Mouse_b(a0)
+				sf		PlrT_Joystick_b(a0)
 
 .notselkey:
 				tst.b	RAWKEY_J(a5)
@@ -307,10 +307,10 @@ plr_KeyboardControl:
 
 				st		PlrT_InvMouse_b(a0) ; hack for when mouse is re-selected
 
-				clr.b	RAWKEY_J(a5)
-				clr.b	PlrT_Keys_b(a0)
-				clr.b	PlrT_Path_b(a0)
-				clr.b	PlrT_Mouse_b(a0)
+				sf		RAWKEY_J(a5)
+				sf		PlrT_Keys_b(a0)
+				sf		PlrT_Path_b(a0)
+				sf		PlrT_Mouse_b(a0)
 				st		PlrT_Joystick_b(a0)
 
 				move.l	a0,-(sp)
@@ -324,11 +324,11 @@ plr_KeyboardControl:
 				tst.b	RAWKEY_M(a5)
 				beq.s	.notselmouse
 
-				clr.b	RAWKEY_M(a5)
-				clr.b	PlrT_Keys_b(a0)
-				clr.b	PlrT_Path_b(a0)
+				sf		RAWKEY_M(a5)
+				sf		PlrT_Keys_b(a0)
+				sf		PlrT_Path_b(a0)
 				st		PlrT_Mouse_b(a0)
-				clr.b	PlrT_Joystick_b(a0)
+				sf		PlrT_Joystick_b(a0)
 				eor.b	#-1,PlrT_InvMouse_b(a0)
 				beq.s	.mouse_normal
 
@@ -395,13 +395,13 @@ plr_KeyboardControl:
 				bra.s	.notswapscr2
 
 .notswapscr:
-				clr.b	lastscr
+				sf		lastscr
 
 .notswapscr2:
 				tst.b	RAWKEY_F7(a5)
 				beq.s	.noframelimit
 
-				clr.b	RAWKEY_F7(a5)
+				sf		RAWKEY_F7(a5)
 				cmp.w	#5,Sys_FPSLimit_w
 				beq.s	.resetfpslimit
 
@@ -417,7 +417,7 @@ plr_KeyboardControl:
 				beq.b   .done_normal_keys
 				add.b   #1,Prefs_CrossHairColour_b
 				and.b   #7,Prefs_CrossHairColour_b
-				clr.b   RAWKEY_NUM_DOT(a5)
+				sf	   RAWKEY_NUM_DOT(a5)
 
 .done_normal_keys:
 				IFD DEV
@@ -427,7 +427,7 @@ plr_KeyboardControl:
 				tst.b			RAWKEY_X(a5)
 				beq.s			.clear_zone_data
 
-				clr.b			RAWKEY_X(a5)
+				sf				RAWKEY_X(a5)
 				lea				Zone_BackdropDisable_vb,a1
 				move.w			PlrT_Zone_w(a0),d0
 				move.w          d0,d1
@@ -439,7 +439,7 @@ plr_KeyboardControl:
 				tst.b			RAWKEY_Z(a5)
 				beq.s			.dev_toggles
 
-				clr.b			RAWKEY_Z(a5)
+				sf				RAWKEY_Z(a5)
 
 				move.w			#ZONE_BACKDROP_DISABLE_SIZE/16-1,d0
 				lea				Zone_BackdropDisable_vb,a1
@@ -521,7 +521,7 @@ plr_KeyboardControl:
 				bra.s	.skip_centre_look_2
 
 .skip_centre_look:
-				clr.b	Plr_OldCentre_b
+				sf		Plr_OldCentre_b
 
 .skip_centre_look_2:
 				move.w	d0,STOPOFFSET
@@ -749,7 +749,7 @@ plr_KeyboardControl:
 
 .firenownotpressed:
 				; fire has been released.
-				clr.b	PlrT_Fire_b(a0)
+				sf		PlrT_Fire_b(a0)
 				bra		.done
 
 .firenotpressed:
@@ -880,7 +880,7 @@ plr_Fall:
 				bra		.proceed
 
 .above_ground:
-				clr.b	Plr_Decelerate_b
+				sf		Plr_Decelerate_b
 				tst.w	PlrT_Jetpack_w(a0)
 				beq.s	.not_flying
 
@@ -958,7 +958,7 @@ plr_Fall:
 				move.w	#100,Aud_NoiseZ_w
 				move.w	#80,Aud_NoiseVol_w
 				move.w	#$fff8,Aud_IDNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				jsr		MakeSomeNoise
 
 				GETREGS
@@ -1039,7 +1039,7 @@ plr_DoFootstepFX:
 				move.w	#100,Aud_NoiseZ_w
 				move.w	#80,Aud_NoiseVol_w
 				move.w	#$fff8,Aud_IDNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.b	PlrT_Echo_b(a0),SourceEcho
 				jsr		MakeSomeNoise
 

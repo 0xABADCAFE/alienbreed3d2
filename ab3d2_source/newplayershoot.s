@@ -150,7 +150,7 @@ Plr1_Shot:
 				move.w	#100,Aud_NoiseVol_w
 				move.w	#100,Plr1_NoiseVol_w
 				move.w	#12,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
@@ -180,7 +180,7 @@ Plr1_Shot:
 				move.w	#300,Aud_NoiseVol_w
 				move.w	ShootT_SFX_w(a6),Aud_SampleNum_w
 				move.b	#2,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				movem.l	d0/a0/d5/d6/d7/a6/a4/a5,-(a7)
 				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
@@ -286,7 +286,7 @@ Plr1_Shot:
 				add.l	d0,d1
 				move.l	d1,Obj_NewY_w
 				st		exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				move.w	#0,Obj_ExtLen_w
 				move.b	#$ff,Obj_AwayFromWall_b
 				move.w	#%0000010000000000,wallflags
@@ -490,7 +490,7 @@ Plr2_Shot:
 				move.w	#300,Aud_NoiseVol_w
 				move.w	#100,Plr2_NoiseVol_w
 				move.w	#12,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.b	#$fb,Aud_IDNum_w
 				jsr		MakeSomeNoise
 
@@ -520,7 +520,7 @@ Plr2_Shot:
 				move.w	#300,Aud_NoiseVol_w
 				move.w	ShootT_SFX_w(a6),Aud_SampleNum_w
 				move.b	#2,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 
 				movem.l	d0/a0/d5/d6/d7/a6/a4/a5,-(a7)
 				move.b	#$fb,Aud_IDNum_w
@@ -618,7 +618,7 @@ Plr2_Shot:
 				add.l	d0,d1
 				move.l	d1,Obj_NewY_w
 				st		exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				move.w	#0,Obj_ExtLen_w
 				move.b	#$ff,Obj_AwayFromWall_b
 				move.w	#%0000010000000000,wallflags
@@ -871,7 +871,7 @@ plr1_HitscanFailed:
 				move.l	d2,Obj_NewY_w
 
 				st		exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				move.w	#0,Obj_ExtLen_w
 				move.b	#$ff,Obj_AwayFromWall_b
 				move.w	#%0000010000000000,wallflags
@@ -1013,7 +1013,7 @@ plr2_HitscanFailed:
 				move.l	d2,Obj_NewY_w
 
 				st		exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		Obj_WallBounce_b
 				move.w	#0,Obj_ExtLen_w
 				move.b	#$ff,Obj_AwayFromWall_b
 				move.w	#%0000010000000000,wallflags

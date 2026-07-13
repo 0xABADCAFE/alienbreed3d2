@@ -718,8 +718,8 @@ pastobjscale:
 				adda.w	d7,a5					; a5 pointing to?
 				asl.w	#4,d7
 				adda.w	d7,a6					; a6 pointing to?
-				clr.b	draw_LightIt_b
-				clr.b	draw_Additive_b
+				sf		draw_LightIt_b
+				sf		draw_Additive_b
 				move.b	4(a0),d7
 				btst	#7,d7
 				sne		draw_FlipIt_b
@@ -2328,7 +2328,7 @@ checkbeh:
 				sub.l	d0,d2
 				move.l	d2,polybright
 				move.l	#draw_2DPointsProjected_vl,a3
-				clr.b	drawit
+				sf		drawit
 				tst.b	draw_Gouraud_b
 				bne.s	usegour
 

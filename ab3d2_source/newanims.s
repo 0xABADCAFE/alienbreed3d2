@@ -675,7 +675,7 @@ Anim_ExplodeIntoBits:
 ; move.w #40,ShotT_Gravity_w(a5)
 				move.w	#0,ShotT_Flags_w(a5)
 				move.w	#0,ShotT_Lifetime_w(a5)
-				clr.b	ShotT_Status_b(a5)
+				sf		ShotT_Status_b(a5)
 				move.b	ShotT_InUpperZone_b(a0),ShotT_InUpperZone_b(a5)
 				st		ShotT_Worry_b(a5)
 				adda.w	#64,a5
@@ -956,7 +956,7 @@ next_lift:
 				blt.s	.nonoise3
 
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffd,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
@@ -982,7 +982,7 @@ next_lift:
 				blt.s	.nonoise
 
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffd,Aud_IDNum_w
 
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
@@ -1296,7 +1296,7 @@ next_door:
 				blt.s	.nonoise
 
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1320,7 +1320,7 @@ nolower:
 				blt.s	.nonoise
 
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1465,7 +1465,7 @@ doorwalls:
 				blt.s	nothinghit
 
 				move.b	#1,Aud_ChannelPick_b
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#$fffd,Aud_IDNum_w
 				movem.l	a0/a3/d0/d1/d2/d3/d6/d7,-(a7)
 				jsr		MakeSomeNoise
@@ -1835,7 +1835,7 @@ JUMPBULLET:
 				bra		doneobj
 
 ;ItsAGasPipe:
-;				clr.b	ShotT_Worry_b(a0)
+;				sf		ShotT_Worry_b(a0)
 ;				move.w	Anim_TempFrames_w,d0
 ;				tst.w	EntT_Timer3_w(a0)
 ;				ble.s	maybeflame
@@ -1870,7 +1870,7 @@ JUMPBULLET:
 ;				move.w	#200,Aud_NoiseVol_w
 ;				move.w	#22,Aud_SampleNum_w
 ;				move.b	#1,Aud_ChannelPick_b
-;				clr.b	notifplaying
+;				sf		notifplaying
 ;				move.w	(a0),Aud_IDNum_w
 ;				jsr		MakeSomeNoise
 ;
@@ -1903,7 +1903,7 @@ JUMPBULLET:
 ;				ext.l	d0
 ;				asl.l	#7,d0
 ;				move.l	d0,ShotT_AccYPos_w(a5)
-;				clr.b	ShotT_Status_b(a5)
+;				sf		ShotT_Status_b(a5)
 ;				move.w	#0,ShotT_VelocityY_w(a5)
 ;				move.w	(a0),d0
 ;				move.w	(a5),d1
@@ -2034,7 +2034,7 @@ noworrylife:
 
 				FREE_ENT	a0
 
-				clr.b	ShotT_Status_b(a0)
+				sf		ShotT_Status_b(a0)
 				move.b	#0,ShotT_Anim_b(a0)
 				rts
 
@@ -2316,8 +2316,8 @@ nograv:
 				tst.l	BulT_BounceHoriz_l(a6)
 				sne		Obj_WallBounce_b
 				seq		exitfirst
-				clr.b	MOVING
-				clr.b	hitwall
+				sf		MOVING
+				sf		hitwall
 				move.b	ShotT_InUpperZone_b(a0),StoodInTop
 				move.w	#%0000010000000000,wallflags
 				move.l	#0,StepUpVal
@@ -2406,7 +2406,7 @@ nomovebul:
 				move.w	d4,4(a0)
 
 .hitsomething:
-				clr.b	timeout
+				sf		timeout
 				move.b	#0,ShotT_Anim_b(a0)
 				move.b	#1,ShotT_Status_b(a0)
 				move.l	BulT_ImpactSFX_l(a6),d0
@@ -3049,7 +3049,7 @@ CheckedEmAll:
 				move.w	d1,anim_MiddleX_w
 				move.w	d2,anim_MiddleZ_w
 				move.w	#9,d7
-				clr.b	exitfirst
+				sf		exitfirst
 				st.b	Obj_WallBounce_b
 				move.w	12(a0),d0
 				move.l	Lvl_ZonePtrsPtr_l,a3
