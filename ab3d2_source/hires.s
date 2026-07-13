@@ -131,23 +131,23 @@ _startup:
 
 				; init default control method
 				IFNE	CD32VER
-				clr.b	Plr1_Keys_b
-				clr.b	Plr1_Path_b
-				clr.b	Plr1_Mouse_b
+				sf		Plr1_Keys_b
+				sf		Plr1_Path_b
+				sf		Plr1_Mouse_b
 				st		Plr1_Joystick_b
-				clr.b	Plr2_Keys_b
-				clr.b	Plr2_Path_b
-				clr.b	Plr2_Mouse_b
+				sf		Plr2_Keys_b
+				sf		Plr2_Path_b
+				sf		Plr2_Mouse_b
 				st		Plr2_Joystick_b
 				ELSE
-				clr.b	Plr1_Keys_b
-				clr.b	Plr1_Path_b
+				sf		Plr1_Keys_b
+				sf		Plr1_Path_b
 				st		Plr1_Mouse_b
-				clr.b	Plr1_Joystick_b
-				clr.b	Plr2_Keys_b
-				clr.b	Plr2_Path_b
+				sf		Plr1_Joystick_b
+				sf		Plr2_Keys_b
+				sf		Plr2_Path_b
 				st		Plr2_Mouse_b
-				clr.b	Plr2_Joystick_b
+				sf		Plr2_Joystick_b
 				ENDC
 
 				; Setup constant table
@@ -487,9 +487,11 @@ noload:
 				movem.l	(sp)+,d0/d1/a0/a1
 
 .noclips:
-				clr.b	Plr1_StoodInTop_b
+				sf		Plr1_StoodInTop_b
 				move.l	#PLR_STAND_HEIGHT,Plr1_SnapHeight_l
 
+				; Audio is really 6 channels because hardware channel zero is
+				; reserved for the soundtrack.
 				move.l	#Aud_EmptyBuffer_vl,pos1LEFT
 				move.l	#Aud_EmptyBuffer_vl,pos2LEFT
 				move.l	#Aud_EmptyBuffer_vl,pos1RIGHT
@@ -538,7 +540,7 @@ noload:
 				tst.l	d0
 				beq.s	.tryAgain
 
-				clr.b	Vid_WaitForDisplayMsg_b
+				sf		Vid_WaitForDisplayMsg_b
 
 .skipChangeScreen:
 				jsr		Plr_Initialise
@@ -601,10 +603,10 @@ scaledownlop:
 				move.w	#%111111111111,Conditions
 .nokeys:
 				move.l	#KeyMap_vb,a5
-				clr.b	RAWKEY_ESC(a5)
+				sf		RAWKEY_ESC(a5)
 
 				move.l	Lvl_MusicPtr_l,mt_data
-				clr.b	UseAllChannels
+				sf		UseAllChannels
 
 ; cmp.b #'b',Prefsfile+3
 ; bne.s .noback
@@ -613,13 +615,13 @@ scaledownlop:
 
 				; TODO - check music is enabled
 
-				st		CHANNELDATA
+				st		Aud_ChannelData_vw
 				jsr		mt_init
 
 *********************************
 
-				st		CHANNELDATA
-				st		CHANNELDATA+8
+				st		Aud_ChannelData_vw
+				st		Aud_ChannelData_vw+8
 
 				move.l	Aud_SampleList_vl+6*8,pos0LEFT
 				move.l	Aud_SampleList_vl+6*8+4,Samp0endLEFT
@@ -630,7 +632,7 @@ scaledownlop:
 
 				CALLC	Sys_ClearKeyboard
 
-				clr.b	Game_MasterQuit_b
+				sf		Game_MasterQuit_b
 
 				cmp.b	#PLR_SINGLE,Plr_MultiplayerType_b
 				seq		Game_SlaveQuit_b
@@ -641,10 +643,10 @@ scaledownlop:
 
 NOCLTXT:
 				;FIXME: need to load the game palette here?
-				clr.b	Plr1_Ducked_b
-				clr.b	Plr2_Ducked_b
-				clr.b	plr1_TmpDucked_b
-				clr.b	plr2_TmpDucked_b
+				sf		Plr1_Ducked_b
+				sf		Plr2_Ducked_b
+				sf		plr1_TmpDucked_b
+				sf		plr2_TmpDucked_b
 
 ********************************************
 
@@ -653,7 +655,7 @@ NOCLTXT:
 ********************************************
 
 				st		Game_Running_b
-				st		dosounds
+				st		Aud_Enabled_b
 
 				jsr		AI_InitAlienWorkspace
 
@@ -726,7 +728,7 @@ NOALLWALLS:
 				move.w	#SMALL_WIDTH,Vid_RightX_w
 				move.w	#SMALL_HEIGHT,Vid_BottomY_w
 				move.w	#SMALL_HEIGHT/2,TOTHEMIDDLE
-				clr.b	Vid_FullScreen_b
+				sf		Vid_FullScreen_b
 				CALLC	Draw_ResetGameDisplay
 
 				st		Plr1_Weapons_vb+1
@@ -762,13 +764,13 @@ CLRDAM:
 				lea		Sys_PrevFrameTimeECV_q,a0
 				CALLC 	Sys_MarkTime
 
-				clr.b	Plr2_Fire_b
-				clr.b	Plr2_TmpFire_b
-				clr.b	Plr2_Used_b
-				clr.b	Plr2_TmpSpcTap_b
+				sf		Plr2_Fire_b
+				sf		Plr2_TmpFire_b
+				sf		Plr2_Used_b
+				sf		Plr2_TmpSpcTap_b
 
-				clr.b	plr1_Dead_b
-				clr.b	plr2_Dead_b
+				sf		plr1_Dead_b
+				sf		plr2_Dead_b
 
 				move.l	Plr1_ObjectPtr_l,a0
 				move.l	Plr2_ObjectPtr_l,a1
@@ -854,8 +856,8 @@ game_main_loop:
 				move.b	d0,Anim_SplatType_w
 				move.l	Plr2_ZonePtr_l,a1
 				move.w	(a1),ObjT_ZoneID_w(a0)
-				move.w	Plr2_TmpXOff_l,newx
-				move.w	Plr2_TmpZOff_l,newz
+				move.w	Plr2_TmpXOff_l,Obj_NewX_w
+				move.w	Plr2_TmpZOff_l,Obj_NewZ_w
 				move.w	#7,d2
 				jsr		Anim_ExplodeIntoBits
 
@@ -899,8 +901,8 @@ game_main_loop:
 
 				move.l	Plr1_ZonePtr_l,a1
 				move.w	(a1),ObjT_ZoneID_w(a0)
-				move.w	Plr1_TmpXOff_l,newx
-				move.w	Plr1_TmpZOff_l,newz
+				move.w	Plr1_TmpXOff_l,Obj_NewX_w
+				move.w	Plr1_TmpZOff_l,Obj_NewZ_w
 				move.w	#7,d2
 				jsr		Anim_ExplodeIntoBits
 
@@ -929,7 +931,7 @@ game_main_loop:
 				bne		.nopause
 				tst.b	RAWKEY_P(a5)
 				beq.s	.nopause
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 .waitrel:
 				tst.b	Plr1_Joystick_b
@@ -966,7 +968,7 @@ nofadedownhc:
 				move.b	Game_SlavePaused_b,d0
 				or.b	Game_MasterPaused_b,d0
 				beq.s	.nopause
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 				move.l	#KeyMap_vb,a5
 .waitrel:
@@ -998,8 +1000,8 @@ nofadedownhc:
 				jsr		RECFIRST
 
 .masfirst:
-				clr.b	Game_SlavePaused_b
-				clr.b	Game_MasterPaused_b
+				sf		Game_SlavePaused_b
+				sf		Game_MasterPaused_b
 				st		Game_Running_b
 
 .nopause:
@@ -1088,7 +1090,7 @@ waitmaster:
 				bra.s	.screenSwapDone
 
 .failed:
-				clr.b	Vid_WaitForDisplayMsg_b		; last attempt failed, so don't wait for next message
+				sf		Vid_WaitForDisplayMsg_b		; last attempt failed, so don't wait for next message
 
 .screenSwapDone:
 				CALLC	Sys_FrameLap
@@ -1163,9 +1165,9 @@ okwat:
 				move.w	Plr1_Bobble_w,plr1_TmpBobble_w
 				move.b	Plr1_Clicked_b,Plr1_TmpClicked_b
 				move.b	Plr1_Fire_b,Plr1_TmpFire_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Clicked_b
 				move.b	Plr1_Used_b,Plr1_TmpSpcTap_b
-				clr.b	Plr1_Used_b
+				sf		Plr1_Used_b
 				move.b	Plr1_Ducked_b,plr1_TmpDucked_b
 				move.b	Plr1_GunSelected_b,Plr1_TmpGunSelected_b
 
@@ -1226,10 +1228,10 @@ NotOnePlayer:
 				move.w	Plr1_SnapAngPos_w,Plr1_TmpAngPos_w
 				move.w	Plr1_Bobble_w,plr1_TmpBobble_w
 				move.b	Plr1_Clicked_b,Plr1_TmpClicked_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Clicked_b
 				move.b	Plr1_Fire_b,Plr1_TmpFire_b
 				move.b	Plr1_Used_b,Plr1_TmpSpcTap_b
-				clr.b	Plr1_Used_b
+				sf		Plr1_Used_b
 				move.b	Plr1_Ducked_b,plr1_TmpDucked_b
 				move.b	Plr1_GunSelected_b,Plr1_TmpGunSelected_b
 
@@ -1342,10 +1344,10 @@ ASlaveShouldWaitOnHisMaster:
 				move.w	Plr2_SnapAngPos_w,Plr2_TmpAngPos_w
 				move.w	Plr2_Bobble_w,plr2_TmpBobble_w
 				move.b	Plr2_Clicked_b,Plr2_TmpClicked_b
-				clr.b	Plr2_Clicked_b
+				sf		Plr2_Clicked_b
 				move.b	Plr2_Fire_b,Plr2_TmpFire_b
 				move.b	Plr2_Used_b,Plr2_TmpSpcTap_b
-				clr.b	Plr2_Used_b
+				sf		Plr2_Used_b
 				move.b	Plr2_Ducked_b,plr2_TmpDucked_b
 				move.b	Plr2_GunSelected_b,Plr2_TmpGunSelected_b
 
@@ -1580,18 +1582,18 @@ findaverage:
 
 				move.l	Plr1_ZonePtr_l,Obj_FromZonePtr_l
 				move.l	Plr2_ZonePtr_l,Obj_ToZonePtr_l
-				move.w	Plr1_TmpXOff_l,Viewerx
-				move.w	Plr1_TmpZOff_l,Viewerz
+				move.w	Plr1_TmpXOff_l,Obj_ViewerX_w
+				move.w	Plr1_TmpZOff_l,Obj_ViewerZ_w
 				move.l	Plr1_TmpYOff_l,d0
 				asr.l	#7,d0
-				move.w	d0,Viewery
-				move.w	Plr2_TmpXOff_l,Targetx
-				move.w	Plr2_TmpZOff_l,Targetz
+				move.w	d0,Obj_ViewerY_w
+				move.w	Plr2_TmpXOff_l,Obj_TargetX_w
+				move.w	Plr2_TmpZOff_l,Obj_TargetZ_w
 				move.l	Plr2_TmpYOff_l,d0
 				asr.l	#7,d0
-				move.w	d0,Targety
-				move.b	Plr1_StoodInTop_b,ViewerTop
-				move.b	Plr2_StoodInTop_b,TargetTop
+				move.w	d0,Obj_TargetY_w
+				move.b	Plr1_StoodInTop_b,Obj_ViewerInUpperZone_b
+				move.b	Plr2_StoodInTop_b,Obj_TargetInUpperZone_b
 				jsr		CanItBeSeen
 
 				move.l	Plr1_ObjectPtr_l,a0
@@ -1747,7 +1749,7 @@ IWasPlayer1:
 ; move.w #0,draw_TopClip_w
 ; move.w #Vid_BottomY_w/2,draw_BottomClip_w
 ;
-; clr.b DOANYWATER
+; sf	 DOANYWATER
 ;
 ; bsr DrawDisplay
 ;
@@ -1841,18 +1843,18 @@ nodrawp2:
 
 .nomap:
 				;move.b	plr1_Teleported_b,d5
-				;clr.b	plr1_Teleported_b
+				;sf		plr1_Teleported_b
 				;cmp.b	#PLR_SLAVE,Plr_MultiplayerType_b
 				;bne.s	.notplr2
 				;move.b	plr2_Teleported_b,d5
-				;clr.b	plr2_Teleported_b
+				;sf		plr2_Teleported_b
 
 				move.b	plr1_Teleported_b,d5
 				or.b	plr2_Teleported_b,d5
 				move.b	d5,C2P_Teleporting_b
 				or.b	d5,C2P_NeedsInit_b ; trigger reinit
-				clr.b	plr1_Teleported_b
-				clr.b	plr1_Teleported_b
+				sf		plr1_Teleported_b
+				sf		plr1_Teleported_b
 
 .notplr2:
 				;tst.b Plr1_Mouse_b
@@ -1923,7 +1925,7 @@ nodrawp2:
 
 ;				tst.b	RAWKEY_F9(a5)
 ;				beq.s	.skip_resolution_cycle
-;				clr.b	RAWKEY_F9(a5)
+;				sf		RAWKEY_F9(a5)
 ;				addq.b	#1,Vid_ResolutionOption_b
 ;
 ;				btst.b	#0,Vid_ResolutionOption_b
@@ -1946,7 +1948,7 @@ nodrawp2:
 
 				tst.b	RAWKEY_F9(a5)
 				beq		.skip_double_height
-				clr.b	RAWKEY_F9(a5)
+				sf		RAWKEY_F9(a5)
 				tst.b	LASTDH
 				bne		.not_double_height
 				st		LASTDH
@@ -1964,13 +1966,13 @@ nodrawp2:
 				bra.s	.not_double_height
 
 .skip_double_height:
-				clr.b	LASTDH
+				sf		LASTDH
 
 .not_double_height:
 				; Hijacking this for the simple wall test
 				tst.b	RAWKEY_F8(a5)
 				beq.s	.skip_double_width
-				clr.b	RAWKEY_F8(a5)
+				sf		RAWKEY_F8(a5)
 				tst.b	LASTDW
 				bne		.not_double_width
 
@@ -1982,7 +1984,7 @@ nodrawp2:
 				bra.s	.not_double_width
 
 .skip_double_width:
-				clr.b	LASTDW
+				sf		LASTDW
 
 .not_double_width:
 
@@ -2307,9 +2309,9 @@ Plr1_Use:
 
 				SAVEREGS
 
-				move.w	#$fffa,IDNUM
+				move.w	#$fffa,Aud_IDNum_w
 				move.w	#19,Aud_SampleNum_w
-				clr.b	notifplaying
+				sf		notifplaying
 				move.w	#0,Aud_NoiseX_w
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#60,Aud_NoiseVol_w
@@ -2577,8 +2579,8 @@ Plr2_Use:
 				SAVEREGS
 
 				move.w	#19,Aud_SampleNum_w
-				clr.b	notifplaying
-				move.w	#$fffa,IDNUM
+				sf		notifplaying
+				move.w	#$fffa,Aud_IDNum_w
 				move.w	#0,Aud_NoiseX_w
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#60,Aud_NoiseVol_w
@@ -2820,20 +2822,20 @@ pathpt:			dc.l	Path
 Plr1_Control:
 ; Take a snapshot of everything.
 				move.l	Plr1_XOff_l,d2
-				move.l	d2,oldx
+				move.l	d2,Obj_OldX_w
 				move.l	Plr1_ZOff_l,d3
-				move.l	d3,oldz
+				move.l	d3,Obj_OldZ_w
 				move.l	Plr1_TmpXOff_l,d0
 				move.l	d0,Plr1_XOff_l
-				move.l	d0,newx
+				move.l	d0,Obj_NewX_w
 				move.l	Plr1_TmpZOff_l,d1
-				move.l	d1,newz
+				move.l	d1,Obj_NewZ_w
 				move.l	d1,Plr1_ZOff_l
 				move.l	plr1_TmpHeight_l,Plr1_Height_l
 				sub.l	d2,d0
 				sub.l	d3,d1
-				move.l	d0,xdiff
-				move.l	d1,zdiff
+				move.l	d0,Obj_XDiff_w
+				move.l	d1,Obj_ZDiff_w
 				move.w	Plr1_TmpAngPos_w,d0
 				move.w	d0,Plr1_AngPos_w
 				move.l	#SinCosTable_vw,a1
@@ -2885,8 +2887,8 @@ Plr1_Control:
 
 .otherwob:
 				move.l	d0,Plr1_YOff_l
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 				move.l	d4,thingheight
 				move.l	#40*256,StepUpVal
 				tst.b	Plr1_Squished_b
@@ -2904,8 +2906,8 @@ Plr1_Control:
 				move.w	ZoneT_TelZone_w(a0),d0
 				blt		.noteleport
 
-				move.w	ZoneT_TelX_w(a0),newx
-				move.w	ZoneT_TelZ_w(a0),newz
+				move.w	ZoneT_TelX_w(a0),Obj_NewX_w
+				move.w	ZoneT_TelZ_w(a0),Obj_NewZ_w
 				move.l	Plr1_ObjectPtr_l,a0
 				move.w	(a0),CollId
 				move.l	#%111111111111111111,Obj_CollideFlags_l
@@ -2914,8 +2916,8 @@ Plr1_Control:
 				tst.b	hitwall
 				beq.s	.teleport
 
-				move.w	Plr1_XOff_l,newx
-				move.w	Plr1_ZOff_l,newz
+				move.w	Plr1_XOff_l,Obj_NewX_w
+				move.w	Plr1_ZOff_l,Obj_NewZ_w
 				bra		.noteleport
 
 .teleport:
@@ -2941,7 +2943,7 @@ Plr1_Control:
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#26,Aud_SampleNum_w
 				move.w	#100,Aud_NoiseVol_w
-				move.w	#$fff9,IDNUM
+				move.w	#$fff9,Aud_IDNum_w
 				jsr		MakeSomeNoise
 				GETREGS
 
@@ -2959,8 +2961,8 @@ Plr1_Control:
 				tst.b	hitwall
 				beq.s	.nothitanything
 
-				move.w	oldx,Plr1_XOff_l
-				move.w	oldz,Plr1_ZOff_l
+				move.w	Obj_OldX_w,Plr1_XOff_l
+				move.w	Obj_OldZ_w,Plr1_ZOff_l
 				move.l	Plr1_XOff_l,Plr1_SnapXOff_l
 				move.l	Plr1_ZOff_l,Plr1_SnapZOff_l
 				bra		.cantmove
@@ -2969,14 +2971,14 @@ Plr1_Control:
 				move.w	#40,Obj_ExtLen_w
 				move.b	#0,Obj_AwayFromWall_b
 
-				clr.b	exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		exitfirst
+				sf		Obj_WallBounce_b
 				bsr		MoveObject
 
 				move.b	StoodInTop,Plr1_StoodInTop_b
 				move.l	Obj_ZonePtr_l,Plr1_ZonePtr_l
-				move.w	newx,Plr1_XOff_l
-				move.w	newz,Plr1_ZOff_l
+				move.w	Obj_NewX_w,Plr1_XOff_l
+				move.w	Obj_NewZ_w,Plr1_ZOff_l
 				move.l	Plr1_XOff_l,Plr1_SnapXOff_l
 				move.l	Plr1_ZOff_l,Plr1_SnapZOff_l
 
@@ -3017,20 +3019,20 @@ nobackgraphics:
 Plr2_Control:
 ; Take a snapshot of everything.
 				move.l	Plr2_XOff_l,d2
-				move.l	d2,oldx
+				move.l	d2,Obj_OldX_w
 				move.l	Plr2_ZOff_l,d3
-				move.l	d3,oldz
+				move.l	d3,Obj_OldZ_w
 				move.l	Plr2_TmpXOff_l,d0
 				move.l	d0,Plr2_XOff_l
-				move.l	d0,newx
+				move.l	d0,Obj_NewX_w
 				move.l	Plr2_TmpZOff_l,d1
-				move.l	d1,newz
+				move.l	d1,Obj_NewZ_w
 				move.l	d1,Plr2_ZOff_l
 				move.l	plr2_TmpHeight_l,Plr2_Height_l
 				sub.l	d2,d0
 				sub.l	d3,d1
-				move.l	d0,xdiff
-				move.l	d1,zdiff
+				move.l	d0,Obj_XDiff_w
+				move.l	d1,Obj_ZDiff_w
 				move.w	Plr2_TmpAngPos_w,d0
 				move.w	d0,Plr2_AngPos_w
 				move.l	#SinCosTable_vw,a1
@@ -3080,8 +3082,8 @@ Plr2_Control:
 
 .otherwob:
 				move.l	d0,Plr2_YOff_l
-				move.l	d0,newy
-				move.l	d0,oldy
+				move.l	d0,Obj_NewY_w
+				move.l	d0,Obj_OldY_w
 				move.l	d4,thingheight
 				move.l	#40*256,StepUpVal
 				tst.b	Plr2_Squished_b
@@ -3099,8 +3101,8 @@ Plr2_Control:
 				move.w	ZoneT_TelZone_w(a0),d0
 				blt		.noteleport
 
-				move.w	ZoneT_TelX_w(a0),newx
-				move.w	ZoneT_TelZ_w(a0),newz
+				move.w	ZoneT_TelX_w(a0),Obj_NewX_w
+				move.w	ZoneT_TelZ_w(a0),Obj_NewZ_w
 				move.l	Plr2_ObjectPtr_l,a0
 				move.w	(a0),CollId
 				move.l	#%111111111111111111,Obj_CollideFlags_l
@@ -3109,8 +3111,8 @@ Plr2_Control:
 				tst.b	hitwall
 				beq.s	.teleport
 
-				move.w	Plr2_XOff_l,newx
-				move.w	Plr2_ZOff_l,newz
+				move.w	Plr2_XOff_l,Obj_NewX_w
+				move.w	Plr2_ZOff_l,Obj_NewZ_w
 				bra		.noteleport
 
 .teleport:
@@ -3136,7 +3138,7 @@ Plr2_Control:
 				move.w	#0,Aud_NoiseZ_w
 				move.w	#26,Aud_SampleNum_w
 				move.w	#100,Aud_NoiseVol_w
-				move.w	#$fff9,IDNUM
+				move.w	#$fff9,Aud_IDNum_w
 				jsr		MakeSomeNoise
 				GETREGS
 
@@ -3154,8 +3156,8 @@ Plr2_Control:
 				tst.b	hitwall
 				beq.s	.nothitanything
 
-				move.w	oldx,Plr2_XOff_l
-				move.w	oldz,Plr2_ZOff_l
+				move.w	Obj_OldX_w,Plr2_XOff_l
+				move.w	Obj_OldZ_w,Plr2_ZOff_l
 				move.l	Plr2_XOff_l,Plr2_SnapXOff_l
 				move.l	Plr2_ZOff_l,Plr2_SnapZOff_l
 				bra		.cantmove
@@ -3163,14 +3165,14 @@ Plr2_Control:
 .nothitanything:
 				move.w	#40,Obj_ExtLen_w
 				move.b	#0,Obj_AwayFromWall_b
-				clr.b	exitfirst
-				clr.b	Obj_WallBounce_b
+				sf		exitfirst
+				sf		Obj_WallBounce_b
 				bsr		MoveObject
 
 				move.b	StoodInTop,Plr2_StoodInTop_b
 				move.l	Obj_ZonePtr_l,Plr2_ZonePtr_l
-				move.w	newx,Plr2_XOff_l
-				move.w	newz,Plr2_ZOff_l
+				move.w	Obj_NewX_w,Plr2_XOff_l
+				move.w	Obj_NewZ_w,Plr2_ZOff_l
 				move.l	Plr2_XOff_l,Plr2_SnapXOff_l
 				move.l	Plr2_ZOff_l,Plr2_SnapZOff_l
 
@@ -3212,7 +3214,7 @@ DONTDOGUN:
 
 				include "modules/draw/draw_zone_graph.s"
 DrawDisplay:
-				clr.b	fillscrnwater
+				sf		fillscrnwater
 
 				; bigsine is 16kb = 8192 words for 4pi (720deg)
 				; --> 4096 words per 2pi
@@ -3406,8 +3408,8 @@ Game_Running_b:	dc.w	0						; does main game run?
 
 endlevel:
 ; 	_break #0
-				clr.b	dosounds
-				clr.b	Game_Running_b
+				sf		Aud_Enabled_b
+				sf		Game_Running_b
 
 				; waiting for serial transmit complete?
 ;waitfortop22:
@@ -3441,7 +3443,7 @@ endlevel:
 
 				move.l	#gameover,mt_data
 				st		UseAllChannels
-				clr.b	reachedend
+				sf		reachedend
 				jsr		mt_init
 
 playgameover:
@@ -3469,7 +3471,7 @@ wevewon:
 .nonextlev:
 				move.l	#welldone,mt_data
 				st		UseAllChannels
-				clr.b	reachedend
+				sf		reachedend
 
 				jsr		mt_init
 playwelldone:
@@ -3498,7 +3500,7 @@ wevelost:
 				jmp		closeeverything
 
 endnomusic:
-				clr.b	Game_Running_b
+				sf		Game_Running_b
 
 
 				jmp		closeeverything
@@ -3517,7 +3519,7 @@ across:
 
 ENDGAMESCROLL:
 				move.l	Lvl_MusicPtr_l,mt_data
-				clr.b	UseAllChannels
+				sf		UseAllChannels
 				jsr		mt_init
 
 ;				move.w	#$fff,MIXCOLL
@@ -3735,7 +3737,7 @@ notbelow:
 				moveq	#0,d4					; some points left to left clip
 				moveq	#0,d5					; some points fully between left and right clip
 				moveq	#0,d6					; some points right of right clip
-				clr.b	anyclipping				; some clipping will be necessary?
+				sf		anyclipping				; some clipping will be necessary?
 
 
 cornerprocessloop: ;	figure					out if any left/right clipping is necessary
@@ -5011,7 +5013,7 @@ noclipleftGOUR:
 				muls	d3,d6
 				add.w	#256*4,d6
 				asr.w	#2,d6
-				clr.b	d6
+				sf		d6
 				add.w	leftbright,d6
 				bge.s	.oklbnn
 				moveq	#0,d6
@@ -5673,7 +5675,7 @@ draw_WaterSurface:
 				move.l	draw_Distance_l,d0
 
 ;				asr.l	#2,d0 ; 0xABADCAFE - this seems to affect the opacity
-				;clr.b	d0
+				;sf		d0
 
 				and.l	#$3f00,d0
 
@@ -5761,7 +5763,7 @@ draw_WaterSurfaceDouble:
 				add.l	#256*16,a1
 				move.l	draw_Distance_l,d0
 				asr.l	#2,d0
-				clr.b	d0
+				sf		d0
 
 				add.w	d0,d0
 				cmp.w	#9*512,d0
@@ -5888,7 +5890,7 @@ key_interrupt:
 ;		beq	.key_cont
 
 				move.b	$bfec01,d0
-				clr.b	$bfec01
+				sf		$bfec01
 
 				tst.b	d0
 				beq		.key_cont
@@ -6125,8 +6127,8 @@ NOSIDES2:
 
 				subq	#1,d0
 				move.w	d0,Aud_SampleNum_w
-				clr.b	notifplaying
-				move.w	(a0),IDNUM
+				sf		notifplaying
+				move.w	(a0),Aud_IDNum_w
 				move.w	#80,Aud_NoiseVol_w
 				move.l	#ObjRotated_vl,a1
 				move.w	(a0),d0
@@ -6319,14 +6321,14 @@ OLDLTOG:		dc.w	0
 
 pastster:
 				cmp.b	#'4',d1
-				seq		CHANNELDATA+8
-				seq		CHANNELDATA+12
-				seq		CHANNELDATA+24
-				seq		CHANNELDATA+28
+				seq		Aud_ChannelData_vw+8
+				seq		Aud_ChannelData_vw+12
+				seq		Aud_ChannelData_vw+24
+				seq		Aud_ChannelData_vw+28
 
 				;* Mt_init *********************
-				st		CHANNELDATA+8
-				st		CHANNELDATA
+				st		Aud_ChannelData_vw+8
+				st		Aud_ChannelData_vw
 				;*******************************
 
 				move.w	#$f,$dff000+dmacon
@@ -6373,7 +6375,7 @@ pastster:
 				bra		notogglesound2
 
 notogglesound:
-				clr.b	lasttogsound
+				sf		lasttogsound
 
 notogglesound2:
 				tst.b	RAWKEY_F4(a5)
@@ -6404,7 +6406,7 @@ pastlighttext:
 				bra		nolighttoggle2
 
 nolighttoggle:
-				clr.b	OLDLTOG
+				sf		OLDLTOG
 
 nolighttoggle2:
 				tst.b	draw_RenderMap_b
@@ -6434,12 +6436,12 @@ nolighttoggle2:
 				bra		.nogood2
 
 .nogood:
-				clr.b	OLDGOOD
+				sf		OLDGOOD
 
 .nogood2:
 				tst.b	RAWKEY_TAB(a5)
 				bne.s	.tabprsd
-				clr.b	tabheld
+				sf		tabheld
 				bra.s	.noswitch
 
 .tabprsd:
@@ -6521,7 +6523,7 @@ justshake:
 
 				tst.b	oktodisplay
 				beq		dontshowtime
-				clr.b	oktodisplay
+				sf		oktodisplay
 				subq.w	#1,dispco
 				bgt		dontshowtime
 				move.w	#10,dispco
@@ -6618,8 +6620,8 @@ nostartalan:
 
 				FREE_OBJ_2	a0,ENT_NEXT_2
 
-				clr.b	Plr1_Fire_b
-				clr.b	Plr1_Clicked_b
+				sf		Plr1_Fire_b
+				sf		Plr1_Clicked_b
 				move.w	#0,Plr_AddToBobble_w
 				move.l	#PLR_CROUCH_HEIGHT,Plr1_SnapHeight_l
 				move.w	View_LookMax_w,d0					; Is this related to render buffer height
@@ -6709,7 +6711,7 @@ control2:
 
 				FREE_OBJ_2	a0,ENT_NEXT_2
 
-				clr.b	Plr2_Fire_b
+				sf		Plr2_Fire_b
 				move.w	#0,Plr_AddToBobble_w
 				move.l	#PLR_CROUCH_HEIGHT,Plr2_SnapHeight_l
 				move.w	View_LookMax_w,d0
@@ -6799,62 +6801,20 @@ control2:
 .plr2_no_joystick:
 
 nocontrols:
-				move.l	#$dff000,a6
-
-				tst.b	dosounds
-				beq.s	nomuckabout
-
-				cmp.b	#'4',Prefsfile+1
-				bne.s	nomuckabout
-
-				move.w	#$0,d0
-				tst.b	NoiseMade0LEFT
-				beq.s	noturnoff0
-				move.w	#1,d0
-noturnoff0:
-				tst.b	NoiseMade0RIGHT
-				beq.s	noturnoff1
-				or.w	#2,d0
-noturnoff1:
-				tst.b	NoiseMade1RIGHT
-				beq.s	noturnoff2
-				or.w	#4,d0
-noturnoff2:
-				tst.b	NoiseMade1LEFT
-				beq.s	noturnoff3
-				or.w	#8,d0
-noturnoff3:
-
-*********************
-				and.w	#$fffe,d0
-*********************
-
-				move.w	d0,dmacon(a6)
-
-nomuckabout:
-
-firenownotpressed2:
-; fire has been released.
-
-firenotpressed2
-; fire was not pressed last frame...
-
-
-dointer
 
 JUSTSOUNDS:
-				tst.b	dosounds
-				beq.s	.notthing
+				tst.b	Aud_Enabled_b
+				beq.s	.skip
 
-				cmp.b	#'4',Prefsfile+1
-				beq		fourchannel
+				; otherwise check if we have a pending interrupt
+				btst	#1,$dff000+intreqr ; this only checks channel 2 ?
 
-				btst	#1,$dff000+intreqr
-				bne.s	newsampbitl
+				; Check if any of the channel interrupts are set
+				;move.w	$dff000+intreqr,d0
+				;and.w 	#$0700,d0
+				bne.s	Aud_DoPacket
 
-.notthing:
-
-; move.w #$f,$dff000+dmacon
+.skip:
 
 				GETREGS
 
@@ -6865,15 +6825,22 @@ JUSTSOUNDS:
 * End of VBlank code
 ********************************************************************
 
-
-dosounds:		dc.w	0
+; This regulates when the sound mixer is active, turned off when the end music plays.
+Aud_Enabled_b:		dc.w	0
 
 swappedem:		dc.w	0
 
-newsampbitl:
+;
+; The main entry point for audio. Called once per interrupt, generates the next packed of audio
+; for the sound system.
+;
+; TODO - this is the place to introduce the new high-spec packet mixer
+;
+Aud_DoPacket:
+
 				move.w	#$200,$dff000+intreq
 
-				tst.b	CHANNELDATA
+				tst.b	Aud_ChannelData_vw
 				bne		nochannel0
 
 				move.l	pos0LEFT,a0
@@ -6910,14 +6877,11 @@ fbig0:
 				move.w	d0,$dff0a8
 
 donechan0:
-
 				move.l	Aupt0,a3
 				move.l	a3,$dff0a0
 				move.l	Auback0,Aupt0
 				move.l	a3,Auback0
-
 				move.l	Auback0,a3
-
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -6925,6 +6889,7 @@ donechan0:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -6944,46 +6909,44 @@ loop:
 
 				tst.b	swappedem
 				beq.s	.ok23
-				exg		a0,a1
-.ok23:
 
+				exg		a0,a1
+
+.ok23:
 				cmp.l	Samp0endLEFT,a0
 				blt.s	.notoffendsamp1
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endLEFT
 				move.b	#0,vol0left
-				clr.w	LEFTCHANDATA+32
-				move.w	#0,LEFTCHANDATA+2
-.notoffendsamp1:
+				clr.w	Aud_LeftChannelData_vw+32
+				move.w	#0,Aud_LeftChannelData_vw+2
 
+.notoffendsamp1:
 				cmp.l	Samp2endLEFT,a1
 				blt.s	.notoffendsamp2
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endLEFT
 				move.b	#0,vol2left
-				clr.w	LEFTCHANDATA+32+8
-				move.w	#0,LEFTCHANDATA+2+8
-.notoffendsamp2:
+				clr.w	Aud_LeftChannelData_vw+32+8
+				move.w	#0,Aud_LeftChannelData_vw+2+8
 
+.notoffendsamp2:
 				move.l	a0,pos0LEFT
 				move.l	a1,pos2LEFT
 
 nochannel0:
-
-				tst.b	CHANNELDATA+16
+				tst.b	Aud_ChannelData_vw+16
 				bne		nochannel1
-
 
 				move.l	pos0RIGHT,a0
 				move.l	pos2RIGHT,a1
-
 				move.l	Aupt1,a3
 				move.l	a3,$dff0b0
 				move.l	Auback1,Aupt1
 				move.l	a3,Auback1
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol0right,d0
@@ -6994,7 +6957,6 @@ nochannel0:
 
 ; d1 is bigger so scale d0 and use d1
 ; as audiochannel volume.
-
 				exg		a0,a1
 				asl.w	#6,d0
 				divs	d1,d0
@@ -7006,6 +6968,7 @@ nochannel0:
 fbig1:
 				tst.w	d0
 				beq.s	donechan1
+
 				asl.w	#6,d1
 				divs	d0,d1
 				lsl.w	#8,d1
@@ -7020,6 +6983,7 @@ donechan1:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop2:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -7039,39 +7003,38 @@ loop2:
 
 				tst.b	swappedem
 				beq.s	ok01
+
 				exg		a0,a1
 ok01:
-
 				cmp.l	Samp0endRIGHT,a0
 				blt.s	.notoffendsamp1
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp0endRIGHT
 				move.b	#0,vol0right
-				clr.w	RIGHTCHANDATA+32
-				move.w	#0,RIGHTCHANDATA+2
-.notoffendsamp1:
+				clr.w	Aud_RightChannelData_vw+32
+				move.w	#0,Aud_RightChannelData_vw+2
 
+.notoffendsamp1:
 				cmp.l	Samp2endRIGHT,a1
 				blt.s	.notoffendsamp2
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp2endRIGHT
 				move.b	#0,vol2right
-				clr.w	RIGHTCHANDATA+32+8
-				move.w	#0,RIGHTCHANDATA+2+8
-.notoffendsamp2:
+				clr.w	Aud_RightChannelData_vw+32+8
+				move.w	#0,Aud_RightChannelData_vw+2+8
 
+.notoffendsamp2:
 				move.l	a0,pos0RIGHT
 				move.l	a1,pos2RIGHT
 
 nochannel1:
 
 ******************* Other two channels
-
 				move.l	pos1LEFT,a0
 				move.l	pos3LEFT,a1
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol1left,d0
@@ -7101,12 +7064,10 @@ fbig2:
 				move.w	d0,$dff0d8
 
 donechan2:
-
 				move.l	Aupt2,a3
 				move.l	a3,$dff0d0
 				move.l	Auback2,Aupt2
 				move.l	a3,Auback2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -7114,6 +7075,7 @@ donechan2:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop3:											; mixing two channels, 50 * 4
 				move.l	(a0)+,d0				; this is sometimes reading past beyond the sample buffer
 				move.b	(a1)+,d1
@@ -7133,40 +7095,38 @@ loop3:											; mixing two channels, 50 * 4
 
 				tst.b	swappedem
 				beq.s	.ok23
-				exg		a0,a1
-.ok23:
 
+				exg		a0,a1
+
+.ok23:
 				cmp.l	Samp1endLEFT,a0
 				blt.s	.notoffendsamp3
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp1endLEFT
 				move.b	#0,vol1left
-				clr.w	LEFTCHANDATA+32+4
-				move.w	#0,LEFTCHANDATA+2+4
-.notoffendsamp3:
+				clr.w	Aud_LeftChannelData_vw+32+4
+				move.w	#0,Aud_LeftChannelData_vw+2+4
 
+.notoffendsamp3:
 				cmp.l	Samp3endLEFT,a1
 				blt.s	.notoffendsamp4
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endLEFT
 				move.b	#0,vol3left
-				clr.w	LEFTCHANDATA+32+12
-				move.w	#0,LEFTCHANDATA+2+12
-.notoffendsamp4:
+				clr.w	Aud_LeftChannelData_vw+32+12
+				move.w	#0,Aud_LeftChannelData_vw+2+12
 
+.notoffendsamp4:
 				move.l	a0,pos1LEFT
 				move.l	a1,pos3LEFT
-
 				move.l	pos1RIGHT,a0
 				move.l	pos3RIGHT,a1
-
 				move.l	Aupt3,a3
 				move.l	a3,$dff0c0
 				move.l	Auback3,Aupt3
 				move.l	a3,Auback3
-
 				move.l	#tab,a2
-
 				moveq	#0,d0
 				moveq	#0,d1
 				move.b	vol1right,d0
@@ -7186,13 +7146,14 @@ loop3:											; mixing two channels, 50 * 4
 fbig3:
 				tst.w	d0
 				beq.s	donechan3
+
 				asl.w	#6,d1
 				divs	d0,d1
 				lsl.w	#8,d1
 				adda.w	d1,a2
 				move.w	d0,$dff0c8
-donechan3:
 
+donechan3:
 				moveq	#0,d0
 				moveq	#0,d1
 				moveq	#0,d2
@@ -7200,6 +7161,7 @@ donechan3:
 				moveq	#0,d4
 				moveq	#0,d5
 				move.w	#49,d7
+
 loop4:
 				move.l	(a0)+,d0
 				move.b	(a1)+,d1
@@ -7220,226 +7182,36 @@ loop4:
 				tst.b	swappedem
 				beq.s	.ok23
 				exg		a0,a1
-.ok23:
 
+.ok23:
 				cmp.l	Samp1endRIGHT,a0
 				blt.s	notoffendsamp3
+
 				move.l	#Aud_EmptyBuffer_vl,a0
 				move.l	#Aud_EmptyBufferEnd,Samp1endRIGHT
 				move.b	#0,vol1right
-				clr.w	RIGHTCHANDATA+32+4
-				move.w	#0,RIGHTCHANDATA+2+4
-notoffendsamp3:
+				clr.w	Aud_RightChannelData_vw+32+4
+				move.w	#0,Aud_RightChannelData_vw+2+4
 
+notoffendsamp3:
 				cmp.l	Samp3endRIGHT,a1
 				blt.s	notoffendsamp4
+
 				move.l	#Aud_EmptyBuffer_vl,a1
 				move.l	#Aud_EmptyBufferEnd,Samp3endRIGHT
 				move.b	#0,vol3right
-				clr.w	RIGHTCHANDATA+32+12
-				move.w	#0,RIGHTCHANDATA+2+12
-notoffendsamp4:
+				clr.w	Aud_RightChannelData_vw+32+12
+				move.w	#0,Aud_RightChannelData_vw+2+12
 
+notoffendsamp4:
 				move.l	a0,pos1RIGHT
 				move.l	a1,pos3RIGHT
 
 				GETREGS
 
 				move.w	#$820f,$dff000+dmacon
-
 				moveq	#0,d0					; VERTB interrupt needs to return Z flag set
 				rts
-
-***********************************
-* 4 channel sound routine
-***********************************
-
-fourchannel:
-				move.l	#$dff000,a6
-
-				tst.b	LEFTCHANDATA
-				bne.s	NoChan0sound
-
-				btst	#7,intreqrl(a6)
-				beq.s	nofinish0
-; move.w #0,LEFTCHANDATA+2
-; st LEFTCHANDATA+1
-				move.l	#Aud_Null1_vw,$a0(a6)
-				move.w	#100,$a4(a6)
-				move.w	#$0080,intreq(a6)
-
-nofinish0:
-				tst.b	NoiseMade0pLEFT
-				beq.s	NoChan0sound
-
-				move.l	Samp0endLEFT,d0
-				move.l	pos0LEFT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$a4(a6)
-				move.l	d1,$a0(a6)
-				ext.l	d0
-
-				divs	#100,d0 ; todo approximate?
-
-				move.w	d0,playnull0
-				move.w	#$8201,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol0left,d0
-				move.w	d0,$a8(a6)
-
-NoChan0sound:
-
-*****************************************
-*****************************************
-
-				btst	#0,intreqr(a6)
-				beq.s	nofinish1
-				move.l	#Aud_Null1_vw,$b0(a6)
-				move.w	#100,$b4(a6)
-				move.w	#$0100,intreq(a6)
-
-nofinish1:
-				tst.b	NoiseMade0pRIGHT
-				beq.s	NoChan1sound
-
-				move.l	Samp0endRIGHT,d0
-				move.l	pos0RIGHT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$b4(a6)
-				move.l	d1,$b0(a6)
-				ext.l	d0
-				divs	#100,d0
-				move.w	d0,playnull1
-				move.w	#$8202,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol0right,d0
-				move.w	d0,$b8(a6)
-
-NoChan1sound:
-
-*****************************************
-*****************************************
-
-				btst	#1,intreqr(a6)
-				beq.s	nofinish2
-				move.l	#Aud_Null1_vw,$c0(a6)
-				move.w	#100,$c4(a6)
-				move.w	#$0200,intreq(a6)
-nofinish2:
-
-				tst.b	NoiseMade1pRIGHT
-				beq.s	NoChan2sound
-
-				move.l	Samp1endRIGHT,d0
-				move.l	pos1RIGHT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$c4(a6)
-				ext.l	d0
-				divs	#100,d0
-				move.w	d0,playnull2
-
-				move.l	d1,$c0(a6)
-				move.w	#$8204,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol1right,d0
-				move.w	d0,$c8(a6)
-
-NoChan2sound:
-
-*****************************************
-*****************************************
-
-				btst	#2,intreqr(a6)
-				beq.s	nofinish3
-				move.l	#Aud_Null1_vw,$d0(a6)
-				move.w	#100,$d4(a6)
-				move.w	#$0400,intreq(a6)
-nofinish3:
-				tst.b	NoiseMade1pLEFT
-				beq.s	NoChan3sound
-
-				move.l	Samp1endLEFT,d0
-				move.l	pos1LEFT,d1
-				sub.l	d1,d0
-				lsr.l	#1,d0
-				move.w	d0,$d4(a6)
-				ext.l	d0
-
-				divs	#100,d0 ; todo - approximate?
-
-				move.w	d0,playnull3
-				move.l	d1,$d0(a6)
-				move.w	#$8208,dmacon(a6)
-				moveq	#0,d0
-				move.b	vol1left,d0
-				move.w	d0,$d8(a6)
-
-NoChan3sound:
-
-nomorechannels:
-				move.l	NoiseMade0LEFT,NoiseMade0pLEFT
-				move.l	#0,NoiseMade0LEFT
-				move.l	NoiseMade0RIGHT,NoiseMade0pRIGHT
-				move.l	#0,NoiseMade0RIGHT
-
-				tst.b	NoiseMade0pLEFT
-				bne.s	chan0still
-				tst.w	playnull0
-				beq.s	nnul0
-				sub.w	#1,playnull0
-				bra.s	chan0still
-nnul0:
-				move.w	#0,LEFTCHANDATA+2
-				clr.w	LEFTCHANDATA+32
-chan0still:
-
-				tst.b	NoiseMade0pRIGHT
-				bne.s	chan1still				;it'll never work
-				tst.w	playnull1
-				beq.s	nnul1
-				sub.w	#1,playnull1
-				bra.s	chan1still
-nnul1:
-				move.w	#0,RIGHTCHANDATA+2
-				clr.w	RIGHTCHANDATA+32
-chan1still:
-
-				tst.b	NoiseMade1pRIGHT
-				bne.s	chan2still
-				tst.w	playnull2
-				beq.s	nnul2
-				sub.w	#1,playnull2
-				bra.s	chan2still
-nnul2:
-				move.w	#0,RIGHTCHANDATA+2+4
-				clr.w	RIGHTCHANDATA+32+4
-chan2still:
-
-				tst.b	NoiseMade1pLEFT
-				bne.s	chan3still
-				tst.w	playnull3
-				beq.s	nnul3
-				sub.w	#1,playnull3
-				bra.s	chan3still
-nnul3:
-				move.w	#0,LEFTCHANDATA+2+4
-				clr.w	LEFTCHANDATA+32+4
-
-chan3still:
-				GETREGS
-
-				moveq	#0,d0					; VERTB interrupt needs to return Z flag set
-				rts
-
-backbeat:		dc.w	0
-
-playnull0:		dc.w	0
-playnull1:		dc.w	0
-playnull2:		dc.w	0
-playnull3:		dc.w	0
 
 Samp0endRIGHT:	dc.l	Aud_EmptyBufferEnd
 Samp1endRIGHT:	dc.l	Aud_EmptyBufferEnd
@@ -7488,35 +7260,34 @@ Aud_NoiseX_w:       dc.w	0
 Aud_NoiseZ_w:       dc.w	0
 Aud_NoiseVol_w:     dc.w	0
 Aud_ChannelPick_b:  dc.w	0
-IDNUM:              dc.w	0
+Aud_IDNum_w:        dc.w	0
 Aud_NeedLeft_b:     dc.b	0
 Aud_NeedRight_b:    dc.b	0
 Aud_Stereo_b:       dc.b	$FF
 
 				even
-CHANNELDATA:
-LEFTCHANDATA:
-				dc.l	$00000000
-				dc.l	$00000000
-				dc.l	$FF000000
-				dc.l	$FF000000
-RIGHTCHANDATA:
+Aud_ChannelData_vw:
+Aud_LeftChannelData_vw:
 				dc.l	$00000000
 				dc.l	$00000000
 				dc.l	$FF000000
 				dc.l	$FF000000
 
+Aud_RightChannelData_vw:
+				dc.l	$00000000
+				dc.l	$00000000
+				dc.l	$FF000000
+				dc.l	$FF000000
+
+; What is this set of
 				ds.l	8
-
-RIGHTPLAYEDTAB:	ds.l	20
-LEFTPLAYEDTAB:	ds.l	20
 
 SourceEcho:		dc.w	0
 PLREcho:		dc.w	0
 
 
-LEFTOFFSET:		dc.l	0
-RIGHTOFFSET:	dc.l	0
+Aud_LeftOffset_l:	dc.l	0
+Aud_RightOffset_l:	dc.l	0
 
 ; TODO - this is a replacement hook
 Aud_PlaySound:
@@ -7557,19 +7328,24 @@ MakeSomeNoise:
 
 ; find if we are already playing
 
-				move.w	IDNUM,d0
+				move.w	Aud_IDNum_w,d0
 				cmp.w	#$ffff,d0
 				beq.s	dontworry
+
+				; This loops over 8 channel definitions in Aud_ChannelData_vw
 				move.w	#7,d1
-				lea		CHANNELDATA,a3
+				lea		Aud_ChannelData_vw,a3
+
 findsameasme:
 				tst.b	(a3)
 				bne.s	notavail
 				cmp.w	32(a3),d0
 				beq		SameAsMe
+
 notavail:
 				add.w	#4,a3
 				dbra	d1,findsameasme
+
 				bra		dontworry
 SameAsMe
 ; move.w #$8010,$dff000+intena
@@ -7593,11 +7369,11 @@ dontworry:
 				beq		pastcalc
 
 				move.w	#31,d0
-.findhigh
+.findhigh:
 				btst	d0,d2
 				bne		.foundhigh
 				dbra	d0,.findhigh
-.foundhigh
+.foundhigh:
 				asr.w	#1,d0
 				clr.l	d3
 				bset	d0,d3
@@ -7611,7 +7387,7 @@ dontworry:
 				sub.w	d3,d0					; second approx
 				bgt		.stillnot0
 				move.w	#1,d0
-.stillnot0
+.stillnot0:
 
 				move.w	d0,d3
 				muls	d3,d3
@@ -7629,7 +7405,7 @@ dontworry:
 				cmp.l	#32767,d3
 				ble.s	.nnnn
 				move.l	#32767,d3
-.nnnn
+.nnnn:
 
 				asr.w	#2,d0
 				addq	#1,d0
@@ -7647,7 +7423,7 @@ notooloud:
 
 				move.w	d3,d4
 				tst.b	Aud_Stereo_b
-				beq		NOSTEREO
+				beq		Aud_DoMono
 
 				move.w	d3,d2
 				muls	Aud_NoiseX_w,d2
@@ -7655,14 +7431,18 @@ notooloud:
 				divs	d0,d2
 
 				bgt.s	quietleft
+
 				add.w	d2,d4
 				bge.s	donequiet
+
 				move.w	#0,d4
 				bra.s	donequiet
+
 quietleft:
 				sub.w	d2,d3
 				bge.s	donequiet
 				move.w	#0,d3
+
 donequiet:
 
 ; d3=leftvol?
@@ -7673,14 +7453,14 @@ donequiet:
 
 				move.w	#$ffff,Aud_NeedLeft_b
 
-				move.l	#0,RIGHTOFFSET
-				move.l	#0,LEFTOFFSET
+				move.l	#0,Aud_RightOffset_l
+				move.l	#0,Aud_LeftOffset_l
 
 				cmp.b	d3,d4
 				bgt.s	RightLouder
 				beq.s	NoLouder
 
-				move.l	#4,LEFTOFFSET
+				move.l	#4,Aud_LeftOffset_l
 
 ; Left is louder; is it MUCH louder?
 
@@ -7692,7 +7472,7 @@ donequiet:
 				bra		aboutsame
 
 RightLouder:
-				move.l	#4,RIGHTOFFSET
+				move.l	#4,Aud_RightOffset_l
 				st		Aud_NeedRight_b
 				move.w	d4,d2
 				sub.w	d3,d2
@@ -7701,23 +7481,25 @@ RightLouder:
 
 aboutsame:
 NoLouder:
-
-
 ; Find least important sound on left
 
 				move.l	#0,a2
 				move.l	#0,d5
 				move.w	#32767,d2
-				move.w	IDNUM,d0
-				lea		LEFTCHANDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_LeftChannelData_vw,a3
 				move.w	#3,d1
-FindLeftChannel
+
+FindLeftChannel:
 				tst.b	(a3)
 				bne.s	.notactive
+
 				cmp.w	32(a3),d0
 				beq.s	FOUNDLEFT
+
 				cmp.w	2(a3),d2
 				blt.s	.notactive
+
 				move.w	2(a3),d2
 				move.l	a3,a2
 				move.w	d5,d6
@@ -7728,6 +7510,7 @@ FindLeftChannel
 				dbra	d1,FindLeftChannel
 				move.l	a2,a3
 				bra.s	gopastleft
+
 FOUNDLEFT:
 				move.w	d5,d6
 gopastleft:
@@ -7738,66 +7521,54 @@ NONOISE:
 ; move.w #$8010,$dff000+intena
 				rts
 FOUNDALEFT:
-
+				; This code path is for stereo mode
 				cmp.w	noiseloud,d2
 				bge		dorightchan
 
 ; d6 = channel number
 				cmp.w	#$ffff,d0
 				bne.s	.noche
+
 				move.w	#$fffe,d0
 .noche:
 				move.w	d0,32(a3)
 				move.w	noiseloud,2(a3)
-
 				move.w	Aud_SampleNum_w,d5
 
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
-				add.l	LEFTOFFSET,a1
+				add.l	Aud_LeftOffset_l,a1
 				move.l	4(a3,d5.w*8),a2
-				add.l	LEFTOFFSET,a2
-
+				add.l	Aud_LeftOffset_l,a2
 				tst.b	d6
 				seq		NoiseMade0LEFT
 				beq.s	.chan0
 				cmp.b	#2,d6
 				slt		NoiseMade1LEFT
 				blt		.chan1
+
 				seq		NoiseMade2LEFT
 				beq		.chan2
-				st		NoiseMade3LEFT
 
-				move.b	d5,LEFTPLAYEDTAB+9
-				move.b	d3,LEFTPLAYEDTAB+1+9
-				move.b	d4,LEFTPLAYEDTAB+2+9
+				st		NoiseMade3LEFT
 				move.b	d3,vol3left
 				move.l	a1,pos3LEFT
 				move.l	a2,Samp3endLEFT
 				bra		dorightchan
 
 .chan0:
-				move.b	d5,LEFTPLAYEDTAB
-				move.b	d3,LEFTPLAYEDTAB+1
-				move.b	d4,LEFTPLAYEDTAB+2
 				move.l	a1,pos0LEFT
 				move.l	a2,Samp0endLEFT
 				move.b	d3,vol0left
 				bra		dorightchan
 
 .chan1:
-				move.b	d5,LEFTPLAYEDTAB+3
-				move.b	d3,LEFTPLAYEDTAB+1+3
-				move.b	d4,LEFTPLAYEDTAB+2+3
 				move.b	d3,vol1left
 				move.l	a1,pos1LEFT
 				move.l	a2,Samp1endLEFT
 				bra		dorightchan
 
 .chan2:
-				move.b	d5,LEFTPLAYEDTAB+6
-				move.b	d3,LEFTPLAYEDTAB+1+6
-				move.b	d4,LEFTPLAYEDTAB+2+6
 				move.l	a1,pos2LEFT
 				move.l	a2,Samp2endLEFT
 				move.b	d3,vol2left
@@ -7809,8 +7580,8 @@ dorightchan:
 				move.l	#0,a2
 				move.l	#0,d5
 				move.w	#10000,d2
-				move.w	IDNUM,d0
-				lea		RIGHTCHANDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_RightChannelData_vw,a3
 				move.w	#3,d1
 FindRightChannel
 				tst.b	(a3)
@@ -7855,8 +7626,8 @@ FOUNDARIGHT:
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
 				move.l	4(a3,d5.w*8),a2
-				add.l	RIGHTOFFSET,a1
-				add.l	RIGHTOFFSET,a2
+				add.l	Aud_RightOffset_l,a1
+				add.l	Aud_RightOffset_l,a2
 
 				tst.b	d6
 				seq		NoiseMade0RIGHT
@@ -7868,9 +7639,6 @@ FOUNDARIGHT:
 				beq		.chan2
 				st		NoiseMade3RIGHT
 
-				move.b	d5,RIGHTPLAYEDTAB+9
-				move.b	d3,RIGHTPLAYEDTAB+1+9
-				move.b	d4,RIGHTPLAYEDTAB+2+9
 				move.b	d4,vol3right
 				move.l	a1,pos3RIGHT
 				move.l	a2,Samp3endRIGHT
@@ -7878,9 +7646,6 @@ FOUNDARIGHT:
 				rts
 
 .chan0:
-				move.b	d5,RIGHTPLAYEDTAB
-				move.b	d3,RIGHTPLAYEDTAB+1
-				move.b	d4,RIGHTPLAYEDTAB+2
 				move.l	a1,pos0RIGHT
 				move.l	a2,Samp0endRIGHT
 				move.b	d4,vol0right
@@ -7888,9 +7653,6 @@ FOUNDARIGHT:
 				rts
 
 .chan1:
-				move.b	d5,RIGHTPLAYEDTAB+3
-				move.b	d3,RIGHTPLAYEDTAB+1+3
-				move.b	d4,RIGHTPLAYEDTAB+2+3
 				move.b	d3,vol1right
 				move.l	a1,pos1RIGHT
 				move.l	a2,Samp1endRIGHT
@@ -7898,21 +7660,18 @@ FOUNDARIGHT:
 				rts
 
 .chan2:
-				move.b	d5,RIGHTPLAYEDTAB+6
-				move.b	d3,RIGHTPLAYEDTAB+1+6
-				move.b	d4,RIGHTPLAYEDTAB+2+6
 				move.l	a1,pos2RIGHT
 				move.l	a2,Samp2endRIGHT
 				move.b	d3,vol2right
 ; move.w #$8010,$dff000+intena
 				rts
 
-NOSTEREO:
+Aud_DoMono:
 				move.l	#0,a2
 				move.l	#-1,d5
 				move.w	#32767,d2
-				move.w	IDNUM,d0
-				lea		CHANNELDATA,a3
+				move.w	Aud_IDNum_w,d0
+				lea		Aud_ChannelData_vw,a3
 				move.w	#7,d1
 				moveq	#-1,d6
 
@@ -7957,33 +7716,35 @@ FOUNDACHAN:
 
 				cmp.w	#$ffff,d0
 				bne.s	.noche
+
 				move.w	#$fffe,d0
 .noche:
 				move.w	d0,32(a3)
 				move.w	noiseloud,2(a3)
-
 				move.w	Aud_SampleNum_w,d5
-
 				move.l	#Aud_SampleList_vl,a3
 				move.l	(a3,d5.w*8),a1
 				move.l	4(a3,d5.w*8),a2
 
 				tst.b	d6
 				beq		.chan0
+
 				cmp.b	#2,d6
 				blt		.chan1
+
 				beq		.chan2
+
 				cmp.b	#4,d6
 				blt		.chan3
+
 				beq		.chan4
+
 				cmp.b	#6,d6
 				blt		.chan5
-				beq		.chan6
-				st		NoiseMade3RIGHT
 
-				move.b	d5,RIGHTPLAYEDTAB+9
-				move.b	d3,RIGHTPLAYEDTAB+1+9
-				move.b	d4,RIGHTPLAYEDTAB+2+9
+				beq		.chan6
+
+				st		NoiseMade3RIGHT
 				move.b	d4,vol3right
 				move.l	a1,pos3RIGHT
 				move.l	a2,Samp3endRIGHT
@@ -7992,9 +7753,6 @@ FOUNDACHAN:
 
 .chan3:
 				st		NoiseMade3LEFT
-				move.b	d5,LEFTPLAYEDTAB+9
-				move.b	d3,LEFTPLAYEDTAB+1+9
-				move.b	d4,LEFTPLAYEDTAB+2+9
 				move.b	d3,vol3left
 				move.l	a1,pos3LEFT
 				move.l	a2,Samp3endLEFT
@@ -8003,9 +7761,6 @@ FOUNDACHAN:
 
 .chan0:
 				st		NoiseMade0LEFT
-				move.b	d5,LEFTPLAYEDTAB
-				move.b	d3,LEFTPLAYEDTAB+1
-				move.b	d4,LEFTPLAYEDTAB+2
 				move.l	a1,pos0LEFT
 				move.l	a2,Samp0endLEFT
 				move.b	d3,vol0left
@@ -8014,9 +7769,6 @@ FOUNDACHAN:
 
 .chan1:
 				st		NoiseMade1LEFT
-				move.b	d5,LEFTPLAYEDTAB+3
-				move.b	d3,LEFTPLAYEDTAB+1+3
-				move.b	d4,LEFTPLAYEDTAB+2+3
 				move.b	d3,vol1left
 				move.l	a1,pos1LEFT
 				move.l	a2,Samp1endLEFT
@@ -8025,9 +7777,6 @@ FOUNDACHAN:
 
 .chan2:
 				st		NoiseMade2LEFT
-				move.b	d5,LEFTPLAYEDTAB+6
-				move.b	d3,LEFTPLAYEDTAB+1+6
-				move.b	d4,LEFTPLAYEDTAB+2+6
 				move.l	a1,pos2LEFT
 				move.l	a2,Samp2endLEFT
 				move.b	d3,vol2left
@@ -8036,9 +7785,6 @@ FOUNDACHAN:
 
 .chan4:
 				st		NoiseMade0RIGHT
-				move.b	d5,RIGHTPLAYEDTAB
-				move.b	d3,RIGHTPLAYEDTAB+1
-				move.b	d4,RIGHTPLAYEDTAB+2
 				move.l	a1,pos0RIGHT
 				move.l	a2,Samp0endRIGHT
 				move.b	d4,vol0right
@@ -8047,9 +7793,6 @@ FOUNDACHAN:
 
 .chan5:
 				st		NoiseMade1RIGHT
-				move.b	d5,RIGHTPLAYEDTAB+3
-				move.b	d3,RIGHTPLAYEDTAB+1+3
-				move.b	d4,RIGHTPLAYEDTAB+2+3
 				move.b	d3,vol1right
 				move.l	a1,pos1RIGHT
 				move.l	a2,Samp1endRIGHT
@@ -8058,9 +7801,6 @@ FOUNDACHAN:
 
 .chan6:
 				st		NoiseMade2RIGHT
-				move.b	d5,RIGHTPLAYEDTAB+6
-				move.b	d3,RIGHTPLAYEDTAB+1+6
-				move.b	d4,RIGHTPLAYEDTAB+2+6
 				move.l	a1,pos2RIGHT
 				move.l	a2,Samp2endRIGHT
 				move.b	d3,vol2right
@@ -8320,7 +8060,7 @@ STOPCOUNT:
 okcount:
 				add.l	d0,TimeCount
 				addq.l	#1,NumTimes
-				clr.b	counting
+				sf		counting
 				move.l	(a7)+,d0
 				rts
 
@@ -8335,7 +8075,7 @@ STOPCOUNTNOADD:
 				add.l	#313*256,d0
 okcount2:
 				add.l	d0,TimeCount
-				clr.b	counting
+				sf		counting
 				move.l	(a7)+,d0
 				rts
 

@@ -718,8 +718,8 @@ pastobjscale:
 				adda.w	d7,a5					; a5 pointing to?
 				asl.w	#4,d7
 				adda.w	d7,a6					; a6 pointing to?
-				clr.b	draw_LightIt_b
-				clr.b	draw_Additive_b
+				sf		draw_LightIt_b
+				sf		draw_Additive_b
 				move.b	4(a0),d7
 				btst	#7,d7
 				sne		draw_FlipIt_b
@@ -1450,10 +1450,10 @@ draw_CalcBrightRings:
 .solid_wall:
 				move.w	EdgeT_XLen_w(a3),d1
 				move.w	EdgeT_ZLen_w(a3),d2
-				move.w	oldx,newx
-				move.w	oldz,newz
-				sub.w	d2,newx
-				add.w	d1,newz
+				move.w	Obj_OldX_w,Obj_NewX_w
+				move.w	Obj_OldZ_w,Obj_NewZ_w
+				sub.w	d2,Obj_NewX_w
+				add.w	d1,Obj_NewZ_w
 
 				SAVEREGS
 
@@ -1614,8 +1614,8 @@ draw_CalcBrightsInZone:
 ; list is terminated with -1.
 
 				move.l	Lvl_PointsPtr_l,a3
-				move.w	draw_Obj_XPos_w,oldx
-				move.w	draw_Obj_ZPos_w,oldz
+				move.w	draw_Obj_XPos_w,Obj_OldX_w
+				move.w	draw_Obj_ZPos_w,Obj_OldZ_w
 				move.w	#10,speed
 				move.w	#0,Range
 
@@ -1623,8 +1623,8 @@ draw_CalcBrightsInZone:
 				move.w	(a1)+,d0				;pt number
 				blt		.done_point_bright
 
-				move.w	(a3,d0.w*4),newx
-				move.w	2(a3,d0.w*4),newz
+				move.w	(a3,d0.w*4),Obj_NewX_w
+				move.w	2(a3,d0.w*4),Obj_NewZ_w
 
 				SAVEREGS
 
@@ -2328,7 +2328,7 @@ checkbeh:
 				sub.l	d0,d2
 				move.l	d2,polybright
 				move.l	#draw_2DPointsProjected_vl,a3
-				clr.b	drawit
+				sf		drawit
 				tst.b	draw_Gouraud_b
 				bne.s	usegour
 

@@ -137,17 +137,17 @@ game_DoneMenu:
 
 				FILTER
 
-				clr.b	Game_FinishedLevel_b
+				sf		Game_FinishedLevel_b
 				clr.w	Plr1_SnapAngPos_w
 				clr.w	Plr2_SnapAngPos_w
 				clr.w	Plr1_AngPos_w
 				clr.w	Plr2_AngPos_w
-				clr.b	Plr1_GunSelected_b
-				clr.b	Plr2_GunSelected_b
+				sf		Plr1_GunSelected_b
+				sf		Plr2_GunSelected_b
 
-***************************
-				clr.b	AI_NoEnemies_b
-***************************
+;***************************
+				sf		AI_NoEnemies_b
+;***************************
 
 				move.l	#Plr_Health_w,a0
 				move.l	#Plr_Shield_w,a1
@@ -319,7 +319,7 @@ onepla:
 				rts
 
 Plr_InitMaster:
-				clr.b	AI_NoEnemies_b
+				sf		AI_NoEnemies_b
 				move.w	Game_LevelNumber_w,d0
 				jsr		SENDFIRST
 
@@ -330,7 +330,7 @@ Plr_InitMaster:
 				rts
 
 Plr_InitSlave:
-				clr.b	AI_NoEnemies_b
+				sf		AI_NoEnemies_b
 				jsr		RECFIRST
 				move.w	d0,Game_LevelNumber_w
 				add.b	#'a',d0

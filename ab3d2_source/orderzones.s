@@ -78,7 +78,7 @@ Zone_OrderZones:
 				move.w	#100,d7					; which ones to look at.
 
 				move.l	a2,a5
-				; clr.b farendfound
+				; sf farendfound
 
 .run_through_list:
 				DEV_INC.w	Reserved2
@@ -102,7 +102,7 @@ Zone_OrderZones:
 
 				move.l	#zone_OrderTable_vw,a5
 				lea		(a5,d0.w*8),a5
-				; clr.b donesomething
+				; sf donesomething
 
 				bsr		zone_InsertList
 

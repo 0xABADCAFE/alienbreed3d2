@@ -239,7 +239,7 @@ startchunkytel:
 				subq.w	#1,Game_TeleportFrame_w
 				bgt.s	.done
 
-				clr.b	C2P_Teleporting_b
+				sf		C2P_Teleporting_b
 				st		C2P_NeedsInit_b
 
 .done:
