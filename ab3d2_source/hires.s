@@ -107,6 +107,7 @@ _startup:
 				tst.l	d0
 				beq		.startup_fail
 
+
 				; since these moved to bss, they need explicit initialisation
 				; todo - module initialisation calls
 				; XXX following two statements are NOPs
@@ -150,7 +151,9 @@ _startup:
 				sf		Plr2_Joystick_b
 				ENDC
 
-				; Setup constant table
+				jsr		InitTables
+
+				; Setup constant table - TODO move into InitTables
 				move.l	#ConstantTable_vl,a0
 				moveq	#1,d0
 				move.w	#8191,d1
@@ -186,6 +189,7 @@ _startup:
 				movem.l	(sp)+,d1-a6
 				rts
 
+				include		"modules/tables.s"
 				; Include even in C version for assembly helpers
 				include		"modules/system.s"
 				include		"modules/level.s"

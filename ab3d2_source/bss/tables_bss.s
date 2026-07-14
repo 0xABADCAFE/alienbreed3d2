@@ -25,6 +25,9 @@ ObjectWorkspace_vl:			ds.l	600 ; hires.s
 
 ConstantTable_vl:			ds.l	8192*2 ; 8192 pairs of long
 
+		; sine/cosine << 15, contains two full cycles (720 degrees) over 8192 entries
+		DCLC SinCosTable_vw,	ds.w,	8192
+
 DataBuffer1_vl:				ds.l	1600 ; wall drawing
 DataBuffer2_vl:				ds.l	1600 ; wall drawing
 Storage_vl:					ds.l	500  ; drawing
@@ -42,6 +45,7 @@ anim_LiftHeightTable_vw:	ds.w	40 ; newanims.s
 anim_DoorOpenTimers_vw:	ds.w	40 ; newanims.s
 
 Obj_RoomPath_vw:			ds.w	100 ; objmove.s
+
 
 		DCLC game_ModProps,	ds.b,	256
 		DCLC KeyMap_vb,		ds.b,	256
