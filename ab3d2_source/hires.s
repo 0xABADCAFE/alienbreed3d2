@@ -107,6 +107,7 @@ _startup:
 				tst.l	d0
 				beq		.startup_fail
 
+
 				; since these moved to bss, they need explicit initialisation
 				; todo - module initialisation calls
 				; XXX following two statements are NOPs
@@ -150,27 +151,7 @@ _startup:
 				sf		Plr2_Joystick_b
 				ENDC
 
-				; Setup constant table
-				move.l	#ConstantTable_vl,a0
-				moveq	#1,d0
-				move.w	#8191,d1
-
-.fill_const:
-				move.l	#16384*64,d2 ; 1<<10
-				divs.l	d0,d2
-; ext.l d2	;c#
-				move.l	#64*64*65536,d3
-				divs.l	d2,d3
-; move.l d3,d4
-; asr.l #6,d4
-				move.l	d3,(a0)+				; e#
-				asr.l	#1,d2					; c#/2.0
-				sub.l	#40*64,d2				; d#
-				muls.l	d3,d2					; d#*e#
-				asr.l	#6,d2
-				move.l	d2,(a0)+
-				addq	#1,d0
-				dbra	d1,.fill_const
+				jsr		InitTables
 
 ;				CALLC	Game_Init ; this might be the best place
 
@@ -186,6 +167,7 @@ _startup:
 				movem.l	(sp)+,d1-a6
 				rts
 
+				include		"modules/tables.s"
 				; Include even in C version for assembly helpers
 				include		"modules/system.s"
 				include		"modules/level.s"
