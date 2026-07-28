@@ -100,3 +100,11 @@
 		UBYTE PlrT_ObjectsInLine_vb			; ..., MAX_OBJS_IN_LINE_COUNT : UBYTE[MAX_OBJS_IN_LINE_COUNT]
 		PADDING (MAX_OBJS_IN_LINE_COUNT-1)
 		LABEL PlrT_SizeOf_l
+
+; TODO - Zonal Gravity?
+
+PLAYER_FALL_ACCELERATION EQU 64			; Fall velocity increment per tick
+PLAYER_IN_WATER_MAX_SINK_SPEED EQU 512	; Terminal fall velcity (in water ?)
+PLAYER_FALL_DAMAGE_MIN EQU 100			; Min threshold for damage. A counter is incremented every tick the player
+										; is falling. The fall damage delivered is whatever the tick count is
+										; above this. This need replacing with a gravity based estimate,

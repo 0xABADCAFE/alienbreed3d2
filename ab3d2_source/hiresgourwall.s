@@ -202,12 +202,12 @@ DoleftendGOUR:
 				add.l	d5,WD_LeftBrightScaled_l(a0)
 				move.l	WD_DUpperHorizBright_l(a0),d5
 				add.l	d5,WD_UpperLeftBrightScaled_l(a0)
-				add.l	#$10000,d7
-				dbra	d7,.scr_divide_loop
+				add.l	#$10000,d7 ; increment upper word.
+				dbra	d7,.scr_divide_loop ; lower word affected only
 
 .out_of_calc:
 				swap	d7
-				tst.w	d7
+				tst.w	d7 ; value that was incremented during first loop
 				bge.s	.something_to_draw
 
 				rts
