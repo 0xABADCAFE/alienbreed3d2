@@ -100,3 +100,35 @@
 		UBYTE PlrT_ObjectsInLine_vb			; ..., MAX_OBJS_IN_LINE_COUNT : UBYTE[MAX_OBJS_IN_LINE_COUNT]
 		PADDING (MAX_OBJS_IN_LINE_COUNT-1)
 		LABEL PlrT_SizeOf_l
+
+; TODO - Gravity Overhaul
+;
+; Instead of using a terminal velocity in water and immediately limiting to it we can simulate drag for whatever
+; we are falling through. Since we update the velocity every tick:
+;
+;         V_new = V_prev + ((G << P) - V_prev) >> P
+;
+; Where:
+;         G is the fall acceleration, either global, level or zone overridden.
+;         P is a shift factor for how easy it is to pass through the medium.
+;
+; At V = 0, the calculation is as present: V_new = P_prev + G (the shifts cancel)
+;
+; As V increases, the effective acceleration begins to fall. Terminal velocity is reached at G << P.
+;
+; Worked example for water: The current terminal velocity for water is defined as 512, and G is 64:
+;
+; V_term = G << P, 512 = 64 << P => P = 3
+;
+; For air, we should use a higher value of P. For example, a value of 8 would have a terminal velocity of 16384
+; i.e. 32x faster than falling through water.
+
+
+PLAYER_FALL_ACCELERATION EQU 64			; Fall velocity increment per tick
+PLAYER_WATER_MAX_SINK_SPEED EQU 512		; Terminal fall velcity when in liquid
+PLAYER_FALL_DAMAGE_MIN EQU 100			; Min threshold for damage. A counter is incremented every tick the player
+										; is falling. The fall damage delivered is whatever the tick count is
+										; above this. This need replacing with a gravity based estimate,
+PLAYER_JETPACK_ACCELERATION EQU -128	; Jetpack Thrust velocity increment, per tick.
+PLAYER_JUMP_IMPULSE_AIR EQU -1024		; Velocity increment for jumping in air.
+PLAYER_JUMP_IMPULSE_WATER EQU -512      ; Velocity increment for jumping in water.

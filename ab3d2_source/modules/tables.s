@@ -57,7 +57,7 @@ InitTables:
 				move.w	d0,8192(a1)	; write Quadrant 8 (copy of Quadrant 4 + 8192)
 				dbra	d1,.mirror_loop
 
-				; Setup constant table - TODO move into InitTables
+; Constant Table
 				move.l	#ConstantTable_vl,a0
 				moveq	#1,d0
 				move.w	#8191,d1

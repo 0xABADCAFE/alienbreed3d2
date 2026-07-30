@@ -110,9 +110,6 @@ BOOL Sys_Init()
         goto fail;
     }
 
-    // Load the game prefs (bindings etc).
-    Game_Init();
-
     return TRUE;
 
 fail:

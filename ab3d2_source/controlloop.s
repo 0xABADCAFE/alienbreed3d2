@@ -321,17 +321,17 @@ onepla:
 Plr_InitMaster:
 				sf		AI_NoEnemies_b
 				move.w	Game_LevelNumber_w,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 
 				move.w	Rand1,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 
 				bsr		TWOPLAYER
 				rts
 
 Plr_InitSlave:
 				sf		AI_NoEnemies_b
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.w	d0,Game_LevelNumber_w
 				add.b	#'a',d0
 				move.b	d0,Lvl_BinFilenameX_vb
@@ -340,7 +340,7 @@ Plr_InitSlave:
 				move.b	d0,Lvl_MapFilenameX_vb
 				move.b	d0,Lvl_FlyMapFilenameX_vb
 
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.w	d0,Rand1
 				bsr		TWOPLAYER
 

@@ -153,7 +153,7 @@ _startup:
 
 				jsr		InitTables
 
-;				CALLC	Game_Init ; this might be the best place
+				CALLC	Game_Init
 
 				jsr		Game_Start
 
@@ -974,12 +974,12 @@ nofadedownhc:
 				cmp.b	#PLR_MASTER,Plr_MultiplayerType_b
 				bne.s	.slavelast
 
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 
 				bra		.masfirst
 
 .slavelast:
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 
 .masfirst:
 				sf		Game_SlavePaused_b
@@ -1194,7 +1194,7 @@ NotOnePlayer:
 
 				GETREGS
 
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 
 				move.w	Anim_FramesToDraw_w,Anim_TempFrames_w
 				cmp.w	#15,Anim_TempFrames_w
@@ -1218,29 +1218,29 @@ NotOnePlayer:
 				move.b	Plr1_GunSelected_b,Plr1_TmpGunSelected_b
 
 				move.l	Plr1_AimSpeed_l,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.l	d0,Plr2_AimSpeed_l
 
 				move.l	Plr1_TmpXOff_l,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.l	d0,Plr2_TmpXOff_l
 
 				move.l	Plr1_TmpZOff_l,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.l	d0,Plr2_TmpZOff_l
 
 				move.l	Plr1_TmpYOff_l,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.l	d0,Plr2_TmpYOff_l
 
 				move.l	plr1_TmpHeight_l,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.l	d0,plr2_TmpHeight_l
 
 				move.w	Plr1_TmpAngPos_w,d0
 				swap	d0
 				move.w	plr1_TmpBobble_w,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.w	d0,plr2_TmpBobble_w
 				swap	d0
 				move.w	d0,Plr2_TmpAngPos_w
@@ -1251,7 +1251,7 @@ NotOnePlayer:
 				move.b	Plr1_TmpSpcTap_b,d0
 				lsl.w	#8,d0
 				move.b	Plr1_TmpClicked_b,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.b	d0,Plr2_TmpClicked_b
 				lsr.w	#8,d0
 				move.b	d0,Plr2_TmpSpcTap_b
@@ -1262,7 +1262,7 @@ NotOnePlayer:
 				or.b	Plr1_Squished_b,d0
 				lsl.w	#8,d0
 				move.b	Plr1_TmpGunSelected_b,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.b	d0,Plr2_TmpGunSelected_b
 				lsr.w	#8,d0
 				move.b	d0,plr2_TmpDucked_b
@@ -1274,7 +1274,7 @@ NotOnePlayer:
 				swap	d0
 				move.b	Game_MasterPaused_b,d0
 				or.b	d0,Game_SlavePaused_b
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				or.b	d0,Game_MasterPaused_b
 				or.b	d0,Game_SlavePaused_b
 				swap	d0
@@ -1284,7 +1284,7 @@ NotOnePlayer:
 				move.b	d0,Plr2_TmpFire_b
 
 				move.w	Plr1_Health_w,d0
-				jsr		SENDFIRST
+				jsr		Ser_SendAndReceiveLong
 				move.w	d0,Plr2_Health_w
 
 				bsr		Plr1_Control
@@ -1317,7 +1317,7 @@ ASlaveShouldWaitOnHisMaster:
 
 				move.w	Plr2_Health_w,draw_DisplayEnergyCount_w
 
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 
 				move.l	Plr2_SnapXOff_l,Plr2_TmpXOff_l
 				move.l	Plr2_SnapZOff_l,Plr2_TmpZOff_l
@@ -1334,29 +1334,29 @@ ASlaveShouldWaitOnHisMaster:
 				move.b	Plr2_GunSelected_b,Plr2_TmpGunSelected_b
 
 				move.l	Plr2_AimSpeed_l,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.l	d0,Plr1_AimSpeed_l
 
 				move.l	Plr2_TmpXOff_l,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.l	d0,Plr1_TmpXOff_l
 
 				move.l	Plr2_TmpZOff_l,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.l	d0,Plr1_TmpZOff_l
 
 				move.l	Plr2_TmpYOff_l,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.l	d0,Plr1_TmpYOff_l
 
 				move.l	plr2_TmpHeight_l,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.l	d0,plr1_TmpHeight_l
 
 				move.w	Plr2_TmpAngPos_w,d0
 				swap	d0
 				move.w	plr2_TmpBobble_w,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.w	d0,plr1_TmpBobble_w
 				swap	d0
 				move.w	d0,Plr1_TmpAngPos_w
@@ -1364,7 +1364,7 @@ ASlaveShouldWaitOnHisMaster:
 				move.b	Plr2_TmpSpcTap_b,d0
 				lsl.w	#8,d0
 				move.b	Plr2_TmpClicked_b,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.b	d0,Plr1_TmpClicked_b
 				lsr.w	#8,d0
 				move.b	d0,Plr1_TmpSpcTap_b
@@ -1375,7 +1375,7 @@ ASlaveShouldWaitOnHisMaster:
 				or.b	Plr2_Squished_b,d0
 				lsl.w	#8,d0
 				move.b	Plr2_TmpGunSelected_b,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.b	d0,Plr1_TmpGunSelected_b
 				lsr.w	#8,d0
 				move.b	d0,plr1_TmpDucked_b
@@ -1389,7 +1389,7 @@ ASlaveShouldWaitOnHisMaster:
 				swap	d0
 				move.b	Game_SlavePaused_b,d0
 				or.b	d0,Game_MasterPaused_b
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				or.b	d0,Game_MasterPaused_b
 				or.b	d0,Game_SlavePaused_b
 				swap	d0
@@ -1399,7 +1399,7 @@ ASlaveShouldWaitOnHisMaster:
 				move.b	d0,Plr1_TmpFire_b
 
 				move.w	Plr2_Health_w,d0
-				jsr		RECFIRST
+				jsr		Ser_ReceiveAndSendLong
 				move.w	d0,Plr1_Health_w
 
 				bsr		Plr1_Control
@@ -8094,13 +8094,3 @@ welldone:
 
 				cnop	0,4
 
-;				IFND OPT060
-;				IFND OPT040
-;				include "modules/c2p/c2p1x1_8_c5_030_2.s"
-;				ENDC
-;				ENDC
-;				include	"modules/c2p/c2p1x1_8_c5_040.s"
-;				include	"modules/c2p/c2p_rect.s"
-;				include	"modules/c2p/c2p2x1_8_c5_gen.s"
-;
-;				include "modules/c2p/small_c2p1x1_8_c5_030_2.s"

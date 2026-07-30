@@ -737,26 +737,26 @@ plr_KeyboardControl:
 				add.l	d7,PlrT_SnapZOff_l(a0)
 				move.b	fire_key,d5
 				tst.b	PlrT_Fire_b(a0)
-				beq.s	.firenotpressed
+				beq.s	.fire_not_pressed
 
 				; fire was pressed last time.
 				tst.b	(a5,d5.w)
-				beq.s	.firenownotpressed
+				beq.s	.fire_released
 
 				; fire is still pressed this time.
 				st		PlrT_Fire_b(a0)
 				bra		.done
 
-.firenownotpressed:
+.fire_released:
 				; fire has been released.
 				sf		PlrT_Fire_b(a0)
 				bra		.done
 
-.firenotpressed:
+.fire_not_pressed:
 				; fire was not pressed last frame...
 				; if it has still not been pressed, go back above
 				tst.b	(a5,d5.w)
-				beq.s	.firenownotpressed
+				beq.s	.fire_released
 
 				; fire was not pressed last time, and was this time, so has
 				; been clicked.
@@ -826,7 +826,7 @@ plr_Fall:
 				asl.l	#6,d2
 				move.l	PlrT_ObjectPtr_l(a0),a4
 				move.w	plr_FallDamage_w,d3
-				sub.w	#100,d3 ; TODO - this should depend on the distance fallen.
+				sub.w	#PLAYER_FALL_DAMAGE_MIN,d3 ; TODO - this should depend on the distance fallen.
 				ble.s	.skip_damage
 
 				add.b	d3,EntT_DamageTaken_b(a4)
@@ -849,14 +849,14 @@ plr_Fall:
 				bsr		plr_DoFootstepFX
 
 .skip_footstep_fx:
-				move.l	#-1024,plr_JumpSpeed_l
+				move.l	#PLAYER_JUMP_IMPULSE_AIR,plr_JumpSpeed_l
 
 				move.l	PlrT_ZonePtr_l(a0),a2
 				move.l	ZoneT_Water_l(a2),d0
 				cmp.l	d0,d1
 				blt.s	.not_in_water
 
-				move.l	#-512,plr_JumpSpeed_l
+				move.l	#PLAYER_JUMP_IMPULSE_WATER,plr_JumpSpeed_l
 
 .not_in_water:
 				tst.w	PlrT_Health_w(a0)
@@ -867,6 +867,7 @@ plr_Fall:
 				move.b	jump_key,d7
 				tst.b	(a5,d7.w)
 				beq.s	.no_thrust
+
 				move.l	plr_JumpSpeed_l,d2
 
 .no_thrust:
@@ -880,6 +881,10 @@ plr_Fall:
 				bra		.proceed
 
 .above_ground:
+				;for reference
+				; PlrT_SnapTYOff_l(a0),d0
+				; PlrT_SnapYOff_l(a0),d1
+				; PlrT_SnapYVel_l(a0),d2
 				sf		Plr_Decelerate_b
 				tst.w	PlrT_Jetpack_w(a0)
 				beq.s	.not_flying
@@ -896,7 +901,7 @@ plr_Fall:
 
 .have_jetpack_fuel:
 				st		Plr_Decelerate_b
-				move.l	#-128,plr_JumpSpeed_l
+				move.l	#PLAYER_JETPACK_ACCELERATION,plr_JumpSpeed_l
 				move.l	#KeyMap_vb,a5
 				moveq	#0,d7
 				move.b	jump_key,d7
@@ -915,18 +920,19 @@ plr_Fall:
 				move.l	d0,d3
 				sub.l	d1,d3
 				cmp.l	#16*64,d3
-				bgt.s	.nonearmove
+				bgt.s	.no_near_move
 
 				st		Plr_Decelerate_b
 
-.nonearmove:
-; need to fall down (possibly).
+.no_near_move:
+				; need to fall down (possibly).
 				add.l	d2,d1
 				cmp.l	d1,d0
 				bgt.s	.still_above
 
+				; minimum cap on fall damage
 				move.w	plr_FallDamage_w,d3
-				sub.w	#100,d3
+				sub.w	#PLAYER_FALL_DAMAGE_MIN,d3
 				ble.s	.skip_damage_2
 
 				move.l	PlrT_ObjectPtr_l(a0),a4
@@ -940,7 +946,11 @@ plr_Fall:
 				bra		.proceed
 
 .still_above:
-				add.l	#64,d2
+				; todo - is this what caused jerkiness on lifts?
+				add.l	#PLAYER_FALL_ACCELERATION,d2
+				; TODO this doesn't really work with slower acceleration
+				;      since it just adds a constant value per time iteration
+				;      that we are above ground
 				add.w	#1,plr_FallDamage_w
 
 				move.l	PlrT_ZonePtr_l(a0),a2
@@ -964,12 +974,13 @@ plr_Fall:
 				GETREGS
 
 .no_splash_fx:
+				; sinking
 				st		Plr_Decelerate_b
 				move.w	#0,plr_FallDamage_w
-				cmp.l	#512,d2
+				cmp.l	#PLAYER_WATER_MAX_SINK_SPEED,d2
 				blt.s	.proceed
 
-				move.l	#512,d2					; reached terminal velocity.
+				move.l	#PLAYER_WATER_MAX_SINK_SPEED,d2	; reached terminal velocity.
 
 .proceed:
 				move.l	PlrT_ZonePtr_l(a0),a2
@@ -987,6 +998,8 @@ plr_Fall:
 				move.l	d3,d1
 				tst.l	d2
 				bge.s	.ok_ceiling
+
+				; todo - determine impact damage
 
 				moveq	#0,d2
 

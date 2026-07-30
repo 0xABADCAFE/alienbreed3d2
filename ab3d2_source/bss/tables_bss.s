@@ -23,7 +23,11 @@ ObjRotated_vl:				ds.l	2*500
 WorkspacePtr_l:				ds.l	1	; hires.s - may depend on position relative to ObjectWorkspace_vl
 ObjectWorkspace_vl:			ds.l	600 ; hires.s
 
-ConstantTable_vl:			ds.l	8192*2 ; 8192 pairs of long
+
+		DCLC ConstantTable_vl,	ds.l,	8192*2 ; 8192 pairs of long
+
+		; sine/cosine << 15, contains two full cycles (720 degrees) over 8192 entries
+		DCLC SinCosTable_vw,	ds.w,	8192
 
 		; sine/cosine << 15, contains two full cycles (720 degrees) over 8192 entries
 		DCLC SinCosTable_vw,	ds.w,	8192
