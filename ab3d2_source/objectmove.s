@@ -1334,6 +1334,8 @@ isinlist:
 ; list of rooms visible from the
 ; source room.
 
+; TODO - can we reuse edge PVS data here?
+
 ; Do line of sight!
 
 				st		CanSee
@@ -1411,6 +1413,8 @@ nomorerclips:
 GoThroughZones:
 				move.l	a5,a0
 				adda.w	ZoneT_EdgeListOffset_w(a0),a0
+
+; Deduplication opportunity.
 
 FindWayOut:
 				move.w	(a0)+,d5
@@ -1584,7 +1588,7 @@ FindCollisionPt:
 				sub.l	d6,d5					; positive
 				divs	EdgeT_Length_w(a2),d4
 				divs	EdgeT_Length_w(a2),d5
-				move.w	d5,d6
+				move.w	d5,d6 ; needed ?
 				add.w	d5,d4
 				beq.s	.sameheight
 				muls	d7,d5
@@ -1906,7 +1910,7 @@ putinmore:
 				move.l	#Obj_RoomPath_vw,a2
 
 putinmore2:
-				move.w	(a2)+,d0
+				move.w	(a2)+,d0 ; why are we going via d0 here?
 				move.w	d0,(a3)+
 				tst.w	d0
 				bge.s	putinmore2
