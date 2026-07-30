@@ -153,7 +153,7 @@ _startup:
 
 				jsr		InitTables
 
-;				CALLC	Game_Init ; this might be the best place
+				CALLC	Game_Init
 
 				jsr		Game_Start
 
@@ -8094,13 +8094,3 @@ welldone:
 
 				cnop	0,4
 
-;				IFND OPT060
-;				IFND OPT040
-;				include "modules/c2p/c2p1x1_8_c5_030_2.s"
-;				ENDC
-;				ENDC
-;				include	"modules/c2p/c2p1x1_8_c5_040.s"
-;				include	"modules/c2p/c2p_rect.s"
-;				include	"modules/c2p/c2p2x1_8_c5_gen.s"
-;
-;				include "modules/c2p/small_c2p1x1_8_c5_030_2.s"
