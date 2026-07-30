@@ -826,7 +826,7 @@ plr_Fall:
 				asl.l	#6,d2
 				move.l	PlrT_ObjectPtr_l(a0),a4
 				move.w	plr_FallDamage_w,d3
-				sub.w	#100,d3 ; TODO - this should depend on the distance fallen.
+				sub.w	#PLAYER_FALL_DAMAGE_MIN,d3 ; TODO - this should depend on the distance fallen.
 				ble.s	.skip_damage
 
 				add.b	d3,EntT_DamageTaken_b(a4)
@@ -849,14 +849,14 @@ plr_Fall:
 				bsr		plr_DoFootstepFX
 
 .skip_footstep_fx:
-				move.l	#-1024,plr_JumpSpeed_l
+				move.l	#PLAYER_JUMP_IMPULSE_AIR,plr_JumpSpeed_l
 
 				move.l	PlrT_ZonePtr_l(a0),a2
 				move.l	ZoneT_Water_l(a2),d0
 				cmp.l	d0,d1
 				blt.s	.not_in_water
 
-				move.l	#-512,plr_JumpSpeed_l
+				move.l	#PLAYER_JUMP_IMPULSE_WATER,plr_JumpSpeed_l
 
 .not_in_water:
 				tst.w	PlrT_Health_w(a0)
@@ -867,6 +867,7 @@ plr_Fall:
 				move.b	jump_key,d7
 				tst.b	(a5,d7.w)
 				beq.s	.no_thrust
+
 				move.l	plr_JumpSpeed_l,d2
 
 .no_thrust:
@@ -900,7 +901,7 @@ plr_Fall:
 
 .have_jetpack_fuel:
 				st		Plr_Decelerate_b
-				move.l	#-128,plr_JumpSpeed_l
+				move.l	#PLAYER_JETPACK_ACCELERATION,plr_JumpSpeed_l
 				move.l	#KeyMap_vb,a5
 				moveq	#0,d7
 				move.b	jump_key,d7
@@ -976,10 +977,10 @@ plr_Fall:
 				; sinking
 				st		Plr_Decelerate_b
 				move.w	#0,plr_FallDamage_w
-				cmp.l	#PLAYER_IN_WATER_MAX_SINK_SPEED,d2
+				cmp.l	#PLAYER_WATER_MAX_SINK_SPEED,d2
 				blt.s	.proceed
 
-				move.l	#PLAYER_IN_WATER_MAX_SINK_SPEED,d2	; reached terminal velocity.
+				move.l	#PLAYER_WATER_MAX_SINK_SPEED,d2	; reached terminal velocity.
 
 .proceed:
 				move.l	PlrT_ZonePtr_l(a0),a2
