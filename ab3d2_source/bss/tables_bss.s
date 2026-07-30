@@ -29,6 +29,9 @@ ObjectWorkspace_vl:			ds.l	600 ; hires.s
 		; sine/cosine << 15, contains two full cycles (720 degrees) over 8192 entries
 		DCLC SinCosTable_vw,	ds.w,	8192
 
+		; sine/cosine << 15, contains two full cycles (720 degrees) over 8192 entries
+		DCLC SinCosTable_vw,	ds.w,	8192
+
 DataBuffer1_vl:				ds.l	1600 ; wall drawing
 DataBuffer2_vl:				ds.l	1600 ; wall drawing
 Storage_vl:					ds.l	500  ; drawing
