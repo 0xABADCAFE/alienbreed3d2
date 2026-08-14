@@ -1182,7 +1182,3 @@ static void draw_CalculateGlyphSpacing() {
 
 #endif // GEN_GLYPH_DATA
 
-
-
-
-

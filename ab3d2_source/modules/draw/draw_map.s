@@ -5,8 +5,21 @@ MAP_STEP_WALL_PEN	EQU 254
 					align 4
 draw_BaseMapTransparencyPtr_l:	ds.l	1
 
+
+
 DoTheMapWotNastyCharlesIsForcingMeToDo:
 
+				move.l Sys_FrameNumber_l,d0
+				and.w #$1f,d0
+				move.w d0,d3
+				move.w d0,d2
+				lsl.w  #2,d2
+				sub.w  d0,d2
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bsr Draw_ShadeCircleUnclipped
 
 				; 0xABADCAFE - Fixme - make these assignable and remember to clear the keys
 				; as the zoom speed is insane under emulations
