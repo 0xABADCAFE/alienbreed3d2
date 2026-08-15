@@ -10,9 +10,11 @@ draw_BaseMapTransparencyPtr_l:	ds.l	1
 DoTheMapWotNastyCharlesIsForcingMeToDo:
 
 				move.l Sys_FrameNumber_l,d0
-				and.w #$1f,d0
-				move.w d0,d3
+				and.w  #$1f,d0
 				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
 				lsl.w  #2,d2
 				sub.w  d0,d2
 

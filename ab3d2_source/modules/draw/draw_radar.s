@@ -44,48 +44,53 @@ PLOT			MACRO
 
 _Draw_ShadeCircleUnclipped::
 Draw_ShadeCircleUnclipped:
+				tst.w	d2
+				bgt.s	.ready ; radius > 0
+
+				; TODO
+				; For small radii, e.g. < 16 pixels we can just have a precalculated list of
+				; x,y word coordinates. We can convert those into buffer position offsets during
+				; initialisation, once we know what the span width is (for future upgrades to resolution).
+				; Since these values are points on the circumference, we can simply zero terminate the list.
+
+				rts
+
+.ready:
 				movem.l d2-d7/a2-a6,-(sp)
 
 				; Shade table slice
-				ext.l   d3
+				and.l   #$3f,d3
 				lsl.l   #8,d3                  ; * 256 bytes per slice
 				add.l   Draw_TexturePalettePtr_l,d3
 				move.l  d3,a0                  ; a0 = slice
 
 				; Centre buffer pointer
 				move.l  Vid_FastBufferPtr_l,a1
-				ext.l   d0                     ; d0.l = x0
-				add.l   d0,a1                  ; a1 = buf = Vid_FastBufferPtr_l + x0
+				;ext.l   d0                     ; d0.l = x0
+				add.w   d0,a1                  ; a1 = buf = Vid_FastBufferPtr_l + x0
 
 				; Draw buffer
-				ext.l   d1                     ; d1.l = y0
 				lea     draw_LineOffsetBuffer_vl,a2
-				lea     (a2,d1.l*4),a2         ; a2 = &draw_LineOffsetBuffer_vl[y0]
+				lea     (a2,d1.w*4),a2         ; a2 = &draw_LineOffsetBuffer_vl[y0]
 
 				; X, Y and error
 				move.w  d2,d4                  ; d4.w = radius (x)
-				ext.l   d4                     ; d4.l = +x
 				moveq   #1,d2                  ; d2.w = err
 				sub.w   d4,d2                  ; d2.w = err = 1 - radius
-
 				clr.l   d3                     ; d3.l = +y = 0
-				suba.l  a4,a4                  ; a4   = -y = 0
+				move.l  d3,a4                  ; a4.l = -y = 0
 
-				; Zero high-order bytes for byte-lookup registers
+				; Using d6/d7 to hold the input pixels for the shade table lookup.
 				clr.l   d6
 				clr.l   d7
 
-				tst.w   d4                     ; Radius < 0 ?
-				blt     .done
-
 .loop_start:
 				; d4.l = +x, d3.l = +y, a4 = -y
-				; Derive -x in d5 far ahead of its use as an AGU index
-				move.l  d4,d5
-				neg.l   d5                     ; d5.l = -x
+				move.w  d4,d5
+				neg.w   d5                     ; d5.l = -x
 
 				; Load row_y_plus address into a3
-				move.l  (a2,d3.l*4),d0
+				move.l  (a2,d3.w*4),d0
 				lea     (a1,d0.l),a3           ; a3 = row_y_plus
 
 				; Octants A & D (Top Half)
@@ -94,17 +99,17 @@ Draw_ShadeCircleUnclipped:
 
 .octants_AD:
 				; Interleaved pair: row_y_plus[x] & row_y_plus[-x]
-				move.b  (a3,d4.l),d6           ; Fetch row_y_plus[+x]
-				move.b  (a3,d5.l),d7           ; Fetch row_y_plus[-x]
-				move.b  (a0,d6.l),d6           ; Lookup +x
-				move.b  (a0,d7.l),d7           ; Lookup -x
-				PLOT    d6,(a3,d4.l)           ; Octant A (+x)
-				PLOT    d7,(a3,d5.l)           ; Octant D (-x)
+				move.b  (a3,d4.w),d6           ; Fetch row_y_plus[+x]
+				move.b  (a3,d5.w),d7           ; Fetch row_y_plus[-x]
+				move.b  (a0,d6.w),d6           ; Lookup +x
+				move.b  (a0,d7.w),d7           ; Lookup -x
+				PLOT    d6,(a3,d4.w)           ; Octant A (+x)
+				PLOT    d7,(a3,d5.w)           ; Octant D (-x)
 				bra     .top_done
 
 .top_single_pixel:
-				move.b  (a3,d4.l),d6
-				PLOT    (a0,d6.l),(a3,d4.l)
+				move.b  (a3,d4.w),d6
+				PLOT    (a0,d6.w),(a3,d4.w)
 
 .top_done:
 				tst.w   d3                     ; y <= 0 ?
@@ -112,7 +117,7 @@ Draw_ShadeCircleUnclipped:
 
 				; Load row_y_minus address into a3 (re-using a3 to free registers)
 				; Uses a4 (-y) as index
-				move.l  (a2,a4.l*4),d0
+				move.l  (a2,a4.w*4),d0
 				lea     (a1,d0.l),a3           ; a3 = row_y_minus
 
 				; Octants E & H (Bottom Half)
@@ -121,17 +126,17 @@ Draw_ShadeCircleUnclipped:
 
 .octants_EH:
 				; Interleaved pair: row_y_minus[x] & row_y_minus[-x]
-				move.b  (a3,d4.l),d6           ; Fetch row_y_minus[+x]
-				move.b  (a3,d5.l),d7           ; Fetch row_y_minus[-x]
-				move.b  (a0,d6.l),d6           ; Lookup +x
-				move.b  (a0,d7.l),d7           ; Lookup -x
-				PLOT    d6,(a3,d4.l)           ; Octant H (+x)
-				PLOT    d7,(a3,d5.l)           ; Octant E (-x)
+				move.b  (a3,d4.w),d6           ; Fetch row_y_minus[+x]
+				move.b  (a3,d5.w),d7           ; Fetch row_y_minus[-x]
+				move.b  (a0,d6.w),d6           ; Lookup +x
+				move.b  (a0,d7.w),d7           ; Lookup -x
+				PLOT    d6,(a3,d4.w)           ; Octant H (+x)
+				PLOT    d7,(a3,d5.w)           ; Octant E (-x)
 				bra     .bottom_done
 
 .bottom_single_pixel:
-				move.b  (a3,d4.l),d6
-				PLOT    (a0,d6.l),(a3,d4.l)
+				move.b  (a3,d4.w),d6
+				PLOT    (a0,d6.w),(a3,d4.w)
 
 .bottom_done:
 				cmp.w   d4,d3                  ; x == y ?
@@ -140,30 +145,31 @@ Draw_ShadeCircleUnclipped:
 .octants_BCFG:
 				; Load row_x_plus (a5) and row_x_minus (a6)
 				; d4 = +x, d5 = -x
-				move.l  (a2,d4.l*4),d0
+				move.l  (a2,d4.w*4),d0
 				lea     (a1,d0.l),a5           ; a5 = row_x_plus
 
-				move.l  (a2,d5.l*4),d0
+				move.l  (a2,d5.w*4),d0
 				lea     (a1,d0.l),a6           ; a6 = row_x_minus
 
 				; Octants B & C Pair: row_x_plus[y] & row_x_plus[-y]
 				; Uses d3 (+y) and a4 (-y) directly—no mid-block negations!
-				move.b  (a5,d3.l),d6           ; Load row_x_plus[+y]
-				move.b  (a5,a4.l),d7           ; Load row_x_plus[-y]
-				move.b  (a0,d6.l),d6
-				move.b  (a0,d7.l),d7
-				PLOT    d6,(a5,d3.l)           ; Octant B (+y)
-				PLOT    d7,(a5,a4.l)           ; Octant C (-y)
+				move.b  (a5,d3.w),d6           ; Load row_x_plus[+y]
+				move.b  (a5,a4.w),d7           ; Load row_x_plus[-y]
+				move.b  (a0,d6.w),d6
+				move.b  (a0,d7.w),d7
+				PLOT    d6,(a5,d3.w)           ; Octant B (+y)
+				PLOT    d7,(a5,a4.w)           ; Octant C (-y)
 
 				; Octants F & G Pair: row_x_minus[-y] & row_x_minus[y]
-				move.b  (a6,d3.l),d6           ; Load row_x_minus[+y]
-				move.b  (a6,a4.l),d7           ; Load row_x_minus[-y]
-				move.b  (a0,d6.l),d6
-				move.b  (a0,d7.l),d7
-				PLOT    d6,(a6,d3.l)           ; Octant G (+y)
-				PLOT    d7,(a6,a4.l)           ; Octant F (-y)
+				move.b  (a6,d3.w),d6           ; Load row_x_minus[+y]
+				move.b  (a6,a4.w),d7           ; Load row_x_minus[-y]
+				move.b  (a0,d6.w),d6
+				move.b  (a0,d7.w),d7
+				PLOT    d6,(a6,d3.w)           ; Octant G (+y)
+				PLOT    d7,(a6,a4.w)           ; Octant F (-y)
 
 .step:
+				; This is the Jesko iteration
 				tst.w   d2                     ; err <= 0 ?
 				ble     .step_y
 
@@ -205,17 +211,17 @@ Draw_ShadeCircleUnclipped:
 				beq     .step
 
 .vertical_axis:
-				move.l  (a2,d4.l*4),d0
+				move.l  (a2,d4.w*4),d0
 				lea     (a1,d0.l),a5           ; row_x_plus (+x)
 
-				move.l  (a2,d5.l*4),d0
+				move.l  (a2,d5.w*4),d0
 				lea     (a1,d0.l),a6           ; row_x_minus (-x)
 
 				; Pair *row_x_plus & *row_x_minus
 				move.b  (a5),d6
 				move.b  (a6),d7
-				move.b  (a0,d6.l),d6
-				move.b  (a0,d7.l),d7
+				move.b  (a0,d6.w),d6
+				move.b  (a0,d7.w),d7
 				PLOT    d6,(a5)                ; Bottom axis
 				PLOT    d7,(a6)                ; Top axis
 
