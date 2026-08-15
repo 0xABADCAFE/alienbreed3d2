@@ -14,10 +14,11 @@ PLOT			MACRO
 
 
 ; Unclipped Circle Routine : Hand tuned from compiler output
-;;
-; Uses Jesko Midpoint algorithm to plot 8 octants per loop. Resulds are
+;
+; Uses Jesko Midpoint algorithm to plot 8 octants per loop. Results are
 ; undefied and potentially disasterous if the circle position/size exceed
-; the buffer extents.
+; the buffer extents. This code should only be used when the circle is
+; already guaranteed to fit within the render buffer.
 ;
 ; Octants
 ;
@@ -40,9 +41,8 @@ PLOT			MACRO
 ; d0.w centreX
 ; d1.w centreY
 ; d2.w radius
-; d3.w shade (-32 - 31) (dark to bright)
+; d3.w shade (0 - 31 white to normal, 32-63 normal to black)
 
-_Draw_ShadeCircleUnclipped::
 Draw_ShadeCircleUnclipped:
 				tst.w	d2
 				bgt.s	.ready ; radius > 0
@@ -60,51 +60,54 @@ Draw_ShadeCircleUnclipped:
 
 				; Shade table slice
 				and.l   #$3f,d3
-				lsl.l   #8,d3                  ; * 256 bytes per slice
-				add.l   Draw_TexturePalettePtr_l,d3
-				move.l  d3,a0                  ; a0 = slice
+				lsl.l   #8,d3                        ; 256 bytes per slice
+				add.l   Draw_TexturePalettePtr_l,d3  ;
+				move.l  d3,a0                        ; a0 = slice
 
-				; Centre buffer pointer
+				; Centre buffer pointer. Calculate the position in the render buffer that corresponds to
+				; the circle centre.
 				move.l  Vid_FastBufferPtr_l,a1
-				;ext.l   d0                     ; d0.l = x0
-				add.w   d0,a1                  ; a1 = buf = Vid_FastBufferPtr_l + x0
+				add.w   d0,a1                        ; a1 = buf = Vid_FastBufferPtr_l + x0
 
-				; Draw buffer
+				; Span buffer (borrowed from the wall renderer)
+				; TODO - We should be able to move away from using this and update the pointers when the
+				;        y step changes. Failing that, for 68060 we can use multiplication to get to the
+				;        required y offset.
+				;
 				lea     draw_LineOffsetBuffer_vl,a2
-				lea     (a2,d1.w*4),a2         ; a2 = &draw_LineOffsetBuffer_vl[y0]
+				lea     (a2,d1.w*4),a2               ; a2 = &draw_LineOffsetBuffer_vl[y0]
 
 				; X, Y and error
-				move.w  d2,d4                  ; d4.w = radius (x)
-				moveq   #1,d2                  ; d2.w = err
-				sub.w   d4,d2                  ; d2.w = err = 1 - radius
-				clr.l   d3                     ; d3.l = +y = 0
-				move.l  d3,a4                  ; a4.l = -y = 0
+				move.w  d2,d4                        ; d4.w = radius (x)
+				moveq   #1,d2                        ; d2.w = err
+				sub.w   d4,d2                        ; d2.w = err = 1 - radius
+				clr.l   d3                           ; d3.w = +y = 0
+				move.l  d3,a4                        ; a4.w = -y = 0
 
 				; Using d6/d7 to hold the input pixels for the shade table lookup.
 				clr.l   d6
 				clr.l   d7
 
 .loop_start:
-				; d4.l = +x, d3.l = +y, a4 = -y
-				move.w  d4,d5
-				neg.w   d5                     ; d5.l = -x
+				move.w  d4,d5                        ; d4.w = +x
+				neg.w   d5                           ; d5.w = -x
 
 				; Load row_y_plus address into a3
 				move.l  (a2,d3.w*4),d0
-				lea     (a1,d0.l),a3           ; a3 = row_y_plus
+				lea     (a1,d0.l),a3                 ; a3 = row_y_plus
 
 				; Octants A & D (Top Half)
-				tst.w   d4                     ; x == 0 ?
+				tst.w   d4                           ; x == 0 ?
 				beq     .top_single_pixel
 
 .octants_AD:
 				; Interleaved pair: row_y_plus[x] & row_y_plus[-x]
-				move.b  (a3,d4.w),d6           ; Fetch row_y_plus[+x]
-				move.b  (a3,d5.w),d7           ; Fetch row_y_plus[-x]
-				move.b  (a0,d6.w),d6           ; Lookup +x
-				move.b  (a0,d7.w),d7           ; Lookup -x
-				PLOT    d6,(a3,d4.w)           ; Octant A (+x)
-				PLOT    d7,(a3,d5.w)           ; Octant D (-x)
+				move.b  (a3,d4.w),d6           ; Read A
+				move.b  (a3,d5.w),d7           ; Read D
+				move.b  (a0,d6.w),d6           ; Remap A
+				move.b  (a0,d7.w),d7           ; Remap D
+				PLOT    d6,(a3,d4.w)           ; Write A
+				PLOT    d7,(a3,d5.w)           ; Write D
 				bra     .top_done
 
 .top_single_pixel:
@@ -126,12 +129,12 @@ Draw_ShadeCircleUnclipped:
 
 .octants_EH:
 				; Interleaved pair: row_y_minus[x] & row_y_minus[-x]
-				move.b  (a3,d4.w),d6           ; Fetch row_y_minus[+x]
-				move.b  (a3,d5.w),d7           ; Fetch row_y_minus[-x]
-				move.b  (a0,d6.w),d6           ; Lookup +x
-				move.b  (a0,d7.w),d7           ; Lookup -x
-				PLOT    d6,(a3,d4.w)           ; Octant H (+x)
-				PLOT    d7,(a3,d5.w)           ; Octant E (-x)
+				move.b  (a3,d4.w),d6           ; Read H
+				move.b  (a3,d5.w),d7           ; Read E
+				move.b  (a0,d6.w),d6           ; Remap H
+				move.b  (a0,d7.w),d7           ; Remap E
+				PLOT    d6,(a3,d4.w)           ; Write H
+				PLOT    d7,(a3,d5.w)           ; Write E
 				bra     .bottom_done
 
 .bottom_single_pixel:
@@ -153,20 +156,20 @@ Draw_ShadeCircleUnclipped:
 
 				; Octants B & C Pair: row_x_plus[y] & row_x_plus[-y]
 				; Uses d3 (+y) and a4 (-y) directly—no mid-block negations!
-				move.b  (a5,d3.w),d6           ; Load row_x_plus[+y]
-				move.b  (a5,a4.w),d7           ; Load row_x_plus[-y]
-				move.b  (a0,d6.w),d6
-				move.b  (a0,d7.w),d7
-				PLOT    d6,(a5,d3.w)           ; Octant B (+y)
-				PLOT    d7,(a5,a4.w)           ; Octant C (-y)
+				move.b  (a5,d3.w),d6           ; Read B
+				move.b  (a5,a4.w),d7           ; Read C
+				move.b  (a0,d6.w),d6           ; Remap B
+				move.b  (a0,d7.w),d7           ; Remap C
+				PLOT    d6,(a5,d3.w)           ; Write B
+				PLOT    d7,(a5,a4.w)           ; Write C
 
 				; Octants F & G Pair: row_x_minus[-y] & row_x_minus[y]
-				move.b  (a6,d3.w),d6           ; Load row_x_minus[+y]
-				move.b  (a6,a4.w),d7           ; Load row_x_minus[-y]
-				move.b  (a0,d6.w),d6
-				move.b  (a0,d7.w),d7
-				PLOT    d6,(a6,d3.w)           ; Octant G (+y)
-				PLOT    d7,(a6,a4.w)           ; Octant F (-y)
+				move.b  (a6,d3.w),d6           ; Read G
+				move.b  (a6,a4.w),d7           ; Read F
+				move.b  (a0,d6.w),d6           ; Remap G
+				move.b  (a0,d7.w),d7           ; Remap F
+				PLOT    d6,(a6,d3.w)           ; Write G
+				PLOT    d7,(a6,a4.w)           ; Write F
 
 .step:
 				; This is the Jesko iteration
@@ -204,6 +207,7 @@ Draw_ShadeCircleUnclipped:
 .check_axis_or_diagonal:
 				cmp.w   d4,d3
 				beq     .step
+
 				tst.w   d3
 				bne     .octants_BCFG
 
@@ -218,13 +222,12 @@ Draw_ShadeCircleUnclipped:
 				lea     (a1,d0.l),a6           ; row_x_minus (-x)
 
 				; Pair *row_x_plus & *row_x_minus
-				move.b  (a5),d6
-				move.b  (a6),d7
-				move.b  (a0,d6.w),d6
-				move.b  (a0,d7.w),d7
-				PLOT    d6,(a5)                ; Bottom axis
-				PLOT    d7,(a6)                ; Top axis
-
+				move.b  (a5),d6                ; Read Bottom
+				move.b  (a6),d7                ; Read Top
+				move.b  (a0,d6.w),d6           ; Remap Bottom
+				move.b  (a0,d7.w),d7           ; Remap Top
+				PLOT    d6,(a5)                ; Write Bottom
+				PLOT    d7,(a6)                ; Write Top
 				tst.w   d2
 				bgt     .step_x
 				bra     .step_y
