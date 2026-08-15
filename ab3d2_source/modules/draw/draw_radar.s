@@ -44,8 +44,8 @@ PLOT			MACRO
 ; d3.w shade (0 - 31 white to normal, 32-63 normal to black)
 
 Draw_ShadeCircleUnclipped:
-				tst.w	d2
-				bgt.s	.ready ; radius > 0
+				tst.w   d2
+				bgt.s   .ready
 
 				; TODO
 				; For small radii, e.g. < 16 pixels we can just have a precalculated list of
@@ -56,178 +56,137 @@ Draw_ShadeCircleUnclipped:
 				rts
 
 .ready:
-				movem.l d2-d7/a2-a6,-(sp)
+				movem.l d2-d7/a2-a5,-(sp)
 
-				; Shade table slice
+				; shade table lookup
 				and.l   #$3f,d3
-				lsl.l   #8,d3                        ; 256 bytes per slice
-				add.l   Draw_TexturePalettePtr_l,d3  ;
-				move.l  d3,a0                        ; a0 = slice
+				lsl.l   #8,d3                       ; 256 bytes per slice
+				add.l   Draw_TexturePalettePtr_l,d3
+				move.l  d3,a0                       ; a0 = shade
 
-				; Centre buffer pointer. Calculate the position in the render buffer that corresponds to
-				; the circle centre.
+				; circle centre address
 				move.l  Vid_FastBufferPtr_l,a1
-				add.w   d0,a1                        ; a1 = buf = Vid_FastBufferPtr_l + x0
+				add.w   d0,a1
+				lea     draw_LineOffsetBuffer_vl,a2 ; stride table from wall code
+				move.l  (a2,d1.w*4),d1              ; y * stride
+				add.l   d1,a1                       ; a1 = center address (Xc, Yc)
 
-				; Span buffer (borrowed from the wall renderer)
-				; TODO - We should be able to move away from using this and update the pointers when the
-				;        y step changes. Failing that, for 68060 we can use multiplication to get to the
-				;        required y offset.
-				;
-				lea     draw_LineOffsetBuffer_vl,a2
-				lea     (a2,d1.w*4),a2               ; a2 = &draw_LineOffsetBuffer_vl[y0]
+				; row pointers
+				move.l  4(a2),d3                    ; d3 = stride
+                move.l  (a2,d2.w*4),d0              ; d0 = radius * stride
+				move.l  a1,a4
+				add.l   d0,a4                       ; a4 = center + (radius * stride)
+				move.l  a1,a5
+				sub.l   d0,a5                       ; a5 = centre - (radius * stride)
+				move.l  a1,a2                       ; a2 = centre row (+y)
+				move.l  a1,a3                       ; a3 = centre row (-y)
+				move.w  d2,d0                       ; d0.w = x (radius)
+				clr.l	d1                          ; d1.w = y (0)
+				moveq   #1,d2
+				sub.w   d0,d2                       ; err = 1 - radius
 
-				; X, Y and error
-				move.w  d2,d4                        ; d4.w = radius (x)
-				moveq   #1,d2                        ; d2.w = err
-				sub.w   d4,d2                        ; d2.w = err = 1 - radius
-				clr.l   d3                           ; d3.w = +y = 0
-				move.l  d3,a4                        ; a4.w = -y = 0
+				; Temporaries for pixel buffering
+				clr.l   d4
+				clr.l   d5
 
-				; Using d6/d7 to hold the input pixels for the shade table lookup.
-				clr.l   d6
-				clr.l   d7
+.loop:
+				; Octants A,D,E,H
+				tst.w   d1                          ; y == 0?
+				beq.s   .plot_y0_axis               ; at y = 0, a2 == a3, avoid double plot
 
-.loop_start:
-				move.w  d4,d5                        ; d4.w = +x
-				neg.w   d5                           ; d5.w = -x
+				move.b  (a2,d0.w),d4                ; Octant A
+				move.b  (a3,d0.w),d5                ; Octant H
+				move.b  (a0,d4.w),d4
+				move.b  (a0,d5.w),d5
+				PLOT    d4,(a2,d0.w)
+				PLOT    d5,(a3,d0.w)
 
-				; Load row_y_plus address into a3
-				move.l  (a2,d3.w*4),d0
-				lea     (a1,d0.l),a3                 ; a3 = row_y_plus
+				tst.w   d0                          ; skip duplicate x = 0 on vertical axis
+				beq.s   .skip_neg_x
 
-				; Octants A & D (Top Half)
-				tst.w   d4                           ; x == 0 ?
-				beq     .top_single_pixel
+				neg.w   d0                          ; -x
+				move.b  (a2,d0.w),d4                ; Octant D
+				move.b  (a3,d0.w),d5                ; Octant E
+				move.b  (a0,d4.w),d4
+				move.b  (a0,d5.w),d5
+				PLOT    d4,(a2,d0.w)
+				PLOT    d5,(a3,d0.w)
+				neg.w   d0                          ; +x
+				bra.s   .skip_neg_x
 
-.octants_AD:
-				; Interleaved pair: row_y_plus[x] & row_y_plus[-x]
-				move.b  (a3,d4.w),d6           ; Read A
-				move.b  (a3,d5.w),d7           ; Read D
-				move.b  (a0,d6.w),d6           ; Remap A
-				move.b  (a0,d7.w),d7           ; Remap D
-				PLOT    d6,(a3,d4.w)           ; Write A
-				PLOT    d7,(a3,d5.w)           ; Write D
-				bra     .top_done
+.plot_y0_axis:
+				; At y = 0: a2 == a3 => plot (+x, 0) and (-x, 0) just once
+				move.b  (a2,d0.w),d4                ; Octant A (+x, 0)
+				move.b  (a0,d4.w),d4
+				PLOT    d4,(a2,d0.w)
 
-.top_single_pixel:
-				move.b  (a3,d4.w),d6
-				PLOT    (a0,d6.w),(a3,d4.w)
+				tst.w   d0                          ; skip duplicate x = 0 on vertical axis
+				beq.s   .skip_neg_x
 
-.top_done:
-				tst.w   d3                     ; y <= 0 ?
-				ble     .check_axis_or_diagonal
+				neg.w   d0                          ; -x
+				move.b  (a2,d0.w),d4                ; Octant D (-x, 0)
+				move.b  (a0,d4.w),d4
+				PLOT    d4,(a2,d0.w)
+				neg.w   d0                          ; +x
 
-				; Load row_y_minus address into a3 (re-using a3 to free registers)
-				; Uses a4 (-y) as index
-				move.l  (a2,a4.w*4),d0
-				lea     (a1,d0.l),a3           ; a3 = row_y_minus
+.skip_neg_x:
+				; Octants B,C,F,G - skip if x == y to avoid double plot
+				cmp.w   d0,d1                       ; x == y
+				beq.s   .step                       ; skip transposed octants
 
-				; Octants E & H (Bottom Half)
-				tst.w   d4                     ; x == 0 ?
-				beq     .bottom_single_pixel
+				move.b  (a4,d1.w),d4                ; Octant B
+				move.b  (a5,d1.w),d5                ; Octant G
+				move.b  (a0,d4.w),d4
+				move.b  (a0,d5.w),d5
+				PLOT    d4,(a4,d1.w)
+				PLOT    d5,(a5,d1.w)
 
-.octants_EH:
-				; Interleaved pair: row_y_minus[x] & row_y_minus[-x]
-				move.b  (a3,d4.w),d6           ; Read H
-				move.b  (a3,d5.w),d7           ; Read E
-				move.b  (a0,d6.w),d6           ; Remap H
-				move.b  (a0,d7.w),d7           ; Remap E
-				PLOT    d6,(a3,d4.w)           ; Write H
-				PLOT    d7,(a3,d5.w)           ; Write E
-				bra     .bottom_done
+				tst.w   d1                          ; skip duplicate y = 0 on horizontal axis
+				beq.s   .step
 
-.bottom_single_pixel:
-				move.b  (a3,d4.w),d6
-				PLOT    (a0,d6.w),(a3,d4.w)
-
-.bottom_done:
-				cmp.w   d4,d3                  ; x == y ?
-				beq     .step
-
-.octants_BCFG:
-				; Load row_x_plus (a5) and row_x_minus (a6)
-				; d4 = +x, d5 = -x
-				move.l  (a2,d4.w*4),d0
-				lea     (a1,d0.l),a5           ; a5 = row_x_plus
-
-				move.l  (a2,d5.w*4),d0
-				lea     (a1,d0.l),a6           ; a6 = row_x_minus
-
-				; Octants B & C Pair: row_x_plus[y] & row_x_plus[-y]
-				; Uses d3 (+y) and a4 (-y) directly—no mid-block negations!
-				move.b  (a5,d3.w),d6           ; Read B
-				move.b  (a5,a4.w),d7           ; Read C
-				move.b  (a0,d6.w),d6           ; Remap B
-				move.b  (a0,d7.w),d7           ; Remap C
-				PLOT    d6,(a5,d3.w)           ; Write B
-				PLOT    d7,(a5,a4.w)           ; Write C
-
-				; Octants F & G Pair: row_x_minus[-y] & row_x_minus[y]
-				move.b  (a6,d3.w),d6           ; Read G
-				move.b  (a6,a4.w),d7           ; Read F
-				move.b  (a0,d6.w),d6           ; Remap G
-				move.b  (a0,d7.w),d7           ; Remap F
-				PLOT    d6,(a6,d3.w)           ; Write G
-				PLOT    d7,(a6,a4.w)           ; Write F
+				neg.w   d1                          ; -y
+				move.b  (a4,d1.w),d4                ; Octant C
+				move.b  (a5,d1.w),d5                ; Octant F
+				move.b  (a0,d4.w),d4
+				move.b  (a0,d5.w),d5
+				PLOT    d4,(a4,d1.w)
+				PLOT    d5,(a5,d1.w)
+				neg.w   d1                          ; +y
 
 .step:
-				; This is the Jesko iteration
-				tst.w   d2                     ; err <= 0 ?
-				ble     .step_y
+				tst.w   d2
+				ble.s   .step_y
 
 .step_x:
-				subq.w  #1,d4                  ; x--
-				move.w  d4,d0
-				lsl.w   #1,d0                  ; x * 2
-				not.w   d0                     ; ~(x * 2) = -2x - 1
-				add.w   d0,d2                  ; err -= (x * 2) + 1
-				cmp.w   d3,d4                  ; x >= y ?
-				bge     .loop_start
+				subq.w  #1,d0                      ; x--
+				suba.l  d3,a4                      ; pointer (yc + x) decrement line
+				adda.l  d3,a5                      ; pointer (yc - x) increment line
 
-.done:
-				movem.l (sp)+,d2-d7/a2-a6
-				rts
+				move.w  d0,d4
+				add.w   d4,d4
+				addq.w  #1,d4
+				sub.w   d4,d2                      ; err -= (2 * x) + 1
+
+				cmp.w   d1,d0                      ; while x >= y
+				bge     .loop
+				bra.s   .done
 
 .step_y:
-				addq.w  #1,d3                  ; y++
-				suba.l  a4,a4
-				suba.l	d3,a4                  ; a4  = -y
-				addq.w  #1,d2                  ; err++
-				move.w  d3,d0
-				lsl.w   #1,d0                  ; y * 2
-				add.w   d0,d2                  ; err += (y * 2)
-				tst.w   d2                     ; err > 0 ?
-				bgt     .step_x
+				addq.w  #1,d1                      ; y++
+				adda.l  d3,a2                      ; pointer (yc + y) increment line
+				suba.l  d3,a3                      ; pointer (yc - y) decrement line
 
-				cmp.w   d3,d4                  ; x >= y ?
-				bge     .loop_start
-				bra     .done
+				move.w  d1,d4
+				add.w   d4,d4
+				addq.w  #1,d4
+				add.w   d4,d2                      ; err += (2 * y) + 1
 
-.check_axis_or_diagonal:
-				cmp.w   d4,d3
-				beq     .step
-
-				tst.w   d3
-				bne     .octants_BCFG
-
-				tst.w   d4
-				beq     .step
-
-.vertical_axis:
-				move.l  (a2,d4.w*4),d0
-				lea     (a1,d0.l),a5           ; row_x_plus (+x)
-
-				move.l  (a2,d5.w*4),d0
-				lea     (a1,d0.l),a6           ; row_x_minus (-x)
-
-				; Pair *row_x_plus & *row_x_minus
-				move.b  (a5),d6                ; Read Bottom
-				move.b  (a6),d7                ; Read Top
-				move.b  (a0,d6.w),d6           ; Remap Bottom
-				move.b  (a0,d7.w),d7           ; Remap Top
-				PLOT    d6,(a5)                ; Write Bottom
-				PLOT    d7,(a6)                ; Write Top
 				tst.w   d2
-				bgt     .step_x
-				bra     .step_y
+				bgt.s   .step_x
+
+				cmp.w   d1,d0                      ; while x >= y
+				bge     .loop
+
+.done:
+				movem.l (sp)+,d2-d7/a2-a5
+				rts
