@@ -1174,7 +1174,7 @@ gotoendG:
 				move.l	d7,draw_GouraudStep_l
 
 				; start/endline in renderbuffer?
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3 ; contains renderbuffer offsets for each line
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3 ; contains renderbuffer offsets for each line
 
 				add.w	d2,d2
 
@@ -1225,7 +1225,7 @@ doubwallGOUR:
 				ble		nostripqG
 
 				move.l	d7,draw_GouraudStep_l
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3
 				add.w	d2,d2
 				move.l	4(a1,d2.w*8),d0
 				add.w	TOPOFFSET(pc),d5
@@ -1304,7 +1304,7 @@ gotoendGB:
 				ble		nostripqG
 
 				move.l	d7,draw_GouraudStep_l
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3 ; start of line in renderbuffer
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3 ; start of line in renderbuffer
 				move.w	d2,d4
 				add.w	d2,d2
 				add.w	d2,d4
@@ -1349,7 +1349,7 @@ doubwallGOURBIG:
 				ble		nostripqG
 
 				move.l	d7,draw_GouraudStep_l
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3
 				move.w	d2,d4
 				add.w	d2,d2
 				add.w	d2,d4

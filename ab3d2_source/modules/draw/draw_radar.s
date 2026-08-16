@@ -61,7 +61,7 @@ Draw_ShadeCircleUnclipped:
 				rts
 
 .ready:
-				movem.l d2-d7/a2-a5,-(sp)
+				movem.l d2-d7/a2-a6,-(sp)
 
 				; shade table lookup
 				and.l   #$3f,d3
@@ -72,7 +72,7 @@ Draw_ShadeCircleUnclipped:
 				; circle centre address
 				move.l  Vid_FastBufferPtr_l,a1
 				add.w   d0,a1
-				lea     draw_LineOffsetBuffer_vl,a2 ; stride table from wall code
+				lea     draw_RenderBufferStrideTable_vl,a2 ; stride table from wall plotting code
 				move.l  (a2,d1.w*4),d1              ; y * stride
 				add.l   d1,a1                       ; a1 = center address (Xc, Yc)
 
@@ -100,26 +100,47 @@ Draw_ShadeCircleUnclipped:
 				move.w  d1,d7
 				neg.w   d7                          ; d7.w = -y
 
+				; Register assignments:
+				;
+				; d0 = x
+				; d1 = y
+				; d2 = err
+				; d3 = buffer stride
+				; d4,d5 = pixel read/remap temporaries
+				; d6 = -x
+				; d7 = -y
+				;
+				; a0 = shade slice
+				; a1,a6 = pixel address temporaries
+				; a2 = row + y
+				; a3 = row - y
+				; a4 = centre + radius * stride
+				; a5 = centre - radius * stride
+
 .loop:
 				; Octants A,D,E,H
 				tst.w   d1                          ; y == 0?
 				beq.s   .plot_y0_axis               ; at y = 0, a2 == a3, avoid double plot
 
-				move.b  (a2,d0.w),d4                ; Octant A
-				move.b  (a3,d0.w),d5                ; Octant H
+				lea     (a2,d0.w),a1                ; Octant A
+				lea     (a3,d0.w),a6                ; Octant H
+				move.b  (a1),d4                     ; Octant A
+				move.b  (a6),d5                     ; Octant H
 				move.b  (a0,d4.w),d4
 				move.b  (a0,d5.w),d5
-				PLOT    d4,(a2,d0.w)
-				PLOT    d5,(a3,d0.w)
+				PLOT    d4,(a1)
+				PLOT    d5,(a6)
 				tst.w   d0                          ; skip duplicate x = 0 on vertical axis
 				beq.s   .skip_neg_x
 
-				move.b  (a2,d6.w),d4                ; Octant D
-				move.b  (a3,d6.w),d5                ; Octant E
+				lea     (a2,d6.w),a1                ; Octant D
+				lea     (a3,d6.w),a6                ; Octant E
+				move.b  (a1),d4                     ; Octant D
+				move.b  (a6),d5                     ; Octant E
 				move.b  (a0,d4.w),d4
 				move.b  (a0,d5.w),d5
-				PLOT    d4,(a2,d6.w)
-				PLOT    d5,(a3,d6.w)
+				PLOT    d4,(a1)
+				PLOT    d5,(a6)
 				bra.s   .skip_neg_x
 
 .plot_y0_axis:
@@ -139,22 +160,26 @@ Draw_ShadeCircleUnclipped:
 				cmp.w   d0,d1                       ; x == y
 				beq.s   .step                       ; skip transposed octants
 
-				move.b  (a4,d1.w),d4                ; Octant B
-				move.b  (a5,d1.w),d5                ; Octant G
+				lea  (a4,d1.w),a1                  ; Octant B
+				lea  (a5,d1.w),a6                  ; Octant G
+				move.b  (a1),d4
+				move.b  (a6),d5
 				move.b  (a0,d4.w),d4
 				move.b  (a0,d5.w),d5
-				PLOT    d4,(a4,d1.w)
-				PLOT    d5,(a5,d1.w)
+				PLOT    d4,(a1)
+				PLOT    d5,(a6)
 
 				tst.w   d1                          ; skip duplicate y = 0 on horizontal axis
 				beq.s   .step
 
-				move.b  (a4,d7.w),d4                ; Octant C
-				move.b  (a5,d7.w),d5                ; Octant F
+				lea     (a4,d7.w),a1                ; Octant C
+				lea     (a5,d7.w),a6                ; Octant F
+				move.b  (a1),d4
+				move.b  (a6),d5
 				move.b  (a0,d4.w),d4
 				move.b  (a0,d5.w),d5
-				PLOT    d4,(a4,d7.w)
-				PLOT    d5,(a5,d7.w)
+				PLOT    d4,(a1)
+				PLOT    d5,(a6)
 
 .step:
 				tst.w   d2
@@ -189,5 +214,5 @@ Draw_ShadeCircleUnclipped:
 				bge     .loop
 
 .done:
-				movem.l (sp)+,d2-d7/a2-a5
+				movem.l (sp)+,d2-d7/a2-a6
 				rts

@@ -17,7 +17,7 @@ draw_StripData_b:		dc.b    0 ; lsb
 
 ; TODO - this buffer is just a lookup table of y * SCREEN_WIDTH. It's probably faster to use mul #SCREEN_WIDTH on 060
 				align 4
-draw_LineOffsetBuffer_vl:
+draw_RenderBufferStrideTable_vl:
 val				SET		0
 				REPT	256
 				dc.l	val
@@ -1427,7 +1427,7 @@ gotoend:
 				sub.w	d5,d6					; end-start; height to draw?
 				ble		nostripq
 
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3 ; offset to render buffer line of the strip
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3 ; offset to render buffer line of the strip
 
 				add.w	d2,d2
 
@@ -1469,7 +1469,7 @@ doubwall:
 				asr.w	#1,d6
 				ble		nostripq				; (d5*3-d6)/2
 
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3
 
 				add.w	d2,d2
 
@@ -1536,7 +1536,7 @@ gotoendBIG:
 				sub.w	d5,d6					; d6 = height to draw.
 				ble		nostripq
 
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3 ;offset to start line in renderbuffer
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3 ;offset to start line in renderbuffer
 
 				move.w	d2,d4
 				add.w	d2,d2
@@ -1577,7 +1577,7 @@ doubwallBIG:
 				sub.w	d5,d6					; height to draw.
 				asr.w	#1,d6
 				ble		nostripq
-				add.l	draw_LineOffsetBuffer_vl(pc,d5.w*4),a3
+				add.l	draw_RenderBufferStrideTable_vl(pc,d5.w*4),a3
 
 				move.w	d2,d4
 				add.w	d2,d2
