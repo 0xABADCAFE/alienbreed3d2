@@ -3313,7 +3313,7 @@ oknothalf:
 
 				bclr.b	#1,$bfe001
 
-				move.l	Draw_TexturePalettePtr_l,a2
+				move.l	Draw_PaletteShadeTablePtr_l,a2
 				add.l	#256*40,a2
 				moveq	#0,d2
 
@@ -4661,7 +4661,7 @@ pastscale:
 				muls.w	linedir,d1				; top line in screen times renderwidth (typical 320)
 				add.l	d1,a6					; this is where we start writing?
 
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 
 				lea		draw_FloorLine,a5
@@ -4763,7 +4763,7 @@ doneclip:
 				muls	linedir,d1
 				add.l	d1,a6					; renderbuffer start address
 ; sub.l d1,REFPTR
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 ;				move.l	LineToUse,a5			; This function ptr has been stored by the very outermost
 				lea		draw_FloorLine,a5
@@ -5012,7 +5012,7 @@ noclipleftGOUR:
 				move.l	a6,a3
 				movem.l	d0/d7/a2/a4/a5/a6,-(a7)
 				move.l	draw_Distance_l,d0
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 				move.l	Draw_FloorTexturesPtr_l,a0
 				adda.w	whichtile,a0
@@ -5107,7 +5107,7 @@ dofloornoclipGOUR:
 				movem.l	d0/d7/a2/a4/a5/a6,-(a7)
 				move.l	d6,d0
 				move.l	d0,draw_Distance_l
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 				move.l	Draw_FloorTexturesPtr_l,a0
 				adda.w	whichtile,a0
@@ -5176,7 +5176,7 @@ draw_FloorLine:
 				move.w	#28,d1					; high clamp
 
 .smallbright:
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 
 				; todo - is this used?
@@ -5653,7 +5653,7 @@ draw_WaterSurface:
 
 				add.l	wateroff,d5
 
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*16,a1 ; halfway into the glare shade table
 				move.l	draw_Distance_l,d0
 
@@ -5742,7 +5742,7 @@ acrossscrnw:
 draw_WaterSurfaceDouble:
 				move.l	d1,d4
 				add.l	wateroff,d5
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*16,a1
 				move.l	draw_Distance_l,d0
 				asr.l	#2,d0

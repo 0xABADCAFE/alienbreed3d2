@@ -214,17 +214,17 @@ Res_LoadFloorsAndTextures:
 				move.l	io_FileExtPointer_l,a1
 				move.l	#".pal",(a1)
 				move.l	#io_Buffer_vb,a0
-				move.l	#Draw_TexturePalettePtr_l,d0
+				move.l	#Draw_PaletteShadeTablePtr_l,d0
 				move.l	#0,d1
 				jsr		IO_QueueFile
 
-; move.l d0,Draw_TexturePalettePtr_l
+; move.l d0,Draw_PaletteShadeTablePtr_l
 				rts
 
 Res_FreeFloorsAndTextures:
 				RES_FREEPTR Draw_GlobalFloorTexturesPtr_l
 				RES_FREEPTR Draw_TextureMapsPtr_l
-				RES_FREEPTR Draw_TexturePalettePtr_l
+				RES_FREEPTR Draw_PaletteShadeTablePtr_l
 				rts
 
 ; *****************************************************************************

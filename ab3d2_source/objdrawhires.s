@@ -272,7 +272,7 @@ draw_bitmap_glare:
 				asl.l	#7,d2
 				add.l	d2,d0
 				addq	#2,a0
-				move.l	Draw_TexturePalettePtr_l,a4
+				move.l	Draw_PaletteShadeTablePtr_l,a4
 				sub.l	#512,a4
 				move.w	(a0)+,d2				; height
 				add.w	draw_AuxY_w,d2
@@ -2440,7 +2440,7 @@ toobright:
 				asl.w	#8,d1
 ; move.w (a1,d1.w*2),d1
 ; asl.w #3,d1
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				;add.l	#256*32,a1
 				lea		8192(a1,d1.w),a1
 				tst.b	draw_PreGouraud_b
@@ -2581,7 +2581,7 @@ val				SET		val+SCREEN_WIDTH
 				ENDR
 
 predoglare:
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				sub.w	#512,a1
 
 DOGLAREPOLY:
@@ -2744,7 +2744,7 @@ LinesPtr:		dc.l	0
 PtsPtr:			dc.l	0
 
 gotlurvelyshading:
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				add.l	#256*32,a1
 				tst.b	draw_PreGouraud_b
 
@@ -2948,7 +2948,7 @@ toodimh:
 
 ; move.w (a1,d1.w*2),d1
 ; asl.w #3,d1
-				move.l	Draw_TexturePalettePtr_l,a1
+				move.l	Draw_PaletteShadeTablePtr_l,a1
 				;add.l	#256*32,a1
 				;add.w	d1,a1
 

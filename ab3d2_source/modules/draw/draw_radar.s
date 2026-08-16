@@ -48,7 +48,8 @@ Draw_ShadeCircleUnclipped:
 				tst.w   d2
 				bgt.s   .ready
 
-; TODO
+; TODO There is a lot of work here for plotting a small circle.
+;
 ; For small radii, e.g. < 16 pixels we can just have a precalculated list of
 ; x,y word coordinates. We can convert those into buffer position offsets during
 ; initialisation, once we know what the span width is (for future upgrades to
@@ -66,7 +67,7 @@ Draw_ShadeCircleUnclipped:
 				; shade table lookup
 				and.l   #$3f,d3
 				lsl.l   #8,d3                       ; 256 bytes per slice
-				add.l   Draw_TexturePalettePtr_l,d3
+				add.l   Draw_PaletteShadeTablePtr_l,d3
 				move.l  d3,a0                       ; a0 = shade
 
 				; circle centre address
@@ -111,7 +112,7 @@ Draw_ShadeCircleUnclipped:
 				; d7 = -y
 				;
 				; a0 = shade slice
-				; a1,a6 = pixel address temporaries
+				; a1,a6 = pixel address temporaries (saves calculating indexed modes repeatedly)
 				; a2 = row + y
 				; a3 = row - y
 				; a4 = centre + radius * stride
@@ -160,8 +161,8 @@ Draw_ShadeCircleUnclipped:
 				cmp.w   d0,d1                       ; x == y
 				beq.s   .step                       ; skip transposed octants
 
-				lea  (a4,d1.w),a1                  ; Octant B
-				lea  (a5,d1.w),a6                  ; Octant G
+				lea     (a4,d1.w),a1                ; Octant B
+				lea     (a5,d1.w),a6                ; Octant G
 				move.b  (a1),d4
 				move.b  (a6),d5
 				move.b  (a0,d4.w),d4

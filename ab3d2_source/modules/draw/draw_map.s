@@ -26,7 +26,7 @@ DoTheMapWotNastyCharlesIsForcingMeToDo:
 				; 0xABADCAFE - Fixme - make these assignable and remember to clear the keys
 				; as the zoom speed is insane under emulations
 
-				move.l	Draw_TexturePalettePtr_l,a4
+				move.l	Draw_PaletteShadeTablePtr_l,a4
 				add.l	#256*25,a4 ; glare offset
 				move.l	a4,draw_BaseMapTransparencyPtr_l
 
