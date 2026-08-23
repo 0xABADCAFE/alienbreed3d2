@@ -9,19 +9,7 @@ draw_BaseMapTransparencyPtr_l:	ds.l	1
 
 DoTheMapWotNastyCharlesIsForcingMeToDo:
 
-				move.l Sys_FrameNumber_l,d0
-				and.w  #$1f,d0
-				move.w d0,d2
-				move.w d0,d3
-				lsr.w  #1,d3
-				add.w  #16,d3
-				lsl.w  #2,d2
-				sub.w  d0,d2
-
-				move.w #160,d0
-				move.w #120,d1
-
-				bsr Draw_ShadeCircleUnclipped
+				bsr Draw_Radar
 
 				; 0xABADCAFE - Fixme - make these assignable and remember to clear the keys
 				; as the zoom speed is insane under emulations

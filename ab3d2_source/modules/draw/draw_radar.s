@@ -1,4 +1,108 @@
 
+
+Draw_Radar:
+
+; TODO - only the radius calculation is changing, so just determine the direction/size of final shift.
+
+				move.w	Draw_MapZoomLevel_w,d0
+				and.b	#7,d0
+				move.w	.jump(pc,d0.w*2),d0
+				jmp		.jump(pc,d0.w)
+.jump:
+				dc.w	.level_0-.jump
+				dc.w	.level_1-.jump
+				dc.w	.level_2-.jump
+				dc.w	.level_3-.jump
+				dc.w	.level_4-.jump
+				dc.w	.level_5-.jump
+				dc.w	.level_6-.jump
+				dc.w	.level_7-.jump
+.level_2:
+				move.l Sys_FrameNumber_l,d0
+				and.w  #$1f,d0 ; every 31 frames
+				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
+				lsl.w  #2,d2
+				sub.w  d0,d2
+				lsl.w  #1,d2  ; radius in steps of 6
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bra Draw_ShadeCircleUnclipped
+
+.level_3:
+				move.l Sys_FrameNumber_l,d0
+				and.w  #$1f,d0 ; every 31 frames
+				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
+				lsl.w  #2,d2
+				sub.w  d0,d2  ; radius in steps of 3
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bra Draw_ShadeCircleUnclipped
+
+.level_4:
+				move.l Sys_FrameNumber_l,d0
+				and.w  #$1f,d0
+				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
+				lsl.w  #2,d2
+				sub.w  d0,d2
+				lsr.w  #1,d2
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bra Draw_ShadeCircleUnclipped
+
+.level_5:
+				move.l Sys_FrameNumber_l,d0
+				and.w  #$1f,d0
+				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
+				lsl.w  #2,d2
+				sub.w  d0,d2
+				lsr.w  #2,d2
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bra Draw_ShadeCircleUnclipped
+
+.level_6:
+				move.l Sys_FrameNumber_l,d0
+				and.w  #$1f,d0
+				move.w d0,d2
+				move.w d0,d3
+				lsr.w  #1,d3
+				add.w  #16,d3
+				lsl.w  #2,d2
+				sub.w  d0,d2
+				lsr.w  #3,d2
+
+				move.w #160,d0
+				move.w #120,d1
+
+				bra Draw_ShadeCircleUnclipped
+.level_0:
+.level_1:
+
+.level_7:
+				rts
+
+
+
 ; Plotting macros. In order to validate each pixel is plotted once, define VALIDATE_PIXEL_ONCE
 ; which chages the plotting mode to a straight increment. Test against a flat background shade.
 
@@ -13,7 +117,7 @@ PLOT			MACRO
 				ENDIF
 
 
-; Unclipped Circle Routine : Hand tuned from compiler output
+; Unclipped Circle Routine : Rewritten from compiler output
 ;
 ; Uses Jesko Midpoint algorithm to plot 8 octants per loop. Results are
 ; undefied and potentially disasterous if the circle position/size exceed
@@ -45,24 +149,79 @@ PLOT			MACRO
 ; d3.w shade (0 - 31 white to normal, 32-63 normal to black)
 
 Draw_ShadeCircleUnclipped:
-				tst.w   d2
-				bgt.s   .ready
+				tst.w	d2
+				bgt.s	.check_big
 
-; TODO There is a lot of work here for plotting a small circle.
-;
-; For small radii, e.g. < 16 pixels we can just have a precalculated list of
-; x,y word coordinates. We can convert those into buffer position offsets during
-; initialisation, once we know what the span width is (for future upgrades to
-; resolution). Since these values are points on the circumference, we can simply
-; zero terminate the list.
-;
-; Note, we'd only need to store the offsets for a half-circle and apply them as
-; addition and subtraction offsets from the centre address.
+.early_exit:
+				rts
 
+; TODO - this can go once the clipping paths are added
+.check_big:
+				cmp.w	#110,d2
+				bge.s   .early_exit
+
+.check_small:
+				cmp.w	#16,d2
+				bge		.ready
+
+.small_path:
+				movem.l	a2-a4,-(sp)
+				; shade table lookup
+				and.l   #$3f,d3
+				lsl.l   #8,d3                              ; 256 bytes per slice
+				add.l   Draw_PaletteShadeTablePtr_l,d3
+				move.l  d3,a0                              ; a0 = shade
+
+				; circle centre address
+				move.l  Vid_FastBufferPtr_l,a1
+				add.w   d0,a1
+				lea     draw_RenderBufferStrideTable_vl,a2 ; stride table from wall plotting code
+				move.l  (a2,d1.w*4),d1                     ; y * stride
+				add.l   d1,a1                              ; a1 = center address (Xc, Yc)
+
+				; load up the small circle data pointer
+				subq.w	#1,d2                              ; radius - 1 = index in table
+				lea 	draw_SmallCiclePtrs_vl,a2
+				move.l  (a2,d2.w*4),a2                     ; a2 = circle data location
+
+				clr.l   d2
+				clr.l   d3
+.pairs:
+				; Register assignments
+				;
+				; d0 = offset
+				; d1 = -offset
+				; d2/d3 = read/remap/write temporaries
+				;
+				; a0 = shade table slice
+				; a1 = circle centre address in framebuffer
+				; a2 = offset pointer
+				; a3,a4 pixel address caches
+
+				move.w	(a2)+,d0                    ; next offset in list
+				beq.s	.done_small                 ; zero terminated
+
+				; d0 and d1 contain the offsets
+				move.w	d0,d1
+				neg.w   d1
+				;st (a1,d0.w)
+				;st (a1,d1.w)
+				lea     (a1,d0.w),a3
+				lea     (a1,d1.w),a4
+				move.b  (a3),d2       ; read
+				move.b  (a4),d3
+				move.b  (a0,d2.w),d2  ; remap
+				move.b  (a0,d3.w),d3
+				PLOT    d2,(a3)       ; write
+				PLOT    d3,(a4)
+				bra.s   .pairs
+
+.done_small:
+				movem.l  (sp)+,a2-a4
 				rts
 
 .ready:
-				movem.l d2-d7/a2-a6,-(sp)
+				movem.l d4-d7/a2-a6,-(sp)
 
 				; shade table lookup
 				and.l   #$3f,d3
@@ -215,5 +374,30 @@ Draw_ShadeCircleUnclipped:
 				bge     .loop
 
 .done:
-				movem.l (sp)+,d2-d7/a2-a6
+				movem.l (sp)+,d4-d7/a2-a6
+				rts
+
+; Called from C init. Sorts out the small circle tables
+	DCLC	draw_InitCircleTable
+				movem.l d2/a2,-(sp)
+
+				lea     draw_SmallCicleList_vw,a0
+				lea     draw_EndSmallCicleList,a1
+				lea     draw_RenderBufferStrideTable_vl,a2
+				clr.l   d0
+
+				; Convert the -y,x byte pair ordinates in draw_SmallCicleList_vw to signed 16-bit pointer
+				; offsets for use in the small circle code path. We use the stride table which is already
+				; set up for the width multiplication.
+.pair:
+				move.b  (a0),d0         ; (positive) y-offset in d0
+				move.w  2(a2,d0.w*4),d1 ; fetch the low 16-bits of the 32-bit stride index for the y component.
+				move.b  1(a0),d2        ; (signed) x-offset in d2
+				ext.w   d2              ; sign extend
+				sub.w   d1,d2           ; offset = x - y*stride
+				move.w  d2,(a0)+        ; store the (signed) offset
+				cmp.l   a0,a1
+				bhi.s   .pair
+
+				movem.l (sp)+,d2/a2
 				rts

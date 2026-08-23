@@ -158,6 +158,8 @@ static void draw_CalculateGlyphSpacing(void);
 
 #include "draw_inline.h"
 
+extern void draw_InitCircleTable(void);
+
 /**********************************************************************************************************************/
 
 /**
@@ -226,6 +228,9 @@ BOOL Draw_Init()
     draw_CalculateGlyphSpacing();
 #endif
     draw_ResetHUDCounters();
+
+    draw_InitCircleTable();
+
 
     return TRUE;
 
