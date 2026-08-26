@@ -27,7 +27,7 @@ Draw_Crosshair:
 				move.l  #Draw_CrosshairPens_vb,a1
 				add.w   d0,a1
 				tst.b   (a1)
-                beq     .done
+				beq     .done
 
 
 				move.l	Vid_FastBufferPtr_l,a0

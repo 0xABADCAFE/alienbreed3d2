@@ -701,11 +701,11 @@ draw_WallGouraudShaded:
 				add.l	d5,d1
 				move.l	draw_TopOfWall_l(pc),d5
 				divs	d0,d5
-				add.w	Vid_CentreY_w,d5
+				add.w	Vid_ViewHorizonY_w,d5
 				move.w	d5,draw_StripTop_w
 				move.l	draw_BottomOfWall_l(pc),d5
 				divs	d0,d5
-				add.w	Vid_CentreY_w,d5
+				add.w	Vid_ViewHorizonY_w,d5
 				move.w	d5,draw_StripBottom_w
 
 .compute_loop:
@@ -727,12 +727,12 @@ draw_WallGouraudShaded:
 				move.l	draw_TopOfWall_l(pc),d6
 				divs	d2,d6
 				move.w	draw_StripBottom_w(pc),16(a0)
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripTop_w
 				move.w	d6,14(a0)
 				move.l	draw_BottomOfWall_l(pc),d6
 				divs	d2,d6
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripBottom_w
 				move.w	d6,18(a0)
 				move.l	d3,(a1)
@@ -804,12 +804,12 @@ computeloop2G:
 				move.l	draw_TopOfWall_l(pc),d6
 				divs	d2,d6
 				move.w	draw_StripBottom_w(pc),16(a0)
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripTop_w
 				move.w	d6,14(a0)
 				move.l	draw_BottomOfWall_l(pc),d6
 				divs	d2,d6
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripBottom_w
 				move.w	d6,18(a0)
 				move.l	d3,(a1)

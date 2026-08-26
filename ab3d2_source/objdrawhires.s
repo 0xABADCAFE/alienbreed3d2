@@ -236,7 +236,7 @@ draw_bitmap_glare:
 				;DEV_INC.w Reserved1
 				; 0xABADCAFE - Not worth it < 10 typically
 
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				cmp.w	d3,d6
 				bge		object_behind
 
@@ -255,7 +255,7 @@ draw_bitmap_glare:
 				divs	d1,d6
 				;DEV_INC.w Reserved1
 
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				cmp.w	d2,d6
 				ble		object_behind
 
@@ -283,7 +283,7 @@ draw_bitmap_glare:
 				divs	d1,d2
 				;DEV_INC.w Reserved1 ; counts how many divisions
 
-				add.w	Vid_CentreY_w,d2
+				add.w	Vid_ViewHorizonY_w,d2
 
 				divs	d1,d0
 				;DEV_INC.w Reserved1 ; counts how many divisions
@@ -602,7 +602,7 @@ draw_Bitmap:
 				divs	d1,d6
 				;DEV_INC.w Reserved1 ; counts how many divisions
 
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				cmp.w	d3,d6
 				bge		object_behind
 
@@ -618,7 +618,7 @@ draw_Bitmap:
 				divs	d1,d6
 				;DEV_INC.w Reserved1 ; counts how many divisions
 
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				cmp.w	d2,d6					; bottom of object over top of screen?
 				ble		object_behind
 
@@ -697,7 +697,7 @@ pastobjscale:
 				divs	d1,d2
 				;DEV_INC.w Reserved1 ; counts how many divisions
 
-				add.w	Vid_CentreY_w,d2
+				add.w	Vid_ViewHorizonY_w,d2
 
 				divs	d1,d0
 				;DEV_INC.w Reserved1 ; counts how many divisions
@@ -1691,7 +1691,7 @@ polybehind:
 ; struct Lvl_ObjectPointsPtr_l {short x,y,z}
 draw_PolygonModel:
 				move.w	EntT_CurrentAngle_w(a0),draw_ObjectAng_w
-				move.w	Vid_CentreY_w,draw_PolygonCentreY_w
+				move.w	Vid_ViewHorizonY_w,draw_PolygonCentreY_w
 				move.w	(a0)+,d0				; object Id?
 				move.l	Lvl_ObjectPointsPtr_l,a4
 				move.w	(a4,d0.w*8),draw_Obj_XPos_w

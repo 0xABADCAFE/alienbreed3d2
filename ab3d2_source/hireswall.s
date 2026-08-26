@@ -886,11 +886,11 @@ scrdrawlopFULLDOUB:
 ;
 ;				move.l	draw_TopOfWall_l(pc),d5
 ;				divs	d0,d5
-;				add.w	Vid_CentreY_w,d5
+;				add.w	Vid_ViewHorizonY_w,d5
 ;				move.w	d5,draw_StripTop_w
 ;				move.l	draw_BottomOfWall_l(pc),d5
 ;				divs	d0,d5
-;				add.w	Vid_CentreY_w,d5
+;				add.w	Vid_ViewHorizonY_w,d5
 ;				move.w	d5,draw_StripBottom_w
 ;
 ;; CACHE_OFF d2
@@ -921,12 +921,12 @@ scrdrawlopFULLDOUB:
 ;				move.w	draw_StripBottom_w(pc),16(a0)
 ;				move.l	draw_TopOfWall_l(pc),d6
 ;				divs	d2,d6
-;				add.w	Vid_CentreY_w,d6
+;				add.w	Vid_ViewHorizonY_w,d6
 ;				move.w	d6,draw_StripTop_w
 ;				move.w	d6,14(a0)
 ;				move.l	draw_BottomOfWall_l(pc),d6
 ;				divs	d2,d6
-;				add.w	Vid_CentreY_w,d6
+;				add.w	Vid_ViewHorizonY_w,d6
 ;				move.w	d6,draw_StripBottom_w
 ;				move.w	d6,18(a0)
 ;				move.w	d3,2(a1)
@@ -1104,13 +1104,13 @@ draw_WallSimpleShaded:
 				divs	d0,d5
 				;DEV_INC.w Reserved1
 
-				add.w	Vid_CentreY_w,d5
+				add.w	Vid_ViewHorizonY_w,d5
 				move.w	d5,draw_StripTop_w
 				move.l	draw_BottomOfWall_l(pc),d5
 				divs	d0,d5
 				;DEV_INC.w Reserved1
 
-				add.w	Vid_CentreY_w,d5
+				add.w	Vid_ViewHorizonY_w,d5
 				move.w	d5,draw_StripBottom_w
 
 .compute_loop:
@@ -1134,12 +1134,12 @@ draw_WallSimpleShaded:
 				move.l	draw_TopOfWall_l(pc),d6
 				divs	d2,d6
 				move.w	draw_StripBottom_w(pc),16(a0)
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripTop_w
 				move.w	d6,14(a0)
 				move.l	draw_BottomOfWall_l(pc),d6
 				divs	d2,d6
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripBottom_w
 				move.w	d6,18(a0)
 				move.l	d3,(a1)
@@ -1216,12 +1216,12 @@ computeloop2:
 				move.l	draw_TopOfWall_l(pc),d6
 				divs	d2,d6
 				move.w	draw_StripBottom_w(pc),16(a0)
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripTop_w
 				move.w	d6,14(a0)
 				move.l	draw_BottomOfWall_l(pc),d6
 				divs	d2,d6
-				add.w	Vid_CentreY_w,d6
+				add.w	Vid_ViewHorizonY_w,d6
 				move.w	d6,draw_StripBottom_w
 				move.w	d6,18(a0)
 				move.l	d3,(a1)
@@ -1412,9 +1412,9 @@ simplewallPACK2:
 ; ATTENION: for some reason the order of these variables is important
 ; There's code that expects	these in the right order to allow for movem
 				align	4
-TOTHEMIDDLE:	dc.w	0
+Vid_CentreY_w:	dc.w	0
 Vid_BottomY_w:	dc.w	0				; also accessed as long
-Vid_CentreY_w:	dc.w	FS_HEIGHT/2
+Vid_ViewHorizonY_w:	dc.w	FS_HEIGHT/2
 TOPOFFSET:		dc.w	0
 BIGMIDDLEY:		dc.l	SCREEN_WIDTH*FS_HEIGHT/2
 SMIDDLEY:		dc.w	FS_HEIGHT/2

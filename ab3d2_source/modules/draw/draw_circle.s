@@ -32,39 +32,66 @@ Draw_CircleShaded:
 				sub.w   d2,d3 ; x - radius
 				blt.s   .not_inside
 
-				; x - radius >= 0 &&
 .check_inside_right:
 				move.w  d0,d3
 				add.w   d2,d3    ; x + radius
 				cmp.w   Vid_RightX_w,d3 ; x + radius
 				bge.s   .not_inside
 
-				; x + radius < Vid_RightX_w &&
 .check_inside_top:
 				move.w  d1,d3
 				sub.w   d2,d3   ; y - radius
 				blt.s   .not_inside
 
-				; y - radius >= 0 &&
 .check_inside_bottom:
 				move.w  d1,d3
 				add.w   d2,d3
 				cmp.w   Vid_BottomY_w,d3
 				bge.s   .not_inside
 
-				; y + radius < Vid_BottomY_w
+				; We are fully inside the view rectangle, no clipping needed.
 .fully_inside:
 				; restore shadeval
 				swap   d3
 				bra.s  draw_ShadeCircleUnclipped
 
+				; We are not fully inside the view rectangle so we need to ensrure
+				; we aren't completely outside it either before we go down the
+				; clipping path.
 .not_inside:
 				;else if (
 				;    x + radius >= 0 && x - radius <= Vid_RightX_w &&
 				;    y + radius >= 0 && y - radius <= Vid_BottomY_w
 				;)
+
+.check_left:
+				move.w  d0,d3
+				add.w   d2,d3 ; x + radius
+				blt.s   .fully_outside
+
+.check_right:
+				move.w  d0,d3
+				sub.w   d2,d3
+				cmp.w   Vid_RightX_w,d3 ; x - radius
+				bge.s   .fully_outside
+
+.check_top:
+				move.w  d1,d3
+				add.w   d2,d3   ; y + radius
+				blt.s   .fully_outside
+
+.check_bottom:
+				move.w  d1,d3
+				add.w   d2,d3 ; y - radius
+				cmp.w   Vid_BottomY_w,d3
+				bge.s   .fully_outside:
+
+
+.clipped:
 				swap d3
-				; TODO - clip path
+
+.fully_outside:
+				swap d3
 				rts
 
 
@@ -114,20 +141,8 @@ PLOT			MACRO
 ; d3.w shade (0 - 31 white to normal, 32-63 normal to black)
 
 draw_ShadeCircleUnclipped:
-;				tst.w	d2
-;				bgt.s	.check_big
-
-;.early_exit:
-;				rts
-
-; TODO - this can go once the clipping paths are added
-;.check_big:
-;				cmp.w	#110,d2
-;				bge.s   .early_exit
-
-.check_small:
 				cmp.w	#16,d2
-				bge		.ready
+				bge.s	.ready
 
 .small_path:
 				movem.l	a2-a4,-(sp)

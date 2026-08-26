@@ -148,7 +148,7 @@ plr_MouseControl:
 .skip_look_down:
 				move.w	d0,STOPOFFSET
 				neg.w	d0
-				add.w	TOTHEMIDDLE,d0
+				add.w	Vid_CentreY_w,d0
 				move.w	d0,SMIDDLEY
 				muls	#SCREEN_WIDTH,d0
 				move.l	d0,SBIGMIDDLEY
@@ -526,7 +526,7 @@ plr_KeyboardControl:
 .skip_centre_look_2:
 				move.w	d0,STOPOFFSET
 				neg.w	d0
-				add.w	TOTHEMIDDLE,d0
+				add.w	Vid_CentreY_w,d0
 				move.w	d0,SMIDDLEY
 				muls.w	#SCREEN_WIDTH,d0
 				move.l	d0,SBIGMIDDLEY

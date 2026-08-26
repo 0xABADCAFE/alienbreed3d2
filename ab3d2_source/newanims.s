@@ -2736,7 +2736,7 @@ Draw_SkyBackdrop:
 ; lea.l Draw_BackdropImagePtr_l,a1
 				add.l	d5,a1
 				add.w	#SKY_BACKDROP_H,a1
-				move.w	Vid_CentreY_w,d7
+				move.w	Vid_ViewHorizonY_w,d7
 				move.w	d7,d6
 				move.w	d6,d5
 				asr.w	#1,d5
@@ -2793,7 +2793,7 @@ draw_SkyBackDropFullscreen:
 				move.l	Draw_BackdropImagePtr_l,a1
 				add.l	d5,a1
 				add.w	#SKY_BACKDROP_H,a1
-				move.w	Vid_CentreY_w,d7
+				move.w	Vid_ViewHorizonY_w,d7
 				move.w	d7,d6
 				sub.w	d6,a1
 				sub.w	d6,a5

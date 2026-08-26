@@ -290,10 +290,10 @@ p1xneg:
 				subq.w	#1,d2
 
 done_right_clip:
-				add.w	TOTHEMIDDLE,d1
+				add.w	Vid_CentreY_w,d1
 				bge		p1ypos
 
-				add.w	TOTHEMIDDLE,d3
+				add.w	Vid_CentreY_w,d3
 				blt		map_offscreen
 
 				move.w	d3,d6
@@ -309,9 +309,9 @@ done_right_clip:
 				bra		done_top_clip
 
 p1ypos:
-				add.w	TOTHEMIDDLE,d3
+				add.w	Vid_CentreY_w,d3
 				bge		done_top_clip
-;Vid_CentreY_w
+;Vid_ViewHorizonY_w
 				move.w	d1,d6
 				sub.w	d3,d6
 				ble		map_offscreen
