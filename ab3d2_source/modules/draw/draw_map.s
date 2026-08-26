@@ -685,4 +685,3 @@ down_more_right_dw:
 				dbra	d7,.line_loop
 
 				rts
-
