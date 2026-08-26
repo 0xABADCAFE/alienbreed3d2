@@ -87,12 +87,51 @@ Draw_CircleShaded:
 				bge.s   .fully_outside:
 
 
+OUTCODE_POS_LEFT	EQU 0
+OUTCODE_POS_RIGHT	EQU 1
+OUTCODE_POS_TOP		EQU 2
+OUTCODE_POS_BOTTOM	EQU 3
+OUTCODE_BIT_LEFT	EQU 1<<OUTCODE_POS_LEFT
+OUTCODE_BIT_RIGHT	EQU 1<<OUTCODE_POS_RIGHT
+OUTCODE_BIT_TOP		EQU 1<<OUTCODE_POS_TOP
+OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
+
+
 .clipped:
+				; Determine where the centre of the circle is. We can use Sutherland-Cohen style
+				; outcode calculation here.
+
+				; shade level is still in upper word.
+				clr.w   d3
+
+				; Test X
+				tst.w   d0
+				bpl.s   .not_left
+				bset    #OUTCODE_POS_LEFT,d3
+.not_left:
+				cmp.w   Vid_RightX_w,d0
+				blt.s   .not_right
+				bset    #OUTCODE_POS_RIGHT,d3
+.not_right:
+				tst.w   d1
+				bpl.s   .not_top
+				bset    #OUTCODE_POS_TOP,d3
+.not_top:
+				cmp.w   Vid_BottomY_w,d3
+				blt.s   .not_bottom
+				bset    #OUTCODE_POS_BOTTOM,d3
+.not_bottom:
+
+				; Outcode in d3
+
+
 				swap d3
 
 .fully_outside:
 				swap d3
 				rts
+
+
 
 
 ; Plotting macros. In order to validate each pixel is plotted once, define VALIDATE_PIXEL_ONCE
