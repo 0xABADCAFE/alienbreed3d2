@@ -84,7 +84,7 @@ Draw_CircleShaded:
 				move.w  d1,d3
 				add.w   d2,d3 ; y - radius
 				cmp.w   Vid_BottomY_w,d3
-				bge.s   .fully_outside:
+				bge.s   .fully_outside
 
 
 OUTCODE_POS_LEFT	EQU 0
@@ -104,6 +104,8 @@ OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 				; shade level is still in upper word.
 				clr.w   d3
 
+				; CENTRE OUTCODE
+
 				; Test X
 				tst.w   d0
 				bpl.s   .not_left
@@ -112,22 +114,41 @@ OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 				cmp.w   Vid_RightX_w,d0
 				blt.s   .not_right
 				bset    #OUTCODE_POS_RIGHT,d3
+
+				; Test Y
 .not_right:
 				tst.w   d1
 				bpl.s   .not_top
 				bset    #OUTCODE_POS_TOP,d3
 .not_top:
-				cmp.w   Vid_BottomY_w,d3
+				cmp.w   Vid_BottomY_w,d1
 				blt.s   .not_bottom
 				bset    #OUTCODE_POS_BOTTOM,d3
 .not_bottom:
 
-				; Outcode in d3
+				tst.w	d3
+				bne.s	.centre_outside
 
+				; TODO - Outcode test for the circle edge here.
+				;        When the circle centre is inside, some quadrants
+				;        can be fully unclipped. For example, if the left
+				;        extent crosses the left edge only, the entire
+				;        right hand octants of the circle can be rendered
+				;        totally unclipped and only the left hand octants
+				;        need to use the clipped path.
+
+
+.centre_outside:
+				; TODO - When the the circle centre is outside, some
+				;        quardants can be fully skipped.
+				;        For exmaple, if the centre of the circle is left
+				;        of the left edge, only the right and octants
+				;        reuquire (clipped) rendering.
 
 				swap d3
 
 .fully_outside:
+				; Nothing to do
 				swap d3
 				rts
 
@@ -172,6 +193,10 @@ PLOT			MACRO
 ; This is a total refactor of the compiler generated baseline that aims to
 ; pair octant read/remap/write cycles to avoid AGU stalls. The main loop is
 ; free from stride table reads and multiplication.
+;
+; TODO Write versions of this function that tender only half and quarter
+;      circles. These will be used to plot parts of circles when the centre
+;      is still inside the view but some edges are not.
 ;
 ; Params
 ; d0.w centreX
