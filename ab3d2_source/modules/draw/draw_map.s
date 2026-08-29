@@ -223,6 +223,8 @@ x1nx2p:			;		X1<0					X2>0, clip against X=0
 				sub.w	d0,d6					; dx
 				beq		map_offscreen				; dx == 0?
 
+
+				DEV_INC.w	Reserved1 ; division
 				move.w	d3,d5
 				sub.w	d1,d5					; dy
 				muls.w	d0,d5					; x1 * dy
@@ -239,6 +241,7 @@ p1xpos:
 				sub.w	d2,d6					; dx
 				ble		map_offscreen				; dx == 0?
 
+				DEV_INC.w	Reserved1 ; division
 				move.w	d1,d5
 				sub.w	d3,d5					; dy
 				muls.w	d2,d5					; x2 * dy
@@ -263,6 +266,7 @@ done_left_clip:
 				sub.w	Vid_RightX_w,d0
 				addq.w	#1,d0
 
+				DEV_INC.w	Reserved1 ; division
 				muls.w	d5,d0					; dy * (rightx -x1)
 				divs.w	d6,d0					; (dy * (rightx -x1))/dx
 				add.w	d0,d1					; y1 + (dy * (rightx -x1))/dx = y1 + dy/dx * (rightx - x1)
@@ -283,6 +287,7 @@ p1xneg:
 				move.w	d1,d5
 				sub.w	d3,d5
 
+				DEV_INC.w	Reserved1 ; division
 				muls.w	d5,d2
 				divs.w	d6,d2
 				add.w	d2,d3
@@ -300,6 +305,7 @@ done_right_clip:
 				sub.w	d1,d6
 				ble		map_offscreen
 
+				DEV_INC.w	Reserved1 ; division
 				move.w	d2,d5
 				sub.w	d0,d5
 				muls.w	d1,d5
@@ -315,6 +321,8 @@ p1ypos:
 				move.w	d1,d6
 				sub.w	d3,d6
 				ble		map_offscreen
+
+				DEV_INC.w	Reserved1 ; division
 
 				move.w	d0,d5
 				sub.w	d2,d5
@@ -333,6 +341,8 @@ done_top_clip:
 				move.w	d1,d6
 				sub.w	d3,d6
 				ble		map_offscreen
+
+				DEV_INC.w	Reserved1 ; division
 
 				sub.w	Vid_BottomY_w,d1
 				addq.w	#1,d1
@@ -353,6 +363,7 @@ p1yneg:
 				sub.w	d1,d6
 				ble		map_offscreen
 
+				DEV_INC.w	Reserved1 ; division
 				sub.w	Vid_BottomY_w,d3
 				addq.w	#1,d3
 				move.w	d0,d5

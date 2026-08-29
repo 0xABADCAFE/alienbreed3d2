@@ -53,38 +53,38 @@ Draw_CircleShaded:
 .fully_inside:
 				; restore shadeval
 				swap   d3
-				bra.s  draw_ShadeCircleUnclipped
+				bra    draw_ShadeCircleUnclipped
 
-				; We are not fully inside the view rectangle so we need to ensrure
+				; We are not fully inside the view rectangle so we need to ensure
 				; we aren't completely outside it either before we go down the
 				; clipping path.
 .not_inside:
 				;else if (
-				;    x + radius >= 0 && x - radius <= Vid_RightX_w &&
-				;    y + radius >= 0 && y - radius <= Vid_BottomY_w
+				;    x + radius >= 0 && x - radius < Vid_RightX_w &&
+				;    y + radius >= 0 && y - radius < Vid_BottomY_w
 				;)
 
 .check_left:
 				move.w  d0,d3
 				add.w   d2,d3 ; x + radius
-				blt.s   .fully_outside
+				blt     .fully_outside
 
 .check_right:
 				move.w  d0,d3
 				sub.w   d2,d3
 				cmp.w   Vid_RightX_w,d3 ; x - radius
-				bge.s   .fully_outside
+				bge     .fully_outside
 
 .check_top:
 				move.w  d1,d3
 				add.w   d2,d3   ; y + radius
-				blt.s   .fully_outside
+				blt     .fully_outside
 
 .check_bottom:
 				move.w  d1,d3
 				add.w   d2,d3 ; y - radius
 				cmp.w   Vid_BottomY_w,d3
-				bge.s   .fully_outside
+				bge     .fully_outside
 
 
 OUTCODE_POS_LEFT	EQU 0
@@ -106,16 +106,19 @@ OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 
 				; CENTRE OUTCODE
 
-				; Test X
+				; Test 0 <= x < Vid_RightX_w
 				tst.w   d0
 				bpl.s   .not_left
+
 				bset    #OUTCODE_POS_LEFT,d3
+
 .not_left:
 				cmp.w   Vid_RightX_w,d0
 				blt.s   .not_right
+
 				bset    #OUTCODE_POS_RIGHT,d3
 
-				; Test Y
+				; Test 0 <= y < Vid_BottomY_w
 .not_right:
 				tst.w   d1
 				bpl.s   .not_top
@@ -137,6 +140,58 @@ OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 				;        totally unclipped and only the left hand octants
 				;        need to use the clipped path.
 
+				; d3.w is already zero here ...
+
+
+				; Test 0 <= x - radius
+.centre_inside:
+
+
+				move.l  d4,-(sp)
+				move.w  d0,d4
+				sub.w   d2,d4 ; x - radius
+				bpl.s   .left_inside
+
+				bset    #OUTCODE_POS_LEFT,d3
+
+				; Test x + radius < Vid_RightX_w
+.left_inside:
+				move.w  d0,d4
+				add.w   d2,d4 ; x + radius
+				cmp.w   Vid_RightX_w,d4
+				blt.s   .right_inside
+
+				bset    #OUTCODE_POS_RIGHT,d3
+
+				; Test 0 <= y - radius
+.right_inside:
+				move.w  d1,d4
+				sub.w   d2,d4 ; y - radius
+				bpl.s   .top_inside
+
+				bset    #OUTCODE_POS_TOP,d3
+
+				; Test y + radius < Vid_BottomY_w
+.top_inside:
+				move.w  d1,d4
+				add.w   d2,d4 ; y + radius
+				cmp.w   Vid_BottomY_w,d4
+				blt.s   .bottom_inside
+
+				bset    #OUTCODE_POS_BOTTOM,d3
+
+.bottom_inside:
+				IFD DEV
+				move.w	d3,dev_Reserved2_w
+				ENDIF
+
+				; restore d4
+				move.l (sp)+,d4
+
+				swap d3
+				rts
+
+				; TODO branch on d3 cases
 
 .centre_outside:
 				; TODO - When the the circle centre is outside, some
