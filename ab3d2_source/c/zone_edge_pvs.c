@@ -177,7 +177,7 @@ static void zone_CountPVS(Zone const* zonePtr, ZPVSCount* pvsCountPtr)
  *
  * This fills the pvsCountBufferPtr with the per-zone facts as it goes. We need that later.
  */
-static ULONG zone_CalcEdgePVSDataSize(ZPVSCount* pvsCountBufferPtr)
+static ULONG zone_CalcEdgePVSDataSize(ZPVSCount* restrict pvsCountBufferPtr)
 {
     /* Begin with the assumption we need as many pointers as zones */
     ULONG totalSize = Lvl_NumZones_w * sizeof(ZEdgePVSHeader*);
@@ -215,7 +215,7 @@ static ZEdgePVSHeader** zone_AllocEdgePVS(ZPVSCount* pvsCountBufferPtr)
 /**
  * Calculate the offset fields for a given ZEdgePVSHeader once the size/edges/features are known
  */
-static void zone_CalcZEdgePVSHeaderOffsets(ZEdgePVSHeader* currentEdgePVSPtr, UWORD features)
+static inline void zone_CalcZEdgePVSHeaderOffsets(ZEdgePVSHeader* restrict currentEdgePVSPtr, UWORD features)
 {
     // First the offset to the edge mask. This immediately follows the the array of ZEdgeInfo
     size_t offset = (sizeof(ZEdgePVSHeader) - sizeof(ZEdgeInfo)) +
@@ -240,7 +240,7 @@ static void zone_CalcZEdgePVSHeaderOffsets(ZEdgePVSHeader* currentEdgePVSPtr, UW
  * Builds up the pointer table with the location for each ZEdgePVSHeader and populates
  * the ZEdgePVSHeader structure fields.
  */
-static void zone_FillZEdgePVSHeaders(ZEdgePVSHeader* currentEdgePVSPtr, ZPVSCount const* pvsCountBufferPtr)
+static void zone_FillZEdgePVSHeaders(ZEdgePVSHeader* restrict currentEdgePVSPtr, ZPVSCount const* restrict pvsCountBufferPtr)
 {
     // First Pass - build the ZEdgePVSHeader data and populate the edge indexes.
     for (WORD zoneID = 0; zoneID < Lvl_NumZones_w; ++zoneID) {
@@ -728,7 +728,7 @@ void zone_ClearEdgePVSBuffer(WORD size)
     }
 }
 
-void zone_MergeEdgePVS(UBYTE const* zoneMaskPtr, ZDoorListMask const* doorListMaskPtr, WORD size)
+void zone_MergeEdgePVS(UBYTE const* restrict zoneMaskPtr, ZDoorListMask const* restrict doorListMaskPtr, WORD size)
 {
     if (doorListMaskPtr) {
         ZDoorListMask mask = Zone_RenderDoorState_w;

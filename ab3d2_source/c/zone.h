@@ -241,6 +241,6 @@ typedef enum {
  * Determines the possible crossing between any two zones, based on their heights.
  * Does not require that the zones are joined as only their relative heights are compared.
  */
-ZoneCrossing Zone_DetermineCrossing(Zone const* from, Zone const* to);
+ZoneCrossing Zone_DetermineCrossing(Zone const* from, Zone const* to) __attribute__((pure));
 
 #endif // ZONE_H
