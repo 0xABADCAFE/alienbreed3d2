@@ -307,12 +307,10 @@ draw_ShadeCircleUnclipped:
 				;st (a1,d1.w)
 				lea     (a1,d0.w),a3
 				lea     (a1,d1.w),a4
-				move.b  (a3),d2       ; read
+				move.b  (a3),d2        ; read
 				move.b  (a4),d3
-				move.b  (a0,d2.w),d2  ; remap
-				move.b  (a0,d3.w),d3
-				PLOT    d2,(a3)       ; write
-				PLOT    d3,(a4)
+				PLOT    (a0,d2.w),(a3) ; remap and write
+				PLOT    (a0,d3.w),(a4)
 				bra.s   .pairs
 
 .done_small:
@@ -385,10 +383,9 @@ draw_ShadeCircleUnclipped:
 				lea     (a3,d0.w),a6                ; Octant H
 				move.b  (a1),d4                     ; Octant A
 				move.b  (a6),d5                     ; Octant H
-				move.b  (a0,d4.w),d4
-				move.b  (a0,d5.w),d5
-				PLOT    d4,(a1)
-				PLOT    d5,(a6)
+				PLOT    (a0,d4.w),(a1)              ; remap and write
+				PLOT    (a0,d5.w),(a6)
+
 				tst.w   d0                          ; skip duplicate x = 0 on vertical axis
 				beq.s   .skip_neg_x
 
@@ -396,23 +393,21 @@ draw_ShadeCircleUnclipped:
 				lea     (a3,d6.w),a6                ; Octant E
 				move.b  (a1),d4                     ; Octant D
 				move.b  (a6),d5                     ; Octant E
-				move.b  (a0,d4.w),d4
-				move.b  (a0,d5.w),d5
-				PLOT    d4,(a1)
-				PLOT    d5,(a6)
+				PLOT    (a0,d4.w),(a1)              ; remap and write
+				PLOT    (a0,d5.w),(a6)
 				bra.s   .skip_neg_x
 
 .plot_y0_axis:
 				; At y = 0: a2 == a3 => plot (+x, 0) and (-x, 0) just once
-				move.b  (a2,d0.w),d4                ; Octant A (+x, 0)
-				move.b  (a0,d4.w),d4
-				PLOT    d4,(a2,d0.w)
+				lea     (a2,d0.w),a1                ; Octant A (+x, 0)
+				move.b  (a1),d4
+				PLOT    (a0,d4.w),(a1)
 				tst.w   d0                          ; skip duplicate x = 0 on vertical axis
 				beq.s   .skip_neg_x
 
-				move.b  (a2,d6.w),d4                ; Octant D (-x, 0)
-				move.b  (a0,d4.w),d4
-				PLOT    d4,(a2,d6.w)
+				lea     (a2,d6.w),a1                ; Octant D (-x, 0)
+				move.b  (a1),d4
+				PLOT    (a0,d4.w),(a1)
 
 .skip_neg_x:
 				; Octants B,C,F,G - skip if x == y to avoid double plot
@@ -423,10 +418,8 @@ draw_ShadeCircleUnclipped:
 				lea     (a5,d1.w),a6                ; Octant G
 				move.b  (a1),d4
 				move.b  (a6),d5
-				move.b  (a0,d4.w),d4
-				move.b  (a0,d5.w),d5
-				PLOT    d4,(a1)
-				PLOT    d5,(a6)
+				PLOT    (a0,d4.w),(a1)              ; remap and write
+				PLOT    (a0,d5.w),(a6)
 
 				tst.w   d1                          ; skip duplicate y = 0 on horizontal axis
 				beq.s   .step
@@ -435,10 +428,8 @@ draw_ShadeCircleUnclipped:
 				lea     (a5,d7.w),a6                ; Octant F
 				move.b  (a1),d4
 				move.b  (a6),d5
-				move.b  (a0,d4.w),d4
-				move.b  (a0,d5.w),d5
-				PLOT    d4,(a1)
-				PLOT    d5,(a6)
+				PLOT    (a0,d4.w),(a1)              ; remap and write
+				PLOT    (a0,d5.w),(a6)
 
 .step:
 				tst.w   d2
