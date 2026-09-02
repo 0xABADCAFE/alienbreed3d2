@@ -82,7 +82,7 @@ Draw_CircleShaded:
 
 .check_bottom:
 				move.w  d1,d3
-				add.w   d2,d3 ; y - radius
+				sub.w   d2,d3 ; y - radius
 				cmp.w   Vid_BottomY_w,d3
 				bge     .fully_outside
 
@@ -199,10 +199,18 @@ OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 				;        For exmaple, if the centre of the circle is left
 				;        of the left edge, only the right and octants
 				;        reuquire (clipped) rendering.
+				IFD DEV
+				move.w	#1001,dev_Reserved2_w
+				ENDIF
+
 
 				swap d3
-
+				rts
 .fully_outside:
+				IFD DEV
+				move.w	#2002,dev_Reserved2_w
+				ENDIF
+
 				; Nothing to do
 				swap d3
 				rts
