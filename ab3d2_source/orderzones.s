@@ -81,7 +81,7 @@ Zone_OrderZones:
 				; sf farendfound
 
 .run_through_list:
-				DEV_INC.w	Reserved2
+				;DEV_INC.w	Reserved2
 				move.l	Lvl_ZoneEdgePtr_l,a1
 				move.w	2(a5),d0
 				move.l	#Sys_Workspace_vl,a6
