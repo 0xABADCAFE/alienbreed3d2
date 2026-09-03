@@ -106,6 +106,7 @@ jump_SCU:
 				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 14:
 				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 15:
 
+
 jump_SCU_full_clip:
 				; TODO - none of the interior quarter or half partials can be rendered without
 				;        clipping, so we have to go to the PITA path.
