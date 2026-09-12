@@ -17,7 +17,7 @@ draw_StripData_b:		dc.b    0 ; lsb
 
 ; TODO - this buffer is just a lookup table of y * SCREEN_WIDTH. It's probably faster to use mul #SCREEN_WIDTH on 060
 				align 4
-draw_RenderBufferStrideTable_vl:
+		DCLC draw_RenderBufferStrideTable_vl
 val				SET		0
 				REPT	256
 				dc.l	val
@@ -1413,8 +1413,8 @@ simplewallPACK2:
 ; There's code that expects	these in the right order to allow for movem
 				align	4
 Vid_CentreY_w:	dc.w	0
-Vid_BottomY_w:	dc.w	0				; also accessed as long
-Vid_ViewHorizonY_w:	dc.w	FS_HEIGHT/2
+		DCLC Vid_BottomY_w, dc.w, 0				; also accessed as long
+		DCLC Vid_ViewHorizonY_w, dc.w, FS_HEIGHT/2
 TOPOFFSET:		dc.w	0
 BIGMIDDLEY:		dc.l	SCREEN_WIDTH*FS_HEIGHT/2
 SMIDDLEY:		dc.w	FS_HEIGHT/2

@@ -24,6 +24,10 @@
 ; d3.l = [ uppwer .w: shade level ][ lower .w: clipping outcode ]
 jump_SCUPartialUnclipped:
 				movem.l d4-d7/a2-a6,-(sp)
+
+				; save off the current coordinates as we will need those to draw the clipped
+				; portions later.
+				movem.w d0-d2,-(sp)
 				clr.l   d5
 				move.w	d3,d4  ; will switch on this in a moment
 				and.w   #$f,d4 ; ensure d4 has only the expected 16 combinations
@@ -92,7 +96,7 @@ jump_SCU:
 				dc.w	jump_SCU_nop-jump_SCU ; outcode  0: Unreachable, already handled by fast path.
 				dc.w	jump_SCU_R-jump_SCU   ; outcode  1: OUTCODE_BIT_LEFT, draw right half only
 				dc.w	jump_SCU_L-jump_SCU   ; outcode  2: OUTCODE_BIT_RIGHT, draw left half only
-				dc.w	jump_SCU_full_clip-jump_SCU ; outcode  3:
+				dc.w	jump_SCU_nop-jump_SCU ; outcode  3: Unreachable; can't be LR clipped but not top and/or bottom.
 				dc.w	jump_SCU_B-jump_SCU   ; outcode  4: OUTCODE_BIT_TOP, draw bottom half only
 				dc.w	jump_SCU_BR-jump_SCU  ; outcode  5: OUTCODE_BIT_TOP|OUTCODE_BIT_LEFT, draw bottom-right corner only
 				dc.w	jump_SCU_BL-jump_SCU  ; outcode  6: OUTCODE_BIT_TOP|OUTCODE_BIT_RIGHT, draw bottom-left corner only
@@ -101,16 +105,23 @@ jump_SCU:
 				dc.w	jump_SCU_TR-jump_SCU  ; outcode  9: OUTCODE_BIT_BOTTOM|OUTCODE_BIT_LEFT, draw top-right corner only
 				dc.w	jump_SCU_TL-jump_SCU  ; outcode 10: OUTCODE_BIT_BOTTOM|OUTCODE_BIT_RIGHT, draw top-pleft-corner only
 				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 11:
-				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 12:
+				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 12: top and bottom
 				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 13:
 				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 14:
-				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 15:
+				dc.w	jump_SCU_full_clip-jump_SCU ; outcode 15: all
 
 
 jump_SCU_full_clip:
 				; TODO - none of the interior quarter or half partials can be rendered without
 				;        clipping, so we have to go to the PITA path.
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq   #$f,d3
+				CALLC   draw_SCUPartialClipped
+				movem.l (sp)+,d4-d7/a2-a6
+				rts
 jump_SCU_nop:
+				movem.w (sp)+,d0-d2
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -197,6 +208,11 @@ jump_SCU_R:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BL|QUADRANT_BIT_TL,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -258,6 +274,11 @@ jump_SCU_L:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BR|QUADRANT_BIT_TR,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -314,6 +335,12 @@ jump_SCU_T:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BR|QUADRANT_BIT_BL,d3
+				CALLC   draw_SCUPartialClipped
+
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -382,6 +409,11 @@ jump_SCU_B:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_TR|QUADRANT_BIT_TL,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -432,6 +464,11 @@ jump_SCU_BR:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BL|QUADRANT_BIT_TR,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -488,10 +525,13 @@ jump_SCU_BL:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BR|QUADRANT_BIT_TL,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
-
-
 
 
 ; Top Left Quarter Octants
@@ -540,6 +580,11 @@ jump_SCU_TL:
 
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_BL|QUADRANT_BIT_TR,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts
 
@@ -582,5 +627,10 @@ jump_SCU_TR:
 				bge     .loop
 
 .done:
+				; restore source coordinates
+				movem.w (sp)+,d0-d2
+				moveq	#QUADRANT_BIT_TL|QUADRANT_BIT_BR,d3
+				CALLC   draw_SCUPartialClipped
+
 				movem.l (sp)+,d4-d7/a2-a6
 				rts

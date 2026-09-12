@@ -9,6 +9,12 @@ OUTCODE_BIT_RIGHT	EQU 1<<OUTCODE_POS_RIGHT
 OUTCODE_BIT_TOP		EQU 1<<OUTCODE_POS_TOP
 OUTCODE_BIT_BOTTOM	EQU 1<<OUTCODE_POS_BOTTOM
 
+; Quadrant bits for incomplete clipped circles
+QUADRANT_BIT_BR		EQU 1
+QUADRANT_BIT_BL		EQU 2
+QUADRANT_BIT_TL		EQU 4
+QUADRANT_BIT_TR		EQU 8
+
 ; Params
 ; d0.w centreX
 ; d1.w centreY
@@ -30,6 +36,15 @@ Draw_CircleShaded:
 				; nope
 				cmp.w   #512,d2
 				bge.s   .early_exit
+
+;				; hackity hack
+;				and.l   #$3f,d3
+;				lsl.l   #8,d3                              ; 256 bytes per slice
+;				add.l   Draw_PaletteShadeTablePtr_l,d3
+;				move.l  d3,a0                              ; a0 = shade
+;				CALLC   draw_SCUPartialClipped
+;				rts
+
 
 				; Next decide if we are fully inside the viewport to use fully unclipped path.
 				; After that, we can use Sutherland-Cohen style outcode style clipping against view edges.
@@ -198,15 +213,22 @@ Draw_CircleShaded:
 				;        of the left edge, only the right and octants
 				;        reuquire (clipped) rendering.
 				IFD DEV
-				move.w	#101,dev_Reserved2_w
+				move.w  #101,dev_Reserved2_w
 				ENDIF
 
+				; TODO - actually work out which quadrants we need to draw.
+				swap    d3
+				and.l   #$3f,d3
+				lsl.l   #8,d3                              ; 256 bytes per slice
+				add.l   Draw_PaletteShadeTablePtr_l,d3
+				move.l  d3,a0                              ; a0 = shade
+				moveq   #$f,d3
+				CALLC   draw_SCUPartialClipped
 
-				swap d3
 				rts
 .fully_outside:
 				IFD DEV
-				move.w	#202,dev_Reserved2_w
+				move.w  #202,dev_Reserved2_w
 				ENDIF
 
 				; Nothing to do
