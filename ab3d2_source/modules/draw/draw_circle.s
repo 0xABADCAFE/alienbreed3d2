@@ -14,6 +14,7 @@ QUADRANT_BIT_BR		EQU 1
 QUADRANT_BIT_BL		EQU 2
 QUADRANT_BIT_TL		EQU 4
 QUADRANT_BIT_TR		EQU 8
+QUADRANT_MASK       EQU 15
 
 ; Params
 ; d0.w centreX
@@ -207,22 +208,51 @@ Draw_CircleShaded:
 
 
 .centre_outside:
-				; TODO - When the the circle centre is outside, some
-				;        quardants can be fully skipped.
-				;        For exmaple, if the centre of the circle is left
-				;        of the left edge, only the right and octants
-				;        reuquire (clipped) rendering.
+				; When the circle centre is outside, any quadrants we need to determine an outcode
+				; so that we know which quadrants to draw.
 				IFD DEV
 				move.w  #101,dev_Reserved2_w
 				ENDIF
 
-				; TODO - actually work out which quadrants we need to draw.
+				; Get the shade slice into a0 to free up d3 for the quadrant code
 				swap    d3
 				and.l   #$3f,d3
 				lsl.l   #8,d3                              ; 256 bytes per slice
 				add.l   Draw_PaletteShadeTablePtr_l,d3
 				move.l  d3,a0                              ; a0 = shade
-				moveq   #$f,d3
+
+				; Now calculate which quadrants to render based on the centre outcode
+				moveq	#QUADRANT_MASK,d3
+
+.check_centre_off_left:
+				tst.w	d0
+				bge.s	.check_centre_off_right
+
+				; clear left quadrants
+				andi.w	#~(QUADRANT_BIT_BL|QUADRANT_BIT_TL),d3
+
+.check_centre_off_right:
+				cmp.w	Vid_RightX_w,d0
+				blt.s   .check_centre_off_top
+
+				; clear right quadrants
+				andi.w	#~(QUADRANT_BIT_TR|QUADRANT_BIT_BR),d3
+
+.check_centre_off_top:
+				tst.w	d1
+				bge.s	.check_centre_off_bottom
+
+				; clear top quadrants
+				andi.w	#~(QUADRANT_BIT_TL|QUADRANT_BIT_TR),d3
+
+.check_centre_off_bottom:
+				cmp.w	Vid_BottomY_w,d1
+				blt.s   .all_checked
+
+				; clear bottom quadrants
+				andi.w	#~(QUADRANT_BIT_BL|QUADRANT_BIT_BR),d3
+
+.all_checked:
 				CALLC   draw_SCUPartialClipped
 
 				rts

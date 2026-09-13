@@ -112,8 +112,8 @@ jump_SCU:
 
 
 jump_SCU_full_clip:
-				; TODO - none of the interior quarter or half partials can be rendered without
-				;        clipping, so we have to go to the PITA path.
+				; None of the interior quarter or half partials can be rendered without clipping, so we have to go to
+				; the PITA path.
 				; restore source coordinates
 				movem.w (sp)+,d0-d2
 				moveq   #$f,d3
