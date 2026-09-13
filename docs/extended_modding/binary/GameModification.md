@@ -11,6 +11,7 @@ The Game Modification File is the binary encoded represntation of the data defin
 The following Chunks are included:
 
 - [Index](./DataFormat.md#index-chunk)
+- Default Globals
 - Inventory Limits
 - Special Ammo Bonuses
 - Weapon Adjustment
@@ -19,6 +20,26 @@ The following Chunks are included:
 - [String](./DataFormat.md#string-chunk)
 
 Only the Index, Inventory Limits and String chunks are mandatory.
+
+### Default Globals Chunk
+
+The Default Globals Chunk contains the binary encoded key-value data defined in the source [Default Globals](../source/GameModification.md#defaultglobals) node. Each key-value pair is stored as a uint32 pair comprising teh FNV1A hash of the key and the 32-bit value.
+
+| Offset In Chunk | Content | Type | Notes |
+| :---- | :---- | :---- | :---- |
+| 0 | **Ident** | `char[4]` | "GBDF" |
+| 4 | **Length** | `uint32` | Size of complete chunk. |
+| - | Record [0] | struct { | Structure of ... |
+| 8 | - KeyHash | `uint32` | FNV1A 32-bit hash of key |
+| 12 | - Value | `uint32` | Value, either integer or offset into String Chunk |
+| - | | } |
+| ... | ... | ... | Structure repeated per key-value|
+
+Notes:
+
+- It is the responsibility of the tool generating the binary from the ARSON source to ensure that there are no colliding keys.
+- It is up to the engine implementation to match the values by their precomputed hash and interpret the corresponding value data accordingly.
+- Unmatched keys are ignored.
 
 ### Inventory Limits Chunk
 

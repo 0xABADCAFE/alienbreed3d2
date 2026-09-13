@@ -132,6 +132,18 @@ The `Reward` structure defines a set of inventory modifications that can be appl
 
 The following nodes define the major behavioural modificatons. Generally, each one will be compiled into a distinct chunk within the generated asset binary.
 
+### DefaultGlobals
+
+The `DefaultGlobals` node is a key-value set, that defines the modification default value for a number of engine parameters. The keys are hashed (FNV1A 32-bit) and values are either 32-bit signed integer or string.
+
+**Structure:**
+
+```
+    DefaultGlobals: {
+        "<global name>": <#value>|"<value>",
+    }
+```
+
 ### DefaultInventoryLimits
 
 The `DefaultInventoryLimits` node is a `SupplyQuantity` that sets the initial limits for player comsumables and ammunition when starting a new game:
