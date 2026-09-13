@@ -44,6 +44,7 @@ extern UBYTE Prefs_ShowMessages_b;
 extern UBYTE Prefs_ShowWeapon_b;
 
 extern UBYTE Draw_MapTransparent_b;
+extern UBYTE Draw_MapRadar_b;
 extern UWORD Draw_MapZoomLevel_w;
 
 extern ULONG Zone_MovementMask_l;
