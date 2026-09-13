@@ -208,7 +208,9 @@ void draw_SCUPartialClipped(
         case QUADRANT_BIT_BL|QUADRANT_BIT_TL: // Left
             while (x >= y) {
                 WORD px_m = x0 - x, py_p = y0 + y, py_m = y0 - y;
-                putPixel(px_m, py_p, pShade, pDraw);
+                if (y != 0) { // avoid double horizontal
+                    putPixel(px_m, py_p, pShade, pDraw);
+                }
                 putPixel(px_m, py_m, pShade, pDraw);
 
                 if (x != y && y != 0) {
@@ -227,13 +229,15 @@ void draw_SCUPartialClipped(
             while (x >= y) {
                 WORD px_p = x0 + x, py_p = y0 + y, py_m = y0 - y;
                 putPixel(px_p, py_p, pShade, pDraw);
-                putPixel(px_p, py_m, pShade, pDraw);
-
+                if (y != 0) { // avoid double horizontal
+                    putPixel(px_p, py_m, pShade, pDraw);
+                }
                 if (x != y && y != 0) {
                     WORD qx_p = x0 + y, qy_p = y0 + x, qy_m = y0 - x;
                     putPixel(qx_p, qy_p, pShade, pDraw);
                     putPixel(qx_p, qy_m, pShade, pDraw);
                 } else if (y == 0 && x != 0) {
+                    // ASM left side doesn't include the zero axis
                     putPixel(x0, y0 + x, pShade, pDraw);
                     putPixel(x0, y0 - x, pShade, pDraw);
                 }
