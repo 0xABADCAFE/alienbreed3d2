@@ -37,8 +37,14 @@ enum {
     IDENT_GBDF = 0x47424446,    // Default Globals (used in: GMOD)
 };
 
+/**********************************************************************************************************************/
+
 /**
  * GMod_HashKeyValue
+ *
+ * Defines a key value pair in which the key has been converted into a hash.
+ *
+ * Used in:
  *     - Main Game Modification (Default Globals)
  */
 typedef struct {
@@ -49,6 +55,19 @@ typedef struct {
         char const* hkv_String;
     };
 } ASM_ALIGN(sizeof(ULONG)) GMod_HashKeyValue; // 8 bytes
+
+enum {
+    HASH_PLR_STAND_HEIGHT    = 0xA0FCEE75, // Player.StandHeight
+    HASH_PLR_CROUCH_HEIGHT   = 0xDEE5770B, // Player.CrouchHeight
+    HASH_PHY_BASE_GRAV_ACCEL = 0x2DEEE9B9, // Physics.BaseGravityAcceleration
+    HASH_PHY_BASE_AIR_RESIST = 0xB7904D2A, // Physics.BaseAirResistance
+    HASH_PHY_BASE_WTR_RESIST = 0x4A7DB331, // Physics.BaseWaterResistance
+};
+
+/**
+ * Attempts to process the GMod_HashKeyValue by matching the key against a set of handler callbacks.
+ */
+extern void Gmod_ProcessGlobalHKV(GMod_HashKeyValue const * pHKVEntry);
 
 /**********************************************************************************************************************/
 
@@ -312,6 +331,8 @@ extern void GMod_Done(void);
  * Returns true if a viable modification file was found and processed correctly.
  */
 extern BOOL GMod_LoadModDefaults(void);
+
+extern void GMod_ApplyGlobalDefaults(void);
 
 /**********************************************************************************************************************/
 

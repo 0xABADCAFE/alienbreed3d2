@@ -277,10 +277,17 @@ static void gmod_SetWeaponAdjustmentsFrom(GMod_WeaponAdjustment const* sourceLim
 /**********************************************************************************************************************/
 
 /**
- * Set the mod defined defaults for GMod_Progress
+ * Set all mod defined defaults
  */
 static void gmod_SetModDefaults(void)
 {
+    // Global defaults (if any)
+    if (GMod_Defaults.gmod_DefaultGlobalsPtr) {
+        for (ULONG i = 0; i < GMod_Defaults.gmod_NumDefaultGlobals; ++i) {
+            Gmod_ProcessGlobalHKV(&GMod_Defaults.gmod_DefaultGlobalsPtr[i]);
+        }
+    }
+
     // If we have defined limits, apply those.
     if (GMod_Defaults.gmod_DefinedInventoryLimitsPtr) {
         gmod_SetInventoryLimitsFrom(GMod_Defaults.gmod_DefinedInventoryLimitsPtr);
@@ -362,6 +369,8 @@ BOOL GMod_LoadModDefaults(void)
         GMod_Defaults.gmod_DefinedAchievementsPtr = (GMod_Achievement const*)GMF_ChunkData(chunkPtr);
         GMod_Defaults.gmod_NumDefinedAchievements = GMF_ChunkRecordCount(chunkPtr, GMod_Achievement);
     }
+
+
     dprintf(
         "GMod_LoadModDefaults()\n"
         "\tgmod_LoadedPtr:                    %p\n"

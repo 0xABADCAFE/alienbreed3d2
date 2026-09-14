@@ -35,6 +35,37 @@ ShortDate GMod_Date = 0;
 extern Inventory Plr1_Inventory;
 extern Inventory Plr2_Inventory;
 
+typedef void (*GMod_HKVHandler)(GMod_HashKeyValue const *);
+
+typedef struct {
+    ULONG hkv_Hash;
+    GMod_HKVHandler hkv_Handler;
+} GMod_HKVHandlerEntry;
+
+
+static void gmod_HKVNop(GMod_HashKeyValue const * pHKVEntry)
+{
+    printf("Matched 0x%08X [%u]\n", pHKVEntry->hkv_Hash, pHKVEntry->hkv_Value);
+}
+
+static GMod_HKVHandlerEntry const GMod_HKVHandlers[] = {
+    { HASH_PLR_STAND_HEIGHT, gmod_HKVNop },
+    { HASH_PLR_CROUCH_HEIGHT, gmod_HKVNop },
+    { HASH_PHY_BASE_GRAV_ACCEL, gmod_HKVNop },
+    { HASH_PHY_BASE_AIR_RESIST, gmod_HKVNop },
+    { HASH_PHY_BASE_WTR_RESIST, gmod_HKVNop }
+};
+
+void Gmod_ProcessGlobalHKV(GMod_HashKeyValue const* pHKVEntry)
+{
+    for (size_t i = 0; i < sizeof(GMod_HKVHandlers)/sizeof(GMod_HKVHandlerEntry); ++i) {
+        if (pHKVEntry->hkv_Hash == GMod_HKVHandlers[i].hkv_Hash) {
+            GMod_HKVHandlers[i].hkv_Handler(pHKVEntry);
+            break;
+        }
+    }
+}
+
 /**********************************************************************************************************************/
 
 /**
