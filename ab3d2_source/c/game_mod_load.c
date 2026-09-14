@@ -332,6 +332,13 @@ BOOL GMod_LoadModDefaults(void)
     }
 
     GMF_ChunkHeader const* chunkPtr;
+
+    // Global defaults
+    if ( (chunkPtr = GMF_LocateChunk(GMod_Defaults.gmod_LoadedPtr, IDENT_GBDF)) ) {
+        GMod_Defaults.gmod_DefaultGlobalsPtr = (GMod_HashKeyValue const*)GMF_ChunkData(chunkPtr);
+        GMod_Defaults.gmod_NumDefaultGlobals = GMF_ChunkRecordCount(chunkPtr, GMod_HashKeyValue);
+    }
+
     // Inventory limits (size is fixed)
     if ( (chunkPtr = GMF_LocateChunk(GMod_Defaults.gmod_LoadedPtr, IDENT_INVL)) ) {
         // Fixed size
@@ -352,25 +359,28 @@ BOOL GMod_LoadModDefaults(void)
 
     // Achievements
     if ( (chunkPtr = GMF_LocateChunk(GMod_Defaults.gmod_LoadedPtr, IDENT_ACHV)) ) {
-        GMod_Defaults.gmod_DefinedAchievementsPtr         = (GMod_Achievement const*)GMF_ChunkData(chunkPtr);
-        GMod_Defaults.gmod_NumDefinedAchievements      = GMF_ChunkRecordCount(chunkPtr, GMod_Achievement);
+        GMod_Defaults.gmod_DefinedAchievementsPtr = (GMod_Achievement const*)GMF_ChunkData(chunkPtr);
+        GMod_Defaults.gmod_NumDefinedAchievements = GMF_ChunkRecordCount(chunkPtr, GMod_Achievement);
     }
-//     dprintf(
-//         "GMod_LoadModDefaults()\n"
-//         "\tgmod_LoadedPtr:                    %p\n"
-//         "\tgmod_DefinedInventoryLimitsPtr:    %p\n"
-//         "\tgmod_DefinedSpecialAmmoBonusesPtr: %p %lu\n"
-//         "\tgmod_DefinedWeaponAdjustmentsPtr:  %p %lu\n"
-//         "\tgmod_DefinedAchievementsPtr:       %p %lu\n",
-//         GMod_Defaults.gmod_LoadedPtr,
-//         GMod_Defaults.gmod_DefinedInventoryLimitsPtr,
-//         GMod_Defaults.gmod_DefinedSpecialAmmoBonusesPtr,
-//         GMod_Defaults.gmod_NumDefinedSpecialAmmoBonuses,
-//         GMod_Defaults.gmod_DefinedWeaponAdjustmentsPtr,
-//         GMod_Defaults.gmod_NumDefinedWeaponAdjustments,
-//         GMod_Defaults.gmod_DefinedAchievementsPtr,
-//         GMod_Defaults.gmod_NumDefinedAchievements
-//     );
+    dprintf(
+        "GMod_LoadModDefaults()\n"
+        "\tgmod_LoadedPtr:                    %p\n"
+        "\tgmod_DefaultGlobalsPtr:            %p %lu\n"
+        "\tgmod_DefinedInventoryLimitsPtr:    %p\n"
+        "\tgmod_DefinedSpecialAmmoBonusesPtr: %p %lu\n"
+        "\tgmod_DefinedWeaponAdjustmentsPtr:  %p %lu\n"
+        "\tgmod_DefinedAchievementsPtr:       %p %lu\n",
+        GMod_Defaults.gmod_LoadedPtr,
+        GMod_Defaults.gmod_DefaultGlobalsPtr,
+        GMod_Defaults.gmod_NumDefaultGlobals,
+        GMod_Defaults.gmod_DefinedInventoryLimitsPtr,
+        GMod_Defaults.gmod_DefinedSpecialAmmoBonusesPtr,
+        GMod_Defaults.gmod_NumDefinedSpecialAmmoBonuses,
+        GMod_Defaults.gmod_DefinedWeaponAdjustmentsPtr,
+        GMod_Defaults.gmod_NumDefinedWeaponAdjustments,
+        GMod_Defaults.gmod_DefinedAchievementsPtr,
+        GMod_Defaults.gmod_NumDefinedAchievements
+    );
     gmod_SetModDefaults();
     return TRUE;
 }
