@@ -723,31 +723,35 @@ Plr2_CollectItem:
 .no_collect:
 				rts
 
+; TODO - There is an issue here with collide height when the player stand height is greater than the game default
+
 Plr1_CheckObjectCollide:
+				DEV_INC.w Reserved3
 				move.l	obj_StatPtr_l,a2
 				move.b	Plr1_StoodInTop_b,d0
 				move.b	ShotT_InUpperZone_b(a0),d1
 				eor.b	d0,d1
-				bne		.NotSameZone
+				bne.s	.NotSameZone
 
 				move.w	Plr1_XOff_l,Obj_OldX_w
 				move.w	Plr1_ZOff_l,Obj_OldZ_w
 				move.w	Plr1_Zone_w,d7
 				cmp.w	ObjT_ZoneID_w(a0),d7
-				bne		.NotSameZone
+				bne.s	.NotSameZone
 
 				move.l	Plr1_YOff_l,d7
 				move.l	Plr1_Height_l,d6
 				asr.l	#1,d6
 				add.l	d6,d7
-				asr.l	#7,d7
+				asr.l	#7,d7 ; here?
 				sub.w	4(a0),d7
 				bgt.s	.okpos
+
 				neg.w	d7
 
 .okpos:
 				cmp.w	ODefT_CollideHeight_w(a2),d7
-				bgt		.NotSameZone
+				bgt.s	.NotSameZone
 
 				move.w	(a0),d0
 				move.l	Lvl_ObjectPointsPtr_l,a1
@@ -756,6 +760,7 @@ Plr1_CheckObjectCollide:
 				move.w	ODefT_CollideRadius_w(a2),d2
 				muls	d2,d2
 				jsr		CheckHit
+
 				move.b	hitwall,d0
 				rts
 

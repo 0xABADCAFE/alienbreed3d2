@@ -45,11 +45,39 @@ typedef struct {
 
 static void gmod_HKVNop(GMod_HashKeyValue const * pHKVEntry)
 {
-    printf("Matched 0x%08X [%u]\n", pHKVEntry->hkv_Hash, pHKVEntry->hkv_Value);
+    dprintf("Matched 0x%08X [%u]\n", pHKVEntry->hkv_Hash, pHKVEntry->hkv_Value);
+}
+
+static void gmod_HVKPlayerStandHeight(GMod_HashKeyValue const * pHKVEntry)
+{
+    extern LONG Plr_StandHeight_l;
+    LONG height = pHKVEntry->hkv_Value;
+    if (height < 48) {
+        height = 48;
+    }
+    if (height > 88) {
+        height = 88;
+    }
+    dprintf("\tStand Height: %d\n", height);
+    Plr_StandHeight_l = height << 8;
+}
+
+static void gmod_HVKPlayerCrouchHeight(GMod_HashKeyValue const * pHKVEntry)
+{
+    extern LONG Plr_CrouchHeight_l;
+    LONG height = pHKVEntry->hkv_Value;
+    if (height < 32) {
+        height = 32;
+    }
+    if (height > 48) {
+        height = 48;
+    }
+    dprintf("\tCrouch Height: %d\n", height);
+    Plr_CrouchHeight_l = height << 8;
 }
 
 static GMod_HKVHandlerEntry const GMod_HKVHandlers[] = {
-    { HASH_PLR_STAND_HEIGHT, gmod_HKVNop },
+    { HASH_PLR_STAND_HEIGHT, gmod_HVKPlayerStandHeight },
     { HASH_PLR_CROUCH_HEIGHT, gmod_HKVNop },
     { HASH_PHY_BASE_GRAV_ACCEL, gmod_HKVNop },
     { HASH_PHY_BASE_AIR_RESIST, gmod_HKVNop },
