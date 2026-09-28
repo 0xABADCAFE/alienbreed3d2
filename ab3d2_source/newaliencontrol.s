@@ -17,7 +17,7 @@ ItsAnAlien:
 				rts
 
 .no_enemies:
-				move.w	#-1,ObjT_ZoneID_w(a0)
+				move.w	#NULL_ZONE_ID,ObjT_ZoneID_w(a0)
 				rts
 
 .ok_alive:
@@ -171,7 +171,7 @@ Collectable:
 
 				tst.w	d0
 				beq.s	.NotCollected1
-				move.w	#-1,ObjT_ZoneID_w(a0)
+				move.w	#NULL_ZONE_ID,ObjT_ZoneID_w(a0)
 				sf		ShotT_Worry_b(a0)
 
 .NotCollected1:
@@ -188,7 +188,7 @@ Collectable:
 				beq.s	.NotCollected2
 
 				; todo - is this what is removing the item?
-				move.w	#-1,ObjT_ZoneID_w(a0)
+				move.w	#NULL_ZONE_ID,ObjT_ZoneID_w(a0)
 				sf		ShotT_Worry_b(a0)
 
 .NotCollected2:
@@ -725,6 +725,9 @@ Plr2_CollectItem:
 
 ; TODO - There is an issue here with collide height when the player stand height is greater than the game default
 
+Debug_Collide_w:	dc.w 0
+Debug_Height_w:		dc.w 0
+
 Plr1_CheckObjectCollide:
 				DEV_INC.w Reserved3
 				move.l	obj_StatPtr_l,a2
@@ -739,17 +742,24 @@ Plr1_CheckObjectCollide:
 				cmp.w	ObjT_ZoneID_w(a0),d7
 				bne.s	.NotSameZone
 
-				move.l	Plr1_YOff_l,d7
-				move.l	Plr1_Height_l,d6
-				asr.l	#1,d6
-				add.l	d6,d7
-				asr.l	#7,d7 ; here?
-				sub.w	4(a0),d7
+				; TODO - This is pretty bonkers. We are calculating the player eye level
+				;        as part of the collision detection comparing that to the object's collide hight definition.
+				;        Why is it not just based on the player's basic position?
+
+				move.l	Plr1_YOff_l,d7			; d7.l = Ypos in world (plus bobble) generally negative * 256
+				move.l	Plr1_Height_l,d6		; d6.l = stand (or crouch) height * 256
+				asr.l	#1,d6					; d6.l = height * 128
+				add.l	d6,d7					; d7.l = (Ypos * 256) + (height * 128)
+				asr.l	#7,d7					; d7.w = (Ypos * 2) + height
+				sub.w	4(a0),d7				; d7.w = (Ypos * 2) + height - object Y pos (or z pos?)
 				bgt.s	.okpos
 
 				neg.w	d7
 
 .okpos:
+				move.w	d7,Debug_Collide_w
+				move.w	ODefT_CollideHeight_w(a2),Debug_Height_w
+
 				cmp.w	ODefT_CollideHeight_w(a2),d7
 				bgt.s	.NotSameZone
 
